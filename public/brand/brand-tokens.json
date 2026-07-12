@@ -1,0 +1,33 @@
+{
+  "brand": "Abdullah Properties",
+  "version": "2026-07-12",
+  "colors": {
+    "foundationBlack": "#0C0C0C",
+    "housingOrange": "#FF6B2C",
+    "warmCanvas": "#FBF9F8",
+    "slate": "#444748",
+    "deepTerracotta": "#802900",
+    "white": "#FFFFFF"
+  },
+  "typography": {
+    "display": "Anybody",
+    "body": "Work Sans",
+    "fallback": "ui-sans-serif, system-ui, sans-serif"
+  },
+  "logos": {
+    "primary": "/brand/logo-primary.png",
+    "inverse": "/brand/logo-dark.png",
+    "mark": "/brand/logo-mark.png",
+    "markInverse": "/brand/logo-mark-inverse.png"
+  },
+  "usage": {
+    "minimumClearSpace": "Keep at least the visual width of the orange window clear around the complete logo.",
+    "lightSurface": "Use the primary black and orange logo.",
+    "darkSurface": "Use the inverse white and orange logo.",
+    "prohibited": [
+      "Do not stretch, rotate, crop, outline, recolor, or add effects to the logo.",
+      "Do not place the logo over a busy image without a quiet, high-contrast field.",
+      "Do not publish unverified property facts, rankings, ratings, guarantees, or leadership identities."
+    ]
+  }
+}

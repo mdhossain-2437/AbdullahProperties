@@ -1,48 +1,63 @@
 import type { Metadata, Viewport } from "next";
-import { Anybody, Work_Sans } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-
-const anybody = Anybody({
-  variable: "--font-anybody",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const workSans = Work_Sans({
-  variable: "--font-work-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
+import { JsonLd } from "@/components/seo/json-ld";
+import { SITE_URL, company, verifiedServiceLines } from "@/lib/company-data";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Abdullah Properties — Housing Base Total Solutions",
+    default: "Abdullah Properties | Real Estate & Joint Venture Housing in Joypurhat",
     template: "%s | Abdullah Properties",
   },
-  description:
-    "A clearer way to discover property, development guidance, and Housing Base Total Solutions in Joypurhat.",
-  applicationName: "Abdullah Properties",
-  keywords: ["Abdullah Properties", "Joypurhat real estate", "property development", "Bangladesh property"],
+  description: company.description,
+  applicationName: company.name,
+  authors: [{ name: company.name }],
+  creator: company.name,
+  publisher: company.name,
+  category: "Real estate",
+  keywords: [company.name, company.nameBn, "Joypurhat real estate", "joint venture housing", "land documentation support"],
+  manifest: "/manifest.webmanifest",
+  formatDetection: {
+    telephone: true,
+    email: true,
+    address: true,
+  },
   icons: {
-    icon: "/brand/app-icon.png",
-    shortcut: "/brand/app-icon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Abdullah Properties",
-    description: "Sturdy, visionary, direct property guidance in Joypurhat.",
+    title: "Abdullah Properties | Joypurhat Real Estate & Housing Solutions",
+    description: company.description,
     type: "website",
     locale: "en_BD",
+    siteName: company.name,
+    url: "/",
+    images: [{ url: "/og/home.jpg", width: 1200, height: 630, alt: "Abdullah Properties in Joypurhat" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Abdullah Properties",
-    description: "Housing Base Total Solutions in Joypurhat.",
+    title: "Abdullah Properties | Joypurhat Real Estate & Housing Solutions",
+    description: company.description,
+    images: ["/og/home.jpg"],
   },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -58,8 +73,80 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${anybody.variable} ${workSans.variable}`}>
+    <html lang="en">
       <body>
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": `${SITE_URL}/#organization`,
+                name: company.name,
+                alternateName: company.nameBn,
+                url: SITE_URL,
+                logo: {
+                  "@type": "ImageObject",
+                  url: absoluteUrl("/icon.png"),
+                  width: 512,
+                  height: 512,
+                },
+                email: company.email,
+                telephone: company.phones[0].e164,
+                slogan: company.slogan,
+              },
+              {
+                "@type": "RealEstateAgent",
+                "@id": `${SITE_URL}/#business`,
+                name: company.name,
+                alternateName: company.nameBn,
+                url: SITE_URL,
+                description: company.description,
+                email: company.email,
+                telephone: company.phones[0].e164,
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: `${company.address.line1}, ${company.address.line2}`,
+                  addressLocality: company.address.locality,
+                  addressRegion: company.address.region,
+                  addressCountry: company.address.countryCode,
+                },
+                areaServed: {
+                  "@type": "City",
+                  name: company.address.locality,
+                },
+                openingHoursSpecification: company.hours.days.map((day) => ({
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: day,
+                  opens: company.hours.opens,
+                  closes: company.hours.closes,
+                })),
+                hasOfferCatalog: {
+                  "@type": "OfferCatalog",
+                  name: "Housing and real estate services",
+                  itemListElement: verifiedServiceLines.map((service) => ({
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: service.title,
+                      description: service.summary,
+                    },
+                  })),
+                },
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${SITE_URL}/#website`,
+                url: SITE_URL,
+                name: company.name,
+                alternateName: company.nameBn,
+                description: company.description,
+                inLanguage: "en-BD",
+                publisher: { "@id": `${SITE_URL}/#organization` },
+              },
+            ],
+          }}
+        />
         <a className="skip-link" href="#main-content">Skip to content</a>
         <SiteHeader />
         <div id="main-content" tabIndex={-1}>{children}</div>

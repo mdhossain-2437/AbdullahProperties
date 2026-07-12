@@ -24,6 +24,7 @@ const securityHeaders = {
   "Cross-Origin-Opener-Policy": "same-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
   "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Strict-Transport-Security": "max-age=31536000",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
 } as const;

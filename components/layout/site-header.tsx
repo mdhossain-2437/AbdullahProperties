@@ -18,7 +18,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="site-shell site-header__inner">
-        <BrandLogo />
+        <BrandLogo preload />
         <nav className="desktop-nav" aria-label="Primary navigation">
           {siteNavigation.map((item) => {
             const isCurrent = isPathCurrent(pathname, item.href);

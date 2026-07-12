@@ -26,13 +26,13 @@ export function PropertyExplorer({ initialQuery = "", initialKind = "All" }: Pro
 
   return (
     <div className="property-explorer">
-      <div className="property-toolbar" aria-label="Property filters">
+      <div className="property-toolbar" role="group" aria-label="Property filters">
         <label className="property-search">
           <span className="sr-only">Search properties</span>
           <Search aria-hidden="true" />
           <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by project, place, or type" />
         </label>
-        <div className="filter-chips" aria-label="Filter by property type">
+        <div className="filter-chips" role="group" aria-label="Filter by property type">
           {kinds.map((item) => (
             <Button key={item} type="button" variant={kind === item ? "default" : "outline"} onClick={() => setKind(item)} aria-pressed={kind === item}>
               {item}
@@ -46,7 +46,7 @@ export function PropertyExplorer({ initialQuery = "", initialKind = "All" }: Pro
       </div>
       {matches.length > 0 ? (
         <div className="property-grid">
-          {matches.map((property, index) => <PropertyCard key={property.slug} property={property} priority={index < 2} />)}
+          {matches.map((property, index) => <PropertyCard key={property.slug} property={property} preload={index < 2} />)}
         </div>
       ) : (
         <div className="empty-state" role="status">

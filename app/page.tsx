@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -19,13 +18,17 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "@/features/properties/property-card";
 import { featuredProperties } from "@/features/properties/data";
+import { company, operatingProcess } from "@/lib/company-data";
+import { createMetadata } from "@/lib/seo";
 import { areas, insights, proofPoints, services } from "@/lib/site-data";
 
-export const metadata: Metadata = {
-  title: "Property guidance built around clarity",
+export const metadata = createMetadata({
+  title: "Real Estate & Joint Venture Housing in Joypurhat",
   description:
-    "Discover Abdullah Properties, selected property visual studies, development services, and local insight for Joypurhat.",
-};
+    "Explore Abdullah Properties services for residential development, joint-venture housing, land documentation, planning, handover, and after-sales support in Joypurhat.",
+  path: "/",
+  image: "/og/home.jpg",
+});
 
 const serviceIcons = {
   building: Building2,
@@ -44,14 +47,14 @@ export default function Home() {
               Property decisions carry real weight. We connect local context, clear advice, and delivery thinking so the next move feels considered.
             </p>
             <h1>
-              <span>Discover</span>
+              <span>Property</span>
               <span className="home-hero__title-row">
                 <span className="home-hero__title-image" aria-hidden="true">
-                  <Image src="/properties/joypurhat-residence.jpg" alt="" fill priority sizes="180px" />
+                  <Image src="/properties/joypurhat-residence.jpg" alt="" fill preload sizes="180px" />
                 </span>
-                the best
+                decisions,
               </span>
-              <span>properties</span>
+              <span>made clear.</span>
             </h1>
           </div>
 
@@ -61,13 +64,13 @@ export default function Home() {
               src="/properties/joypurhat-residence.jpg"
               alt="Contemporary Abdullah Properties residential entrance"
               fill
-              priority
+              preload
               sizes="(max-width: 760px) 100vw, 1240px"
             />
             <div className="hero-stage__veil" />
             <div className="hero-search-panel">
-              <span className="eyebrow eyebrow--light">Property discovery / Joypurhat</span>
-              <h2>Looking for a strategic, comfortable place?</h2>
+              <span className="eyebrow eyebrow--light">Housing support / Joypurhat</span>
+              <h2>Looking for a home, land partner, or project route?</h2>
               <form action="/properties" className="hero-search-panel__form" role="search">
                 <label>
                   <span className="sr-only">Search by location or property type</span>
@@ -75,15 +78,15 @@ export default function Home() {
                 </label>
                 <button type="submit" aria-label="Search properties"><Search aria-hidden="true" /></button>
               </form>
-              <div className="hero-search-panel__chips" aria-label="Popular filters">
+              <nav className="hero-search-panel__chips" aria-label="Popular property filters">
                 <Link href="/properties?type=Residential">Residential</Link>
                 <Link href="/properties?type=Commercial">Commercial</Link>
                 <Link href="/properties?type=Mixed-use">Mixed-use</Link>
-              </div>
+              </nav>
             </div>
             <div className="hero-stage__index">
               <span>AP / 01</span>
-              <span>Main Road, Joypurhat</span>
+              <span>Illustrative property study</span>
             </div>
           </Reveal>
         </div>
@@ -100,7 +103,7 @@ export default function Home() {
             <div className="proof-points__title"><span>Our focus</span><span>Built for clear decisions</span></div>
             {proofPoints.map((point) => (
               <div className="proof-point" key={point.value}>
-                <strong>{point.value}<em>+</em></strong>
+                <strong>{point.value}</strong>
                 <span>{point.label}</span>
               </div>
             ))}
@@ -111,7 +114,7 @@ export default function Home() {
       <section className="services-section">
         <div className="site-shell">
           <div className="section-heading-row">
-            <SectionHeading eyebrow="Services / 04" title="One property journey. Four connected disciplines." description="Every service has a clear role, but the decisions work together." />
+            <SectionHeading eyebrow="Services / 06" title="One property journey. Connected support." description="Residential development, joint ventures, documentation, planning, handover, and after-sales each have a clear role." />
             <Button asChild className="brand-button brand-button--outline"><Link href="/services">View all services</Link></Button>
           </div>
           <div className="service-grid">
@@ -133,7 +136,7 @@ export default function Home() {
         <div className="site-shell consult-section__frame">
           <Reveal className="consult-card">
             <div className="consult-card__media">
-              <Image src="/projects/client-studio.jpg" alt="Abdullah Properties client consultation studio" fill sizes="(max-width: 760px) 100vw, 42vw" />
+              <Image src="/projects/client-studio.jpg" alt="Illustrative Abdullah Properties client consultation studio" fill sizes="(max-width: 760px) 100vw, 42vw" />
             </div>
             <div className="consult-card__content">
               <span className="eyebrow">Direct enquiry</span>
@@ -148,11 +151,11 @@ export default function Home() {
       <section className="featured-section">
         <div className="site-shell">
           <div className="section-heading-row section-heading-row--dark">
-            <SectionHeading inverse eyebrow="Selected work / Visual studies" title="Best choice is the one that fits the whole picture." description="These branded studies communicate design and delivery intent. Confirm live inventory and availability directly with the team." />
+            <SectionHeading inverse eyebrow="Selected work / Visual studies" title="Choose what fits the whole picture." description="These branded studies communicate design and delivery intent. Confirm live inventory and availability directly with the team." />
             <Button asChild className="brand-button brand-button--light"><Link href="/properties">Explore all</Link></Button>
           </div>
           <div className="featured-grid">
-            {featuredProperties.map((property, index) => <PropertyCard property={property} key={property.slug} priority={index === 0} />)}
+            {featuredProperties.map((property, index) => <PropertyCard property={property} key={property.slug} preload={index === 0} />)}
           </div>
           <div className="featured-section__footer">
             <span>Sturdy structures</span><span>Visionary direction</span><span>Direct service</span>
@@ -178,15 +181,10 @@ export default function Home() {
 
       <section className="process-section">
         <div className="site-shell process-section__grid">
-          <SectionHeading eyebrow="The process" title="Four clear gates. No mystery in the middle." description="A direct sequence helps every stakeholder understand what is known, what is next, and who owns the decision." />
+          <SectionHeading eyebrow="The working process" title="Five visible steps from inquiry to handover." description="The published operating sequence keeps scope, evidence, decisions, and responsibilities understandable." />
           <ol className="process-list">
-            {[
-              ["01", "Frame", "Clarify the need, users, location, budget boundaries, and definition of success."],
-              ["02", "Verify", "Check the site, documentation, access, constraints, and assumptions that carry risk."],
-              ["03", "Shape", "Compare options and connect design, commercial, programme, and operational thinking."],
-              ["04", "Deliver", "Coordinate the route to handover with visible decisions and accountable follow-through."],
-            ].map(([number, title, copy]) => (
-              <li key={number}><span>{number}</span><h3>{title}</h3><p>{copy}</p></li>
+            {operatingProcess.map((step) => (
+              <li key={step.id}><span>{step.id}</span><h3>{step.title}</h3><p>{step.summary}</p></li>
             ))}
           </ol>
         </div>
@@ -194,7 +192,7 @@ export default function Home() {
 
       <section className="brand-principles">
         <div className="site-shell brand-principles__grid">
-          <div className="brand-principles__mark"><ShieldCheck aria-hidden="true" /><span>Avenue Legacy / AP</span></div>
+          <div className="brand-principles__mark"><ShieldCheck aria-hidden="true" /><span>Housing Base / AP</span></div>
           <div className="brand-principles__words"><span>Sturdy</span><span>Visionary</span><span>Direct</span></div>
           <p>The house frame signals protection. The AP foundation carries the journey. The orange window keeps warmth and opportunity visible.</p>
         </div>
@@ -223,7 +221,7 @@ export default function Home() {
         <div className="site-shell">
           <Reveal className="home-cta__card">
             <div className="home-cta__icon"><Compass aria-hidden="true" /><Sparkles aria-hidden="true" /></div>
-            <span className="eyebrow eyebrow--light">Your next property move</span>
+            <span className="eyebrow eyebrow--light">{company.address.locality} property support</span>
             <h2>Start with a better question.</h2>
             <p>Tell us what you are trying to achieve. We will help organize the next conversation around the decisions that matter.</p>
             <Button asChild className="brand-button brand-button--light"><Link href="/contact">Start a conversation <ArrowRight aria-hidden="true" /></Link></Button>

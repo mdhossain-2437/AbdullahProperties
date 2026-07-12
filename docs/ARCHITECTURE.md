@@ -235,8 +235,12 @@ Default to server-first rendering, explicit domain language, small pure function
 | `/` | Understand the brand and best opportunities | Static | Explore properties |
 | `/properties` | Browse and filter available inventory | Static + client URL filters | View property |
 | `/properties/[slug]` | Assess one property/project | Static params | Request details |
-| `/projects` | Review delivery capability and portfolio | Static | Discuss a project |
-| `/services` | Understand end-to-end services | Static | Book consultation |
-| `/about` | Verify trust, approach, and local commitment | Static | Meet the team / contact |
+| `/projects` | Review a bounded project record and visual studies | Static | Verify project details |
+| `/projects/nirapad-nibas` | Review the consistent published project facts | Static | Request approved records |
+| `/services` | Understand six services and the working process | Static | Plan a consultation |
+| `/about` | Verify approach, local commitment, and leadership-data status | Static | Contact the company |
 | `/insights` | Learn from area and property guidance | Static | Read an article |
-| `/contact` | Start a qualified conversation | Static + progressive form | Send enquiry |
+| `/contact` | Start a qualified conversation | Static + progressive form | Open email or WhatsApp |
+| `/faq` | Get verified operational answers | Static | Contact the company |
+| `/brand-kit` | Download approved brand resources | Static | Download the kit |
+| `/privacy`, `/terms`, `/cookies`, `/property-disclaimer`, `/accessibility` | Review policy and usage boundaries | Static | Contact with questions |

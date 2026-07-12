@@ -1,7 +1,21 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { company } from "@/lib/company-data";
 import { siteNavigation } from "@/lib/site-data";
+
+const supportLinks = [
+  { href: "/faq", label: "FAQ" },
+  { href: "/brand-kit", label: "Brand kit" },
+  { href: "/accessibility", label: "Accessibility" },
+] as const;
+
+const legalLinks = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/cookies", label: "Cookies" },
+  { href: "/property-disclaimer", label: "Property disclaimer" },
+] as const;
 
 export function SiteFooter() {
   return (
@@ -20,15 +34,24 @@ export function SiteFooter() {
           <BrandLogo tone="dark" />
           <nav aria-label="Footer navigation">
             {siteNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+            {supportLinks.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
           </nav>
           <div className="site-footer__note">
             <p>Sturdy. Visionary. Direct.</p>
-            <p>Contact details and enquiry delivery are connected during production onboarding.</p>
+            <address>
+              {company.address.line1}<br />
+              {company.address.line2}, {company.address.country}<br />
+              <a href={company.phones[0].href}>{company.phones[0].display}</a><br />
+              <a href={`mailto:${company.email}`}>{company.email}</a>
+            </address>
+            <p>{company.hours.display}</p>
           </div>
         </div>
         <div className="site-footer__legal">
           <span>© {new Date().getFullYear()} Abdullah Properties</span>
-          <span>Housing Base Total Solutions</span>
+          <nav aria-label="Legal navigation">
+            {legalLinks.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+          </nav>
         </div>
       </div>
     </footer>

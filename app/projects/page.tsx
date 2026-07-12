@@ -1,32 +1,45 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Building2, ClipboardCheck, Layers3 } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
 import { Reveal } from "@/components/motion/reveal";
+import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import { Button } from "@/components/ui/button";
 import { AppImage as Image } from "@/components/ui/app-image";
+import { createMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Projects",
-  description: "See how Abdullah Properties connects brand, planning, delivery, and client experience across the property journey.",
-};
+export const metadata = createMetadata({
+  title: "Projects & Nirapad Nibas in Joypurhat",
+  description:
+    "Review Abdullah Properties' published Nirapad Nibas project location in Dhanmondi, Joypurhat, plus clearly labelled design and delivery studies.",
+  path: "/projects",
+  image: "/og/projects.jpg",
+});
 
 export default function ProjectsPage() {
   return (
     <main>
-      <PageHero eyebrow="Projects & capability" index="03" title="Built work starts with visible decisions." description="A portfolio is more than finished imagery. It shows how identity, planning, delivery, and long-term use remain connected." />
+      <BreadcrumbJsonLd items={[{ name: "Home", path: "/" }, { name: "Projects", path: "/projects" }]} />
+      <PageHero
+        eyebrow="Projects & capability"
+        index="03"
+        title="Project information with evidence boundaries."
+        description="Nirapad Nibas is identified in the supplied company material. Conflicting dimensions and amenity claims are withheld until an approved project schedule is available."
+      />
 
       <section className="content-section">
         <div className="site-shell project-feature">
           <Reveal className="media-panel">
-            <Image src="/projects/housing-base-construction.jpg" alt="Housing Base Total Solution development under construction" fill priority sizes="(max-width: 760px) 100vw, 62vw" />
-            <div className="media-panel__label"><span>Housing Base / Delivery study</span><span>Joypurhat</span></div>
+            <Image src="/projects/housing-base-construction.jpg" alt="Abdullah Properties branded construction delivery visual" fill preload sizes="(max-width: 760px) 100vw, 62vw" />
+            <div className="media-panel__label"><span>Illustrative delivery image</span><span>Not a verified project photograph</span></div>
           </Reveal>
           <Reveal className="editorial-copy" delay={0.08}>
-            <span className="eyebrow">Delivery thinking</span>
-            <h2>Make progress understandable.</h2>
-            <p>Good project communication turns programme, scope, risk, and quality into shared decisions. It helps clients see what is changing and what must stay protected.</p>
-            <Button asChild className="brand-button"><Link href="/contact">Discuss a project <ArrowRight aria-hidden="true" /></Link></Button>
+            <span className="eyebrow">Published project record</span>
+            <h2>Nirapad Nibas</h2>
+            <p><strong>Published location:</strong> Dhanmondi, Joypurhat.</p>
+            <p>
+              The former company website identifies this residential project, but publishes conflicting areas, balcony counts, and other specifications. This site therefore shows only the consistent project name and locality until the owner approves a single project record.
+            </p>
+            <Button asChild className="brand-button"><Link href="/projects/nirapad-nibas">Review the bounded record <ArrowRight aria-hidden="true" /></Link></Button>
           </Reveal>
         </div>
       </section>
@@ -34,9 +47,9 @@ export default function ProjectsPage() {
       <section className="content-section content-section--dark">
         <div className="site-shell project-principles">
           {[
-            { icon: Layers3, number: "01", title: "Connected layers", copy: "Commercial, spatial, technical, and operational decisions are reviewed as one property system." },
-            { icon: ClipboardCheck, number: "02", title: "Visible gates", copy: "Each phase ends with evidence, decisions, owners, and the next useful action." },
-            { icon: Building2, number: "03", title: "Long-term use", copy: "The experience after handover is part of the brief, not somebody else's problem." },
+            { icon: Layers3, number: "01", title: "Connected layers", copy: "Commercial, spatial, technical, documentation, and operating decisions are reviewed as one property system." },
+            { icon: ClipboardCheck, number: "02", title: "Visible gates", copy: "Each phase should end with evidence, decisions, owners, and the next useful action." },
+            { icon: Building2, number: "03", title: "Responsible claims", copy: "Dimensions, approvals, amenities, prices, and availability are published only from an approved current record." },
           ].map((principle, index) => (
             <Reveal className="project-principle" delay={index * 0.06} key={principle.number}>
               <principle.icon aria-hidden="true" />
@@ -49,9 +62,13 @@ export default function ProjectsPage() {
       </section>
 
       <section className="content-section content-section--tint">
+        <div className="site-shell project-study-heading">
+          <div className="editorial-copy"><span className="eyebrow">Brand & delivery studies</span><h2>Visual direction, clearly separated from inventory.</h2><p>These images show presentation and experience concepts. They are not evidence of completed, available, or approved property inventory.</p></div>
+          <Button asChild className="brand-button brand-button--outline"><Link href="/property-disclaimer">Read the property disclaimer</Link></Button>
+        </div>
         <div className="site-shell project-gallery">
-          <div className="media-panel"><Image src="/projects/client-studio.jpg" alt="Abdullah Properties client experience studio" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="media-panel__label"><span>Client experience</span><span>Interior identity</span></div></div>
-          <div className="media-panel"><Image src="/projects/building-signage.jpg" alt="Abdullah Properties building signage" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="media-panel__label"><span>Property presence</span><span>Exterior identity</span></div></div>
+          <div className="media-panel"><Image src="/projects/client-studio.jpg" alt="Illustrative Abdullah Properties client experience studio" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="media-panel__label"><span>Visual study</span><span>Client experience</span></div></div>
+          <div className="media-panel"><Image src="/projects/building-signage.jpg" alt="Illustrative Abdullah Properties building signage" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="media-panel__label"><span>Visual study</span><span>Property identity</span></div></div>
         </div>
       </section>
     </main>

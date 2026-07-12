@@ -1,17 +1,21 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
+import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld";
+import { createMetadata } from "@/lib/seo";
 import { insights } from "@/lib/site-data";
 
-export const metadata: Metadata = {
-  title: "Insights",
-  description: "Practical field notes for land, property development, commercial fit, and clearer real-estate decisions.",
-};
+export const metadata = createMetadata({
+  title: "Property & Land Insights for Joypurhat",
+  description: "Practical Abdullah Properties field notes for land due diligence, development planning, and commercial location decisions in Joypurhat.",
+  path: "/insights",
+  image: "/og/insights.jpg",
+});
 
 export default function InsightsPage() {
   return (
     <main>
+      <BreadcrumbJsonLd items={[{ name: "Home", path: "/" }, { name: "Insights", path: "/insights" }]} />
       <PageHero eyebrow="Field notes" index="06" title="Think clearly before the property carries weight." description="Short, practical perspectives for evaluating land, shaping a development journey, and understanding commercial fit." />
       <section className="content-section">
         <div className="site-shell insight-index">

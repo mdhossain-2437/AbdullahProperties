@@ -18,9 +18,9 @@ export const properties: readonly PropertyRecord[] = [
   {
     slug: "joypurhat-residence",
     title: "Joypurhat Residence",
-    location: "Main Road, Joypurhat",
+    location: "Joypurhat / illustrative study",
     kind: "Residential",
-    status: "Design showcase",
+    status: "Illustrative design study",
     image: "/properties/joypurhat-residence.jpg",
     imageAlt: "Contemporary concrete and glass residential entrance",
     summary: "A calm urban arrival shaped around light, durable materials, and everyday clarity.",
@@ -32,7 +32,7 @@ export const properties: readonly PropertyRecord[] = [
   {
     slug: "city-edge-workplace",
     title: "City Edge Workplace",
-    location: "Sadar, Joypurhat",
+    location: "Joypurhat / illustrative study",
     kind: "Commercial",
     status: "Vision concept",
     image: "/properties/night-district.jpg",
@@ -41,12 +41,12 @@ export const properties: readonly PropertyRecord[] = [
     overview:
       "The concept explores how a commercial property can pair brand presence with functional planning, flexible workplace floors, and an active evening identity.",
     highlights: ["High-visibility identity", "Flexible workplace planning", "After-dark presence"],
-    services: ["Commercial strategy", "Brand integration", "Property management planning"],
+    services: ["Project consultation", "Design coordination", "Delivery planning"],
   },
   {
     slug: "housing-base-development",
     title: "Housing Base Development",
-    location: "Joypurhat",
+    location: "Joypurhat / illustrative study",
     kind: "Mixed-use",
     status: "Delivery study",
     image: "/projects/housing-base-construction.jpg",
@@ -60,7 +60,7 @@ export const properties: readonly PropertyRecord[] = [
   {
     slug: "client-experience-studio",
     title: "Client Experience Studio",
-    location: "Joypurhat",
+    location: "Joypurhat / illustrative study",
     kind: "Experience",
     status: "Brand environment",
     image: "/projects/client-studio.jpg",

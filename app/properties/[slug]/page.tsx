@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import { Button } from "@/components/ui/button";
 import { AppImage as Image } from "@/components/ui/app-image";
 import { getProperty, properties } from "@/features/properties/data";
+import { createMetadata } from "@/lib/seo";
 
 type PropertyDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -18,8 +20,19 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
   const { slug } = await params;
   const property = getProperty(slug);
   return property
-    ? { title: property.title, description: property.summary }
-    : { title: "Property not found" };
+    ? createMetadata({
+        title: `${property.title} — Illustrative Property Study`,
+        description: property.summary,
+        path: `/properties/${property.slug}`,
+        image: "/og/properties.jpg",
+        noIndex: true,
+      })
+    : createMetadata({
+        title: "Property study not found",
+        description: "This property study does not exist.",
+        path: `/properties/${slug}`,
+        noIndex: true,
+      });
 }
 
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
@@ -29,10 +42,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
   return (
     <main>
+      <BreadcrumbJsonLd items={[{ name: "Home", path: "/" }, { name: "Properties", path: "/properties" }, { name: property.title, path: `/properties/${property.slug}` }]} />
       <section className="detail-hero">
         <div className="site-shell">
           <div className="detail-hero__media">
-            <Image src={property.image} alt={property.imageAlt} fill priority sizes="(max-width: 760px) 100vw, 1280px" />
+            <Image src={property.image} alt={property.imageAlt} fill preload sizes="(max-width: 760px) 100vw, 1280px" />
             <div className="detail-hero__overlay" />
             <div className="detail-hero__content">
               <div>

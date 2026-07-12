@@ -6,14 +6,14 @@ import type { PropertyRecord } from "@/features/properties/data";
 
 type PropertyCardProps = {
   property: PropertyRecord;
-  priority?: boolean;
+  preload?: boolean;
 };
 
-export function PropertyCard({ property, priority = false }: PropertyCardProps) {
+export function PropertyCard({ property, preload = false }: PropertyCardProps) {
   return (
     <article className="property-card">
       <Link className="property-card__media" href={`/properties/${property.slug}`} aria-label={`View ${property.title}`}>
-        <Image src={property.image} alt={property.imageAlt} fill sizes="(max-width: 760px) 100vw, 33vw" priority={priority} />
+        <Image src={property.image} alt={property.imageAlt} fill sizes="(max-width: 760px) 100vw, 33vw" preload={preload} />
         <Badge className="property-card__status">{property.status}</Badge>
         <span className="property-card__arrow"><ArrowUpRight aria-hidden="true" /></span>
       </Link>

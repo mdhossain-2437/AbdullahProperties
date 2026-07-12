@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Mail, MessageCircle, RotateCcw } from "lucide-react";
 import { z } from "zod";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { company } from "@/lib/company-data";
 
 const emailAddressSchema = z.string().email();
 
@@ -45,6 +46,24 @@ export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
     reset();
   }
 
+  const preparedMessage = prepared
+    ? [
+        "Abdullah Properties enquiry",
+        "",
+        `Name: ${prepared.name}`,
+        `Preferred contact: ${prepared.contact}`,
+        `Interest: ${prepared.interest}`,
+        "",
+        prepared.message,
+      ].join("\n")
+    : "";
+  const mailtoHref = prepared
+    ? `mailto:${company.email}?subject=${encodeURIComponent(`Property enquiry: ${prepared.interest}`)}&body=${encodeURIComponent(preparedMessage)}`
+    : undefined;
+  const whatsappHref = prepared
+    ? `${company.whatsapp}?text=${encodeURIComponent(preparedMessage)}`
+    : undefined;
+
   return (
     <div className="enquiry-form-wrap">
       {prepared ? (
@@ -52,8 +71,13 @@ export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
           <CheckCircle2 aria-hidden="true" />
           <AlertTitle>Your enquiry summary is ready.</AlertTitle>
           <AlertDescription>
-            Thanks, {prepared.name}. This preview validates the consultation flow without transmitting personal data. Connect the approved CRM or email provider before production launch.
+            Thanks, {prepared.name}. Review the prepared summary, then choose a channel. Nothing is transmitted until you confirm send inside your email or WhatsApp app.
           </AlertDescription>
+          <div className="enquiry-success__actions">
+            <Button asChild className="brand-button"><a href={mailtoHref}><Mail aria-hidden="true" /> Open email</a></Button>
+            <Button asChild className="brand-button brand-button--outline"><a href={whatsappHref} target="_blank" rel="noreferrer"><MessageCircle aria-hidden="true" /> Open WhatsApp</a></Button>
+            <Button type="button" variant="ghost" onClick={() => setPrepared(null)}><RotateCcw aria-hidden="true" /> Prepare another</Button>
+          </div>
         </Alert>
       ) : null}
       <form className="enquiry-form" onSubmit={handleSubmit(prepareEnquiry)} noValidate>
@@ -78,7 +102,7 @@ export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
           {errors.message ? <p id="message-error" className="field-error" role="alert">{errors.message.message}</p> : null}
         </div>
         <div className="form-submit-row">
-          <p>No personal data leaves this preview.</p>
+          <p>Preparation stays local. You review before opening an external sending app.</p>
           <Button className="brand-button" type="submit" disabled={isSubmitting}>Prepare enquiry</Button>
         </div>
       </form>

@@ -10,54 +10,54 @@ export const services = [
   {
     id: "01",
     icon: "building",
-    title: "Property sales & leasing",
+    title: "Residential development",
     summary:
-      "A clear, locally informed route from first conversation to the right residential or commercial opportunity.",
+      "Planning and development support for residential flats and housing projects in Joypurhat.",
   },
   {
     id: "02",
     icon: "landmark",
-    title: "Development advisory",
+    title: "Joint-venture housing",
     summary:
-      "Site evaluation, positioning, feasibility thinking, and a practical roadmap before capital is committed.",
+      "A structured partnership route for landowners, with scope and commitments confirmed in writing.",
   },
   {
     id: "03",
     icon: "ruler",
-    title: "Design & delivery",
+    title: "Land & documentation",
     summary:
-      "One accountable team connecting the brief, the built environment, and the details that protect long-term value.",
+      "Coordination for land review, document checks, mutation, registration, and professional legal follow-through.",
   },
   {
     id: "04",
     icon: "key",
-    title: "Property management",
+    title: "Planning to after-sales",
     summary:
-      "Ongoing guidance for occupied assets, tenant experience, maintenance priorities, and operational clarity.",
+      "Project consultation, design coordination, delivery updates, handover, and structured follow-up.",
   },
 ] as const;
 
 export const proofPoints = [
-  { value: "JOY", label: "Joypurhat-first market focus" },
-  { value: "360°", label: "Property guidance, end to end" },
-  { value: "01", label: "One accountable relationship" },
+  { value: "JOY", label: "Joypurhat-first local focus" },
+  { value: "06", label: "Connected service lines" },
+  { value: "01", label: "One clear working process" },
 ] as const;
 
 export const areas = [
   {
-    name: "Joypurhat Sadar",
-    note: "Connected urban living, workplace access, and established daily services.",
-    index: "24.59°N",
+    name: "Joypurhat",
+    note: "The company’s stated operating focus for residential development, joint ventures, and property support.",
+    index: "SERVICE AREA / 01",
   },
   {
-    name: "Main Road corridor",
-    note: "High-visibility commercial potential shaped by access and passing movement.",
-    index: "CITY / 01",
+    name: "Dhanmondi, Joypurhat",
+    note: "The published location of Nirapad Nibas. Specifications and current availability require direct confirmation.",
+    index: "PROJECT AREA / 02",
   },
   {
-    name: "Panchbibi",
-    note: "A growing local context for measured residential and mixed-use opportunity.",
-    index: "NORTH / 02",
+    name: "Purbo Bazar",
+    note: "The published office location on the 2nd Floor of Pouro Market in Joypurhat.",
+    index: "OFFICE / 03",
   },
 ] as const;
 
@@ -67,6 +67,8 @@ export type Insight = {
   title: string;
   dek: string;
   readTime: string;
+  publishedAt: string;
+  updatedAt: string;
   sections: ReadonlyArray<{ heading: string; body: string }>;
 };
 
@@ -77,6 +79,8 @@ export const insights: readonly Insight[] = [
     title: "How to evaluate land with more clarity",
     dek: "A practical starting framework for access, documentation, context, and long-term usability.",
     readTime: "5 min read",
+    publishedAt: "2026-07-12",
+    updatedAt: "2026-07-12",
     sections: [
       {
         heading: "Start with the intended use",
@@ -98,6 +102,8 @@ export const insights: readonly Insight[] = [
     title: "From plot to handover: one connected journey",
     dek: "Why clear decision gates reduce uncertainty across planning, design, delivery, and occupancy.",
     readTime: "6 min read",
+    publishedAt: "2026-07-12",
+    updatedAt: "2026-07-12",
     sections: [
       {
         heading: "Frame the brief",
@@ -119,6 +125,8 @@ export const insights: readonly Insight[] = [
     title: "What makes a commercial location fit",
     dek: "Look beyond visibility to customer movement, servicing, flexibility, and the economics of daily operation.",
     readTime: "4 min read",
+    publishedAt: "2026-07-12",
+    updatedAt: "2026-07-12",
     sections: [
       {
         heading: "Match movement to the business",
