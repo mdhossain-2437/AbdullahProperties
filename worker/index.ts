@@ -21,6 +21,9 @@ const securityHeaders = {
   "X-Frame-Options": "DENY",
 } as const;
 
+const brandKitPublicPath = "/brand/abdullah-properties-brand-kit.zip";
+const brandKitAssetPath = "/downloads/abdullah-properties-brand-kit-v1.zip";
+
 function withSecurityHeaders(response: Response) {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(securityHeaders)) {
@@ -37,6 +40,42 @@ function withSecurityHeaders(response: Response) {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === brandKitPublicPath) {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        return withSecurityHeaders(new Response("Method not allowed", {
+          status: 405,
+          headers: { Allow: "GET, HEAD", "Cache-Control": "no-store" },
+        }));
+      }
+
+      const assetUrl = new URL(brandKitAssetPath, request.url);
+      const assetResponse = await env.ASSETS.fetch(new Request(assetUrl, {
+        method: request.method,
+        headers: request.headers,
+      }));
+      if (!assetResponse.ok) {
+        return withSecurityHeaders(new Response("Brand kit unavailable", {
+          status: 404,
+          headers: {
+            "Cache-Control": "no-store",
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; sandbox",
+            "Content-Type": "text/plain; charset=utf-8",
+          },
+        }));
+      }
+
+      const headers = new Headers(assetResponse.headers);
+      headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+      headers.set("Content-Disposition", 'attachment; filename="abdullah-properties-brand-kit.zip"');
+      headers.set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; sandbox");
+      headers.set("Content-Type", "application/zip");
+
+      return withSecurityHeaders(new Response(request.method === "HEAD" ? null : assetResponse.body, {
+        status: 200,
+        headers,
+      }));
+    }
 
     if (url.pathname === "/_vinext/image") {
       return withSecurityHeaders(new Response("Not found", {

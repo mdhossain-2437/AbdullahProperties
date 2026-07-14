@@ -1,40 +1,6 @@
-import { access, cp, mkdir, rm, writeFile } from "node:fs/promises";
+import { access, cp, mkdir, rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { Plugin } from "vite";
-
-const STATIC_ASSET_HEADERS = `# Security and cache policy for assets served before the application worker.
-/*
-  Cross-Origin-Opener-Policy: same-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Referrer-Policy: strict-origin-when-cross-origin
-  Strict-Transport-Security: max-age=31536000
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-
-/assets/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/fonts/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/brand/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-
-/og/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-
-/projects/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-
-/properties/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-
-/social/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-
-/brand/abdullah-properties-brand-kit.zip
-  Content-Disposition: attachment; filename="abdullah-properties-brand-kit.zip"
-`;
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -75,11 +41,6 @@ export function sites(): Plugin {
         });
       }
 
-      await writeFile(
-        resolve(root, "dist", "client", "_headers"),
-        STATIC_ASSET_HEADERS,
-        "utf8",
-      );
     },
   };
 }

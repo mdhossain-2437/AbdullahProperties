@@ -4,11 +4,12 @@ import test from "node:test";
 
 const templateRoot = new URL("../", import.meta.url);
 const siteUrl = "https://abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site";
+const brandKitPublicPath = "/brand/abdullah-properties-brand-kit.zip";
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
 const workerPromise = import(workerUrl.href).then(({ default: worker }) => worker);
 
-async function render(pathname = "/") {
+async function render(pathname = "/", assetFetch = async () => new Response("Not found", { status: 404 })) {
   const worker = await workerPromise;
 
   return worker.fetch(
@@ -17,7 +18,7 @@ async function render(pathname = "/") {
     }),
     {
       ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
+        fetch: assetFetch,
       },
     },
     {
@@ -277,7 +278,7 @@ test("ships transparent logos, correct icon sizes, social previews, and a comple
     assert.deepEqual(size, { width: 1200, height: 630 });
   }
 
-  const zip = await readFile(new URL("../public/brand/abdullah-properties-brand-kit.zip", import.meta.url));
+  const zip = await readFile(new URL("../public/downloads/abdullah-properties-brand-kit-v1.zip", import.meta.url));
   assert.equal(zip.subarray(0, 2).toString("ascii"), "PK");
   await access(new URL("../public/fonts/anybody-latin.woff2", import.meta.url));
   await access(new URL("../public/fonts/work-sans-latin.woff2", import.meta.url));
@@ -331,21 +332,35 @@ test("disables the unused image transformation surface with a strict response po
   assert.doesNotMatch(contentSecurityPolicy, /unsafe-inline/);
 });
 
-test("packages hosting metadata, static header policy, and security disclosure", async () => {
-  const [sourceHosting, stagedHosting, staticHeaders, securityDisclosure] = await Promise.all([
+test("serves the public brand bundle through a hardened download boundary", async () => {
+  const zipFixture = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+  const response = await render(brandKitPublicPath, async (request) => {
+    assert.equal(new URL(request.url).pathname, "/downloads/abdullah-properties-brand-kit-v1.zip");
+    return new Response(zipFixture, { status: 200, headers: { "Content-Type": "application/zip" } });
+  });
+  const contentSecurityPolicy = response.headers.get("content-security-policy") ?? "";
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("content-disposition"), 'attachment; filename="abdullah-properties-brand-kit.zip"');
+  assert.equal(response.headers.get("cache-control"), "public, max-age=86400, stale-while-revalidate=604800");
+  assert.equal(response.headers.get("content-type"), "application/zip");
+  assert.match(contentSecurityPolicy, /default-src 'none'/);
+  assert.doesNotMatch(contentSecurityPolicy, /unsafe-inline/);
+  assert.equal(Buffer.from(await response.arrayBuffer()).subarray(0, 2).toString("ascii"), "PK");
+});
+
+test("packages hosting metadata, deployable assets, and security disclosure", async () => {
+  const [sourceHosting, stagedHosting, securityDisclosure] = await Promise.all([
     readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
     readFile(new URL("../dist/.openai/hosting.json", import.meta.url), "utf8"),
-    readFile(new URL("../dist/client/_headers", import.meta.url), "utf8"),
     readFile(new URL("../dist/client/.well-known/security.txt", import.meta.url), "utf8"),
   ]);
 
   assert.deepEqual(JSON.parse(stagedHosting), JSON.parse(sourceHosting));
   await access(new URL("../dist/server/index.js", import.meta.url));
   await access(new URL("../dist/client/assets", import.meta.url));
+  await access(new URL("../dist/client/downloads/abdullah-properties-brand-kit-v1.zip", import.meta.url));
   await access(new URL("../dist/.openai/drizzle/meta/_journal.json", import.meta.url));
-  assert.match(staticHeaders, /\/assets\/\*[\s\S]*max-age=31536000, immutable/);
-  assert.match(staticHeaders, /X-Content-Type-Options: nosniff/);
-  assert.match(staticHeaders, /Content-Disposition: attachment/);
   assert.match(securityDisclosure, /Contact: mailto:abdullahproperties\.24@gmail\.com/);
   assert.match(securityDisclosure, /Preferred-Languages: en, bn/);
 });

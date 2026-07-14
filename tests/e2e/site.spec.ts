@@ -122,6 +122,17 @@ test("enquiry validation and explicit channel handoff work without transmitting 
   await expect(page.getByRole("button", { name: "Prepare enquiry" })).toBeVisible();
 });
 
+test("brand kit download returns the packaged ZIP with enforced headers", async ({ request }) => {
+  const response = await request.get("/brand/abdullah-properties-brand-kit.zip");
+  const body = await response.body();
+
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toBe("application/zip");
+  expect(response.headers()["content-disposition"]).toBe('attachment; filename="abdullah-properties-brand-kit.zip"');
+  expect(response.headers()["cache-control"]).toBe("public, max-age=86400, stale-while-revalidate=604800");
+  expect(body.subarray(0, 2).toString("ascii")).toBe("PK");
+});
+
 for (const route of ["/", "/properties", "/about", "/contact", "/faq"] as const) {
   test(`${route} has no automated WCAG A/AA violations`, async ({ page }) => {
     await page.goto(route, { waitUntil: "networkidle" });
