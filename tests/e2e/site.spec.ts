@@ -8,6 +8,12 @@ const publicRoutes = [
   "/projects",
   "/projects/nirapad-nibas",
   "/services",
+  "/services/residential-development",
+  "/buyers",
+  "/landowners",
+  "/process",
+  "/area-guides",
+  "/area-guides/joypurhat-property-decisions",
   "/about",
   "/insights",
   "/insights/evaluate-land-with-clarity",
@@ -133,7 +139,11 @@ test("brand kit download returns the packaged ZIP with enforced headers", async 
   expect(body.subarray(0, 2).toString("ascii")).toBe("PK");
 });
 
-for (const route of ["/", "/properties", "/about", "/contact", "/faq"] as const) {
+for (const route of [
+  "/", "/properties", "/properties/joypurhat-residence", "/projects/nirapad-nibas", "/services/residential-development",
+  "/about", "/contact", "/faq", "/buyers", "/landowners", "/process", "/area-guides",
+  "/area-guides/joypurhat-property-decisions", "/insights/evaluate-land-with-clarity",
+] as const) {
   test(`${route} has no automated WCAG A/AA violations`, async ({ page }) => {
     await page.goto(route, { waitUntil: "networkidle" });
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
@@ -146,6 +156,28 @@ for (const route of ["/", "/properties", "/about", "/contact", "/faq"] as const)
     expect(summary, `${route} accessibility violations`).toEqual([]);
   });
 }
+
+test("new creative journeys remain mobile-safe at the narrow supported viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+  for (const route of ["/", "/buyers", "/landowners", "/process", "/area-guides/purbo-bazar-office-visit", "/services/land-documentation-support"] as const) {
+    await page.goto(route, { waitUntil: "networkidle" });
+    await expect(page.locator("h1")).toHaveCount(1);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+    expect(overflow, `${route} should not overflow at 320px`).toBe(false);
+  }
+});
+
+test("the CMS is noindexed and fails closed without configured allowlists", async ({ page }) => {
+  await page.setExtraHTTPHeaders({ "oai-authenticated-user-email": "unapproved@example.com" });
+  const response = await page.goto("/studio", { waitUntil: "networkidle" });
+
+  expect(response?.status()).toBe(200);
+  expect(response?.headers()["cache-control"]).toBe("private, no-store");
+  expect(response?.headers()["x-robots-tag"]).toBe("noindex, nofollow, noarchive");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(/allowlists are not configured|not an approved editor or owner/i);
+  await expect(page.getByRole("link", { name: "New entry" })).toHaveCount(0);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/i);
+});
 
 test("unknown routes are a noindex 404 and reduced motion is honored", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });

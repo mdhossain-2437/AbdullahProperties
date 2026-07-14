@@ -63,7 +63,7 @@ export default function NirapadNibasPage() {
 
       <section className="detail-cta">
         <div className="site-shell detail-cta__inner">
-          <div><span className="eyebrow eyebrow--light">Direct verification</span><h2>Ask for the current approved project record.</h2></div>
+          <div><span className="eyebrow">Direct verification</span><h2>Ask for the current approved project record.</h2></div>
           <Button asChild className="brand-button brand-button--light"><Link href="/contact?interest=Nirapad%20Nibas">Contact Abdullah Properties <ArrowRight aria-hidden="true" /></Link></Button>
         </div>
       </section>

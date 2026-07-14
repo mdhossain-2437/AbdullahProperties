@@ -24,10 +24,13 @@ const securityHeaders = {
 const brandKitPublicPath = "/brand/abdullah-properties-brand-kit.zip";
 const brandKitAssetPath = "/downloads/abdullah-properties-brand-kit-v1.zip";
 
-function withSecurityHeaders(response: Response) {
+function withSecurityHeaders(response: Response, overrides: Readonly<Record<string, string>> = {}) {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(securityHeaders)) {
-    if (!headers.has(name)) headers.set(name, value);
+    headers.set(name, value);
+  }
+  for (const [name, value] of Object.entries(overrides)) {
+    headers.set(name, value);
   }
 
   return new Response(response.body, {
@@ -59,22 +62,20 @@ const worker = {
           status: 404,
           headers: {
             "Cache-Control": "no-store",
-            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; sandbox",
             "Content-Type": "text/plain; charset=utf-8",
           },
-        }));
+        }), { "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; sandbox" });
       }
 
       const headers = new Headers(assetResponse.headers);
       headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
       headers.set("Content-Disposition", 'attachment; filename="abdullah-properties-brand-kit.zip"');
-      headers.set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; sandbox");
       headers.set("Content-Type", "application/zip");
 
       return withSecurityHeaders(new Response(request.method === "HEAD" ? null : assetResponse.body, {
         status: 200,
         headers,
-      }));
+      }), { "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; sandbox" });
     }
 
     if (url.pathname === "/_vinext/image") {
@@ -82,13 +83,24 @@ const worker = {
         status: 404,
         headers: {
           "Cache-Control": "no-store",
-          "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; sandbox",
           "Content-Type": "text/plain; charset=utf-8",
         },
-      }));
+      }), { "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; sandbox" });
     }
 
-    return withSecurityHeaders(await handler.fetch(request, env, ctx));
+    const response = withSecurityHeaders(await handler.fetch(request, env, ctx));
+    if (url.pathname === "/studio" || url.pathname.startsWith("/studio/")) {
+      const headers = new Headers(response.headers);
+      headers.set("Cache-Control", "private, no-store");
+      headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
+    }
+
+    return response;
   },
 };
 

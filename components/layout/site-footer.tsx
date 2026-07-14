@@ -5,6 +5,10 @@ import { company } from "@/lib/company-data";
 import { siteNavigation } from "@/lib/site-data";
 
 const supportLinks = [
+  { href: "/buyers", label: "Buyer journey" },
+  { href: "/landowners", label: "Landowner journey" },
+  { href: "/area-guides", label: "Area guides" },
+  { href: "/insights", label: "Insights" },
   { href: "/faq", label: "FAQ" },
   { href: "/brand-kit", label: "Brand kit" },
   { href: "/accessibility", label: "Accessibility" },

@@ -11,7 +11,7 @@
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run build && npm run test:artifacts",
-    "test:artifacts": "node --test tests/rendered-html.test.mjs tests/performance-budget.test.mjs",
+    "test:artifacts": "node --test tests/cms-workflow.test.mjs tests/rendered-html.test.mjs tests/performance-budget.test.mjs",
     "test:e2e": "playwright test",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "typecheck": "tsc --noEmit",

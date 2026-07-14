@@ -2,8 +2,8 @@ export const siteNavigation = [
   { href: "/properties", label: "Properties" },
   { href: "/projects", label: "Projects" },
   { href: "/services", label: "Services" },
+  { href: "/process", label: "Process" },
   { href: "/about", label: "About" },
-  { href: "/insights", label: "Insights" },
 ] as const;
 
 export const services = [

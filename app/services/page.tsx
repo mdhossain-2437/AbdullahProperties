@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { companyFaqs, operatingProcess, verifiedServiceLines } from "@/lib/company-data";
+import { serviceDetails } from "@/lib/experience-data";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -49,13 +50,13 @@ export default function ServicesPage() {
 
       <section className="content-section">
         <div className="site-shell service-suite">
-          {verifiedServiceLines.map((service, index) => {
+          {serviceDetails.map((service, index) => {
             const Icon = serviceIcons[index];
             return (
               <article className="service-suite__item" key={service.id}>
                 <div className="service-suite__index"><span>{service.id}</span><Icon aria-hidden="true" /></div>
                 <div><h2>{service.title}</h2><p>{service.summary}</p></div>
-                <Link href={`/contact?interest=${encodeURIComponent(service.title)}`}>Discuss this service <ArrowRight aria-hidden="true" /></Link>
+                <Link href={`/services/${service.slug}`}>Explore service <ArrowRight aria-hidden="true" /></Link>
               </article>
             );
           })}
@@ -100,7 +101,7 @@ export default function ServicesPage() {
 
       <section className="detail-cta">
         <div className="site-shell detail-cta__inner">
-          <div><span className="eyebrow eyebrow--light">{verifiedServiceLines.length} connected service lines</span><h2>Frame the right service together.</h2></div>
+          <div><span className="eyebrow">{verifiedServiceLines.length} connected service lines</span><h2>Frame the right service together.</h2></div>
           <Button asChild className="brand-button brand-button--light"><Link href="/contact">Plan a consultation <ArrowRight aria-hidden="true" /></Link></Button>
         </div>
       </section>

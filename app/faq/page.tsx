@@ -5,7 +5,8 @@ import { PageHero } from "@/components/layout/page-hero";
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
-import { company, companyFaqs, contentVerification } from "@/lib/company-data";
+import { listPublicFaqs } from "@/features/cms/public-content";
+import { company, contentVerification } from "@/lib/company-data";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createMetadata({
@@ -16,7 +17,9 @@ export const metadata: Metadata = createMetadata({
   image: "/og/faq.jpg",
 });
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const faqs = await listPublicFaqs();
+
   return (
     <main className="faq-page">
       <BreadcrumbJsonLd
@@ -29,7 +32,7 @@ export default function FaqPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          mainEntity: companyFaqs.map((faq) => ({
+          mainEntity: faqs.map((faq) => ({
             "@type": "Question",
             name: faq.question,
             acceptedAnswer: {
@@ -65,15 +68,15 @@ export default function FaqPage() {
           </aside>
 
           <div className="faq-page__list">
-            {companyFaqs.map((faq, index) => (
-              <details className="faq-page__item" key={faq.question} open={index === 0}>
+            {faqs.map((faq, index) => (
+              <details className="faq-page__item" key={faq.slug} open={index === 0}>
                 <summary>
                   <span className="faq-page__index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                   <span className="faq-page__question">{faq.question}</span>
                   <span className="faq-page__toggle" aria-hidden="true">+</span>
                 </summary>
                 <div className="faq-page__answer">
-                  <p>{faq.answer}</p>
+                  {faq.answer.split("\n\n").map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
               </details>
             ))}

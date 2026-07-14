@@ -3,6 +3,7 @@ import "./globals.css";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { JsonLd } from "@/components/seo/json-ld";
+import { ScrollProgress } from "@/components/motion/scroll-progress";
 import { SITE_URL, company, verifiedServiceLines } from "@/lib/company-data";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -64,6 +65,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <ScrollProgress />
         <JsonLd
           data={{
             "@context": "https://schema.org",

@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import { createMetadata } from "@/lib/seo";
-import { insights } from "@/lib/site-data";
+import { listPublicInsights } from "@/features/cms/public-content";
 
 export const metadata = createMetadata({
   title: "Property & Land Insights for Joypurhat",
@@ -12,7 +12,8 @@ export const metadata = createMetadata({
   image: "/og/insights.jpg",
 });
 
-export default function InsightsPage() {
+export default async function InsightsPage() {
+  const insights = await listPublicInsights();
   return (
     <main>
       <BreadcrumbJsonLd items={[{ name: "Home", path: "/" }, { name: "Insights", path: "/insights" }]} />

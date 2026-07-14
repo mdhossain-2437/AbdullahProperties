@@ -9,17 +9,19 @@ const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
 const workerPromise = import(workerUrl.href).then(({ default: worker }) => worker);
 
-async function render(pathname = "/", assetFetch = async () => new Response("Not found", { status: 404 })) {
+async function render(pathname = "/", assetFetch = async () => new Response("Not found", { status: 404 }), options = {}) {
   const worker = await workerPromise;
+  const requestHeaders = new Headers({ accept: "text/html", ...(options.headers ?? {}) });
 
   return worker.fetch(
     new Request(`http://localhost${pathname}`, {
-      headers: { accept: "text/html" },
+      headers: requestHeaders,
     }),
     {
       ASSETS: {
         fetch: assetFetch,
       },
+      ...(options.bindings ?? {}),
     },
     {
       waitUntil() {},
@@ -100,6 +102,17 @@ test("server-renders every public route with unique SEO metadata", async () => {
     ["/projects", /Nirapad Nibas/],
     ["/projects/nirapad-nibas", /Name and locality are consistent/],
     ["/services", /Six services around one clear housing journey/],
+    ["/services/residential-development", /Good scope begins with better questions/],
+    ["/services/joint-venture-housing", /Joint-venture housing/],
+    ["/services/land-documentation-support", /Land &amp; documentation support|Land & documentation support/],
+    ["/services/project-consultation", /Project consultation/],
+    ["/services/design-project-planning", /Design &amp; project planning|Design & project planning/],
+    ["/services/handover-after-sales", /Handover &amp; after-sales|Handover & after-sales/],
+    ["/buyers", /Make the property earn your confidence/],
+    ["/landowners", /Build the agreement before the building/],
+    ["/process", /One visible route through a complex decision/],
+    ["/area-guides", /Read the place before the property/],
+    ["/area-guides/joypurhat-property-decisions", /A practical lens for property decisions in Joypurhat/],
     ["/about", /Leadership details without invented identities/],
     ["/insights", /Think clearly before the property carries weight/],
     ["/insights/evaluate-land-with-clarity", /How to evaluate land with more clarity/],
@@ -203,7 +216,7 @@ test("publishes crawl controls, sitemap, manifest, and branded discovery assets"
 
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
-  for (const path of ["/about", "/services", "/projects/nirapad-nibas", "/faq", "/brand-kit", "/privacy"]) {
+  for (const path of ["/about", "/services", "/services/residential-development", "/buyers", "/landowners", "/process", "/area-guides/joypurhat-property-decisions", "/projects/nirapad-nibas", "/faq", "/brand-kit", "/privacy"]) {
     assert.ok(sitemap.includes(`${siteUrl}${path}`), `sitemap should include ${path}`);
   }
   assert.doesNotMatch(sitemap, /<loc>[^<]*\?|properties\/joypurhat-residence/);
@@ -218,6 +231,52 @@ test("publishes crawl controls, sitemap, manifest, and branded discovery assets"
   assert.match(home, new RegExp(`href="${siteUrl.replaceAll(".", "\\.")}\/manifest\\.webmanifest"`));
   assert.match(home, new RegExp(`href="${siteUrl.replaceAll(".", "\\.")}\/favicon\\.ico`));
   assert.match(home, new RegExp(`href="${siteUrl.replaceAll(".", "\\.")}\/apple-icon\\.png"`));
+});
+
+test("keeps the CMS authenticated, allowlisted, durable, noindexed, and fail-closed", async () => {
+  const anonymous = await render("/studio");
+  assert.equal(anonymous.status, 307);
+  assert.match(anonymous.headers.get("location") ?? "", /\/signin-with-chatgpt\?return_to=/);
+  assert.equal(anonymous.headers.get("cache-control"), "private, no-store");
+  assert.equal(anonymous.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
+
+  const denied = await render("/studio", undefined, {
+    headers: { "oai-authenticated-user-email": "unapproved@example.com" },
+    bindings: { CMS_ALLOWED_EMAILS: "owner@example.com" },
+  });
+  assert.equal(denied.status, 200);
+  const deniedHtml = await denied.text();
+  assert.match(deniedHtml, /not an approved editor|allowlists? are not configured|Loading protected content/);
+  assert.doesNotMatch(deniedHtml, /Create a blank draft|Import curated content|Structured entries/);
+  assert.ok(containsRobotsNoIndex(deniedHtml));
+
+  const [hosting, migration, schema, authSource, actionSource, workflowSource, publicContentSource, robotsResponse] = await Promise.all([
+    readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
+    readFile(new URL("../drizzle/0000_many_living_tribunal.sql", import.meta.url), "utf8"),
+    readFile(new URL("../db/schema.ts", import.meta.url), "utf8"),
+    readFile(new URL("../features/cms/auth.ts", import.meta.url), "utf8"),
+    readFile(new URL("../features/cms/actions.ts", import.meta.url), "utf8"),
+    readFile(new URL("../features/cms/workflow.ts", import.meta.url), "utf8"),
+    readFile(new URL("../features/cms/public-content.ts", import.meta.url), "utf8"),
+    render("/robots.txt").then((response) => response.text()),
+  ]);
+  assert.equal(JSON.parse(hosting).d1, "DB");
+  assert.match(migration, /CREATE TABLE `content_entries`/);
+  assert.match(migration, /CREATE TABLE `content_revisions`/);
+  assert.match(migration, /CREATE TABLE `audit_events`/);
+  assert.match(migration, /content_entries_type_slug_unique/);
+  assert.match(migration, /content_revisions_entry_version_unique/);
+  assert.match(schema, /verification/);
+  assert.match(schema, /version/);
+  assert.match(authSource, /CMS_OWNER_EMAILS/);
+  assert.match(actionSource, /validateCmsSubmission\(actor\.role/);
+  assert.match(actionSource, /validateCmsTransition\(actor\.role/);
+  assert.match(workflowSource, /verification === "owner_approved" && role !== "owner"/);
+  assert.match(workflowSource, /current === "published" && role !== "owner"/);
+  assert.match(publicContentSource, /listPublicFaqs/);
+  assert.match(publicContentSource, /listPublicAnnouncements/);
+  assert.match(publicContentSource, /removeManagedFallback/);
+  assert.match(robotsResponse, /Disallow: \/studio\//);
 });
 
 test("keeps filters and illustrative detail pages out of the index and noindexes 404 responses", async () => {
@@ -309,7 +368,7 @@ test("keeps the starter preview, local paths, and production security regression
   assert.doesNotMatch(page, /_sites-preview|SkeletonPreview|codex-preview/);
   assert.doesNotMatch(layout, /Starter Project|codex-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton|WRANGLER_LOG_PATH=/);
-  assert.doesNotMatch(`${html}\n${workerSource}`, /(?:^|[^A-Za-z])[A-Za-z]:[\\/]|\\\\Users\\|\.vinext[\\/]fonts|mdhos/i);
+  assert.doesNotMatch(`${html}\n${workerSource}`, /[A-Za-z]:[\\/](?:Users|ProgramData|Windows|Program Files)|\\\\Users\\|\.vinext[\\/]fonts|mdhos/i);
   assert.equal(
     `${html}\n${workerSource}`.replaceAll("\\", "/").toLowerCase().includes(process.cwd().replaceAll("\\", "/").toLowerCase()),
     false,

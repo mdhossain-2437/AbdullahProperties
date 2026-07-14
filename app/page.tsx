@@ -2,7 +2,9 @@ import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
+  BookOpen,
   Building2,
+  Check,
   Compass,
   KeyRound,
   Landmark,
@@ -13,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
+import { JourneyCard } from "@/components/brand/journey-card";
 import { AppImage as Image } from "@/components/ui/app-image";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { Button } from "@/components/ui/button";
@@ -20,7 +23,9 @@ import { PropertyCard } from "@/features/properties/property-card";
 import { featuredProperties } from "@/features/properties/data";
 import { company, operatingProcess } from "@/lib/company-data";
 import { createMetadata } from "@/lib/seo";
-import { areas, insights, proofPoints, services } from "@/lib/site-data";
+import { proofPoints, services } from "@/lib/site-data";
+import { documentReadiness, journeyPaths } from "@/lib/experience-data";
+import { listPublicAnnouncements, listPublicAreaGuides, listPublicInsights } from "@/features/cms/public-content";
 
 export const metadata = createMetadata({
   title: "Real Estate & Joint Venture Housing in Joypurhat",
@@ -37,7 +42,12 @@ const serviceIcons = {
   key: KeyRound,
 } as const;
 
-export default function Home() {
+export default async function Home() {
+  const [announcements, areaGuides, insights] = await Promise.all([
+    listPublicAnnouncements(),
+    listPublicAreaGuides(),
+    listPublicInsights(),
+  ]);
   return (
     <main>
       <section className="home-hero">
@@ -92,6 +102,30 @@ export default function Home() {
         </div>
       </section>
 
+      {announcements.length > 0 ? (
+        <section className="announcement-strip" aria-labelledby="announcement-strip-title">
+          <div className="site-shell announcement-strip__layout">
+            <div className="announcement-strip__heading">
+              <span className="eyebrow">Company updates</span>
+              <h2 id="announcement-strip-title">Current notices from Abdullah Properties.</h2>
+            </div>
+            <div className="announcement-strip__list">
+              {announcements.map((announcement, index) => (
+                <article className="announcement-strip__item" key={announcement.slug}>
+                  <div>
+                    <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                    <time dateTime={announcement.publishedAt}>{announcement.publishedAt.slice(0, 10)}</time>
+                  </div>
+                  <h3>{announcement.title}</h3>
+                  <p>{announcement.summary}</p>
+                  <Link href="/contact">Ask about this update <ArrowUpRight aria-hidden="true" /></Link>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="proof-section">
         <div className="site-shell proof-section__grid">
           <Reveal className="proof-section__statement">
@@ -108,6 +142,19 @@ export default function Home() {
               </div>
             ))}
           </Reveal>
+        </div>
+      </section>
+
+      <section className="journey-paths" aria-labelledby="journey-paths-heading">
+        <div className="site-shell">
+          <div className="journey-paths__head">
+            <span className="eyebrow">Choose your route</span>
+            <h2 id="journey-paths-heading">One company. Three different starting questions.</h2>
+            <p>Enter through the decision that matches your role; the next useful step should become clearer immediately.</p>
+          </div>
+          <div className="journey-paths__grid">
+            {journeyPaths.map((path) => <JourneyCard item={path} key={path.id} />)}
+          </div>
         </div>
       </section>
 
@@ -163,30 +210,57 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="areas-section">
-        <div className="site-shell">
-          <SectionHeading eyebrow="Local intelligence" title="Read the place before you choose the property." description="A location is a system of access, daily life, visibility, services, and long-term change." />
-          <div className="area-grid">
-            {areas.map((area, index) => (
-              <Reveal className="area-card" delay={index * 0.06} key={area.name}>
-                <div><MapPin aria-hidden="true" /><span>{area.index}</span></div>
-                <h3>{area.name}</h3>
-                <p>{area.note}</p>
-                <Link href="/contact">Discuss this area <ArrowUpRight aria-hidden="true" /></Link>
-              </Reveal>
-            ))}
+      <section className="evidence-dossier">
+        <div className="site-shell evidence-dossier__grid">
+          <div className="evidence-dossier__index"><span>PROJECT RECORD</span><strong>01</strong></div>
+          <div className="evidence-dossier__copy">
+            <span className="eyebrow">Nirapad Nibas / Dhanmondi, Joypurhat</span>
+            <h2>Publish what is known. Mark what still needs evidence.</h2>
+            <p>The project name and locality are consistently published. Specifications, plans, approvals, ownership, pricing, status, and availability remain confirmation items.</p>
+            <Link href="/projects/nirapad-nibas">Open the evidence dossier <ArrowUpRight aria-hidden="true" /></Link>
+          </div>
+          <div className="evidence-dossier__media">
+            <Image src="/projects/building-signage.jpg" alt="Illustrative Abdullah Properties project identity study" fill sizes="(max-width: 760px) 100vw, 42vw" />
+            <span>Illustrative visual study</span>
           </div>
         </div>
       </section>
 
-      <section className="process-section">
+      <section className="areas-section">
+        <div className="site-shell">
+          <SectionHeading eyebrow="Local intelligence" title="Read the place before you choose the property." description="A location is a system of access, daily life, visibility, services, and long-term change." />
+          <div className="area-grid">
+            {areaGuides.map((guide, index) => (
+              <Reveal className="area-card" delay={index * 0.06} key={guide.slug}>
+                <div><MapPin aria-hidden="true" /><span>{guide.index}</span></div>
+                <h3>{guide.name}</h3>
+                <p>{guide.dek}</p>
+                <Link href={`/area-guides/${guide.slug}`}>Read area guide <ArrowUpRight aria-hidden="true" /></Link>
+              </Reveal>
+            ))}
+          </div>
+          <div className="areas-section__footer"><Button asChild className="brand-button brand-button--outline"><Link href="/area-guides">Explore all area guides <BookOpen aria-hidden="true" /></Link></Button></div>
+        </div>
+      </section>
+
+      <section className="process-section process-section--corridor">
         <div className="site-shell process-section__grid">
-          <SectionHeading eyebrow="The working process" title="Five visible steps from inquiry to handover." description="The published operating sequence keeps scope, evidence, decisions, and responsibilities understandable." />
+          <div className="process-section__sticky"><SectionHeading eyebrow="The working process" title="Five visible steps from inquiry to handover." description="The published operating sequence keeps scope, evidence, decisions, and responsibilities understandable." /><Button asChild className="brand-button brand-button--outline"><Link href="/process">Enter the full process <ArrowRight aria-hidden="true" /></Link></Button></div>
           <ol className="process-list">
             {operatingProcess.map((step) => (
               <li key={step.id}><span>{step.id}</span><h3>{step.title}</h3><p>{step.summary}</p></li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      <section className="document-lab">
+        <div className="site-shell document-lab__grid">
+          <div className="document-lab__title"><span className="eyebrow eyebrow--light">Conversation kit</span><h2>Arrive with context.<br />Leave with a next step.</h2></div>
+          <ul>
+            {documentReadiness.map((item, index) => <li key={item}><span>0{index + 1}</span><p>{item}</p><Check aria-hidden="true" /></li>)}
+          </ul>
+          <div className="document-lab__action"><p>This checklist prepares the first conversation; it is not a complete legal or technical document list.</p><Link href="/contact">Prepare an enquiry <ArrowUpRight aria-hidden="true" /></Link></div>
         </div>
       </section>
 

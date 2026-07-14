@@ -7,7 +7,7 @@ Delivery assumption: public property discovery and qualified lead generation com
 
 ## 1. Executive Summary
 
-The first production slice is a fast, accessible public platform for Abdullah Properties: brand storytelling, property discovery, project proof, service education, editorial content, and high-intent enquiries. It is intentionally not an e-commerce marketplace. Cart, vendor wallet, coupon, refund, and multi-provider payment infrastructure are deferred until a confirmed business workflow requires them.
+The production slice is a fast, accessible public platform for Abdullah Properties plus a protected editorial Content Studio: brand storytelling, role-based buyer/landowner journeys, property discovery, project proof, service education, area guidance, editorial content, and high-intent enquiries. It is intentionally not an e-commerce marketplace. Cart, vendor wallet, coupon, refund, and multi-provider payment infrastructure are deferred until a confirmed business workflow requires them.
 
 The recommended starting point is a modular monolith built with Next.js 16 App Router, React 19, TypeScript, Tailwind CSS, and owned shadcn/Radix primitives. Server Components render content-heavy routes; small Client Components own filters, navigation, and motion. Domain repositories begin as typed in-memory adapters and can be replaced by PostgreSQL/Prisma implementations without changing page composition.
 
@@ -63,7 +63,7 @@ sequenceDiagram
 
 ## 5. Database Engineering
 
-No production database is introduced in the first static release. The Phase 2 relational model should include `properties`, `property_media`, `property_features`, `projects`, `services`, `locations`, `enquiries`, `enquiry_events`, `content_entries`, `content_revisions`, `users`, `roles`, `permissions`, and `audit_events`.
+Cloudflare D1 now persists the bounded editorial CMS through `content_entries`, `content_revisions`, and `audit_events`. Public reads retain curated fallback when the binding or migration is unavailable. The later operational PostgreSQL model should add `properties`, `property_media`, `property_features`, `projects`, `services`, `locations`, `enquiries`, `enquiry_events`, `users`, `roles`, and `permissions` when those workflows become real.
 
 - Normalize transactional data to third normal form; denormalize read models only after profiling.
 - Use UUID/ULID identifiers, immutable public slugs, `created_at`, `updated_at`, and explicit publication status.
@@ -152,7 +152,7 @@ Redis is deferred until there is shared mutable server state or expensive repeat
 
 ## 13. CMS Design
 
-Phase 2 CMS scope: homepage sections, reusable landing-page blocks, banners, announcements, FAQs, projects, properties, services, area guides, articles, SEO fields, navigation, and media. Content requires draft, review, scheduled publish, version history, preview, rollback, role-based permissions, and audit history. A structured-block model is preferred over unrestricted HTML.
+The implemented CMS scope is deliberately bounded to insights, area guides, FAQs, and announcements. It provides structured blocks, draft/review/publish/archive workflow, verification gates, protected preview, optimistic concurrency, immutable revisions, audit events, SEO fields, and public fallback. Generic CMS editing cannot change company identity, leadership, legal records, projects, property availability, pricing, or approvals. See `docs/CMS-OPERATIONS.md` for the flow, sequence, database, security, states, and deployment procedure.
 
 ## 14. Vendor System
 
@@ -238,9 +238,15 @@ Default to server-first rendering, explicit domain language, small pure function
 | `/projects` | Review a bounded project record and visual studies | Static | Verify project details |
 | `/projects/nirapad-nibas` | Review the consistent published project facts | Static | Request approved records |
 | `/services` | Understand six services and the working process | Static | Plan a consultation |
+| `/services/[slug]` | Understand one service and its decision gates | Static params | Discuss that service |
+| `/buyers` | Use an evidence-led buyer decision framework | Static | Plan a buyer consultation |
+| `/landowners` | Prepare a structured joint-venture discussion | Static | Discuss a land partnership |
+| `/process` | Follow the five-stage operating route | Static | Start the first conversation |
+| `/area-guides`, `/area-guides/[slug]` | Read source-conscious local context | Curated fallback + D1 published override | Discuss the location |
 | `/about` | Verify approach, local commitment, and leadership-data status | Static | Contact the company |
 | `/insights` | Learn from area and property guidance | Static | Read an article |
 | `/contact` | Start a qualified conversation | Static + progressive form | Open email or WhatsApp |
 | `/faq` | Get verified operational answers | Static | Contact the company |
 | `/brand-kit` | Download approved brand resources | Static | Download the kit |
 | `/privacy`, `/terms`, `/cookies`, `/property-disclaimer`, `/accessibility` | Review policy and usage boundaries | Static | Contact with questions |
+| `/studio/*` | Manage structured editorial content | Dynamic, authenticated, allowlisted, no-store | Save a revision |
