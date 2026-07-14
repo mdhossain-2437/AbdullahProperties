@@ -47,7 +47,7 @@ export function SiteHeader() {
               {siteNavigation.map((item, index) => (
                 <SheetClose asChild key={item.href}>
                   <Link href={item.href} aria-current={isPathCurrent(pathname, item.href) ? "page" : undefined}>
-                    <span>0{index + 1}</span>
+                    <span aria-hidden="true">0{index + 1}</span>
                     {item.label}
                   </Link>
                 </SheetClose>

@@ -48,17 +48,6 @@ export const metadata: Metadata = {
     description: company.description,
     images: ["/og/home.jpg"],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
 };
 
 export const viewport: Viewport = {

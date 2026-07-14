@@ -44,6 +44,11 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    optimizeDeps: {
+      // vinext can otherwise prebundle this package differently between the
+      // RSC and client graphs, which prevents reliable client hydration.
+      exclude: ["lucide-react"],
+    },
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,

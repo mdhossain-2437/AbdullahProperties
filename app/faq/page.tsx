@@ -68,8 +68,9 @@ export default function FaqPage() {
             {companyFaqs.map((faq, index) => (
               <details className="faq-page__item" key={faq.question} open={index === 0}>
                 <summary>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <h3>{faq.question}</h3>
+                  <span className="faq-page__index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="faq-page__question">{faq.question}</span>
+                  <span className="faq-page__toggle" aria-hidden="true">+</span>
                 </summary>
                 <div className="faq-page__answer">
                   <p>{faq.answer}</p>

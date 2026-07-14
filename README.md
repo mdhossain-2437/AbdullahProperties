@@ -30,10 +30,10 @@ Technical indexing is enabled against the current Sites URL. A business-controll
 
 ## Local development
 
-Node.js `>=22.13.0` is required.
+Node.js `24.16.0` and npm `11.15.0` are the verified release toolchain. The exact Node version is recorded in `.node-version`.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -42,13 +42,11 @@ Open `http://localhost:3000`.
 ## Verification
 
 ```bash
-npm run lint
-npm run typecheck
-npm test
-npm audit --omit=dev
+npm run verify
+npm audit --omit=dev --audit-level=high
 ```
 
-`npm test` creates the production vinext build and verifies public routes, dynamic routes, redirects, SEO endpoints, canonical metadata, structured data safeguards, asset delivery, security headers, and 404 handling through the built worker.
+`npm run verify` runs linting, strict TypeScript checks, the production vinext build, route/metadata/security/artifact tests, compressed bundle budgets, and Chromium end-to-end checks for hydration, images, keyboard navigation, filters, enquiry handoff, reduced motion, and WCAG A/AA violations. The same locked gate runs in GitHub Actions for every pull request and push to `main`.
 
 ## Architecture and production boundary
 

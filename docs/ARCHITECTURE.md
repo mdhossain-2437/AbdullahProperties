@@ -172,7 +172,7 @@ Use reproducible installs, pinned lockfiles, environment validation, preview env
 
 ## 18. CI/CD
 
-Pull requests must run type checking, linting, unit tests, route/render tests, build, dependency/security review, and targeted browser smoke tests. Production deployment requires an immutable commit, approval policy, migration compatibility check, health check, and documented rollback. Database changes follow expand/migrate/contract to support zero-downtime rollout.
+Pull requests run the source-controlled `verify:ci` gate: locked installation, type checking, linting, route/render and artifact tests, compressed bundle budgets, Chromium interaction/accessibility checks, a production build, and a production-dependency audit. The workflow uses read-only repository permissions, commit-pinned actions, concurrency cancellation, and a fixed Node LTS toolchain. Production deployment requires an immutable commit, approval policy, migration compatibility check, health check, and documented rollback. Database changes follow expand/migrate/contract to support zero-downtime rollout.
 
 ## 19. Testing
 

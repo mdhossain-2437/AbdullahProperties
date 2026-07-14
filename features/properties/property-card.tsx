@@ -12,11 +12,11 @@ type PropertyCardProps = {
 export function PropertyCard({ property, preload = false }: PropertyCardProps) {
   return (
     <article className="property-card">
-      <Link className="property-card__media" href={`/properties/${property.slug}`} aria-label={`View ${property.title}`}>
+      <div className="property-card__media">
         <Image src={property.image} alt={property.imageAlt} fill sizes="(max-width: 760px) 100vw, 33vw" preload={preload} />
         <Badge className="property-card__status">{property.status}</Badge>
         <span className="property-card__arrow"><ArrowUpRight aria-hidden="true" /></span>
-      </Link>
+      </div>
       <div className="property-card__body">
         <div>
           <span className="property-card__kind">{property.kind}</span>

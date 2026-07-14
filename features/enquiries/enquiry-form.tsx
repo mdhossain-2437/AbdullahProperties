@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CheckCircle2, Mail, MessageCircle, RotateCcw } from "lucide-react";
@@ -36,6 +36,7 @@ type EnquiryFormProps = {
 
 export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
   const [prepared, setPrepared] = useState<EnquiryValues | null>(null);
+  const successRef = useRef<HTMLDivElement>(null);
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<EnquiryValues>({
     resolver: zodResolver(enquirySchema),
     defaultValues: { name: "", contact: "", interest: initialInterest, message: "" },
@@ -45,6 +46,10 @@ export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
     setPrepared(values);
     reset();
   }
+
+  useEffect(() => {
+    if (prepared) successRef.current?.focus();
+  }, [prepared]);
 
   const preparedMessage = prepared
     ? [
@@ -67,7 +72,7 @@ export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
   return (
     <div className="enquiry-form-wrap">
       {prepared ? (
-        <Alert className="enquiry-success">
+        <Alert className="enquiry-success" ref={successRef} tabIndex={-1}>
           <CheckCircle2 aria-hidden="true" />
           <AlertTitle>Your enquiry summary is ready.</AlertTitle>
           <AlertDescription>
@@ -79,7 +84,7 @@ export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
             <Button type="button" variant="ghost" onClick={() => setPrepared(null)}><RotateCcw aria-hidden="true" /> Prepare another</Button>
           </div>
         </Alert>
-      ) : null}
+      ) : (
       <form className="enquiry-form" onSubmit={handleSubmit(prepareEnquiry)} noValidate>
         <div className="form-field">
           <Label htmlFor="name">Full name</Label>
@@ -106,6 +111,7 @@ export function EnquiryForm({ initialInterest = "" }: EnquiryFormProps) {
           <Button className="brand-button" type="submit" disabled={isSubmitting}>Prepare enquiry</Button>
         </div>
       </form>
+      )}
     </div>
   );
 }

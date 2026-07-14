@@ -1,0 +1,4 @@
+Contact: mailto:abdullahproperties.24@gmail.com
+Canonical: https://abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site/.well-known/security.txt
+Expires: 2027-07-14T23:59:59Z
+Preferred-Languages: en, bn

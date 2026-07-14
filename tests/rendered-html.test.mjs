@@ -309,8 +309,43 @@ test("keeps the starter preview, local paths, and production security regression
   assert.doesNotMatch(layout, /Starter Project|codex-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton|WRANGLER_LOG_PATH=/);
   assert.doesNotMatch(`${html}\n${workerSource}`, /(?:^|[^A-Za-z])[A-Za-z]:[\\/]|\\\\Users\\|\.vinext[\\/]fonts|mdhos/i);
+  assert.equal(
+    `${html}\n${workerSource}`.replaceAll("\\", "/").toLowerCase().includes(process.cwd().replaceAll("\\", "/").toLowerCase()),
+    false,
+    "rendered output should not expose the absolute build workspace",
+  );
   assert.match(packageJson, /"next": "\^16\.2\.10"/);
   assert.match(packageJson, /"react": "\^19\.2\.7"/);
   assert.match(architecture, /Modular monolith/);
   await assert.rejects(access(new URL("app/_sites-preview", templateRoot)));
+});
+
+test("disables the unused image transformation surface with a strict response policy", async () => {
+  const response = await render("/_vinext/image?url=%2Fproperties%2Fjoypurhat-residence.jpg&w=640&q=75");
+  const contentSecurityPolicy = response.headers.get("content-security-policy") ?? "";
+
+  assert.equal(response.status, 404);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.match(contentSecurityPolicy, /default-src 'none'/);
+  assert.match(contentSecurityPolicy, /sandbox/);
+  assert.doesNotMatch(contentSecurityPolicy, /unsafe-inline/);
+});
+
+test("packages hosting metadata, static header policy, and security disclosure", async () => {
+  const [sourceHosting, stagedHosting, staticHeaders, securityDisclosure] = await Promise.all([
+    readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
+    readFile(new URL("../dist/.openai/hosting.json", import.meta.url), "utf8"),
+    readFile(new URL("../dist/client/_headers", import.meta.url), "utf8"),
+    readFile(new URL("../dist/client/.well-known/security.txt", import.meta.url), "utf8"),
+  ]);
+
+  assert.deepEqual(JSON.parse(stagedHosting), JSON.parse(sourceHosting));
+  await access(new URL("../dist/server/index.js", import.meta.url));
+  await access(new URL("../dist/client/assets", import.meta.url));
+  await access(new URL("../dist/.openai/drizzle/meta/_journal.json", import.meta.url));
+  assert.match(staticHeaders, /\/assets\/\*[\s\S]*max-age=31536000, immutable/);
+  assert.match(staticHeaders, /X-Content-Type-Options: nosniff/);
+  assert.match(staticHeaders, /Content-Disposition: attachment/);
+  assert.match(securityDisclosure, /Contact: mailto:abdullahproperties\.24@gmail\.com/);
+  assert.match(securityDisclosure, /Preferred-Languages: en, bn/);
 });
