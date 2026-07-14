@@ -87,6 +87,7 @@ function readJpegSize(buffer) {
 
 function assertPublicHead(html, path) {
   const canonical = `${siteUrl}${path === "/" ? "/" : path}`;
+  assert.match(html, /<html lang="en-BD">/);
   assert.match(html, /<meta name="description" content="[^"]+"\/>/);
   assert.ok(html.includes(`<link rel="canonical" href="${canonical}"/>`), `${path} should expose its absolute canonical URL`);
   assert.match(html, new RegExp(`<meta property="og:image" content="${siteUrl.replaceAll(".", "\\.")}\/og\/[^\"]+\.jpg"\/>`));
@@ -111,6 +112,12 @@ test("server-renders every public route with unique SEO metadata", async () => {
     ["/buyers", /Make the property earn your confidence/],
     ["/landowners", /Build the agreement before the building/],
     ["/process", /One visible route through a complex decision/],
+    ["/solutions", /One property system\. Four useful starting points\./],
+    ["/joint-venture", /Build the agreement before the building\./],
+    ["/quality", /Quality should leave a decision trail\./],
+    ["/client-care", /The relationship continues after the keys\./],
+    ["/resources", /Bring better questions to the property decision\./],
+    ["/property-planner", /Prepare the questions before the enquiry\./],
     ["/area-guides", /Read the place before the property/],
     ["/area-guides/joypurhat-property-decisions", /A practical lens for property decisions in Joypurhat/],
     ["/about", /Leadership details without invented identities/],
@@ -172,12 +179,78 @@ test("renders verified company data, responsible leadership boundaries, and dire
   assert.doesNotMatch(combined, /Joypurhat(?:'|&apos;|&#x27;)?s #1|#1 real estate/i);
 });
 
+test("server-renders the cinematic decision story and accessible footer signature", async () => {
+  const response = await render("/");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+
+  assert.match(html, /<h1[^>]*id="home-hero-title"[^>]*>/);
+  assert.match(html, /Property decisions, made clear\./);
+  assert.match(html, /id="decision-story-heading"/);
+  assert.match(html, /data-kinetic-rail="true"/);
+  assert.match(html, /data-enhanced="false"[^>]*data-kinetic-rail="true"[^>]*data-running="false"/);
+  assert.match(html, /aria-label="Pause moving text"/);
+  assert.match(html, /aria-label="Homepage story chapters"/);
+  for (const sectionId of ["story-start", "choose-route", "operating-system", "decision-process", "selected-work", "visit-office"]) {
+    assert.ok(html.includes(`href="#${sectionId}"`), `the chapter index should link to ${sectionId}`);
+    assert.ok(html.includes(`id="${sectionId}"`), `the homepage should expose the ${sectionId} chapter target`);
+  }
+
+  assert.match(html, /name="property-decision-route"/);
+  assert.match(html, /Compare the whole decision(?:—|&mdash;)not only the property/);
+  assert.match(html, /Make the partnership reviewable before it becomes a project/);
+  assert.match(html, /Connect the brief, evidence, delivery, and handover/);
+  assert.match(html, /Nirapad Nibas \/ Evidence ledger/);
+  assert.match(html, /What still needs direct evidence/);
+  assert.match(html, /Come with a question\. Leave with a named action\./);
+  assert.match(html, /2nd Floor, Pouro Market/);
+  assert.match(html, /Saturday(?:–|&ndash;)Thursday, 10:00 AM(?:–|&ndash;)8:00 PM/);
+
+  const chapterTitles = [
+    "Start with the outcome, not the brochure.",
+    "See the site as a living system.",
+    "Separate what is known from what needs proof.",
+    "Put scope, responsibility, and change in writing.",
+    "Keep the record connected through handover.",
+  ];
+
+  for (const title of chapterTitles) {
+    assert.ok(html.includes(title), `the server response should include the chapter: ${title}`);
+  }
+  assert.equal(
+    (html.match(/aria-label="Go to chapter \d{2}:/g) ?? []).length,
+    chapterTitles.length,
+    "each story chapter should have a directly selectable control",
+  );
+  for (const chapterId of ["01", "02", "03", "04", "05"]) {
+    assert.ok(
+      html.includes(`href="#decision-story-chapter-${chapterId}"`),
+      `chapter ${chapterId} should retain native no-JavaScript navigation`,
+    );
+  }
+
+  assert.match(html, /aria-label="Abdullah Properties home"/);
+  assert.match(html, /data-footer-ghost-marquee="true"/);
+  assert.match(html, /data-enhanced="false"/);
+  assert.match(html, /<div[^>]*aria-hidden="true"[^>]*>/);
+  assert.match(html, /aria-label="Pause footer brand animation"/);
+  const decorativeMarks = [...html.matchAll(/<img[^>]*src="\/brand\/logo-mark-inverse\.png"[^>]*>/g)].map(
+    (match) => match[0],
+  );
+  assert.equal(decorativeMarks.length, 2, "the seamless footer loop should contain exactly two mark/name groups");
+  for (const mark of decorativeMarks) assert.match(mark, /alt=""/);
+
+  const transparentMark = readPngHeader(await readFile(new URL("../public/brand/logo-mark-inverse.png", import.meta.url)));
+  assert.equal(transparentMark.colorType, 6, "the repeated footer mark should retain its alpha channel");
+});
+
 test("emits parseable, visible, and non-misleading structured data", async () => {
-  const [homeHtml, servicesHtml, faqHtml, articleHtml] = await Promise.all([
+  const [homeHtml, servicesHtml, faqHtml, articleHtml, areaGuideHtml] = await Promise.all([
     render("/").then((response) => response.text()),
     render("/services").then((response) => response.text()),
     render("/faq").then((response) => response.text()),
     render("/insights/evaluate-land-with-clarity").then((response) => response.text()),
+    render("/area-guides/joypurhat-property-decisions").then((response) => response.text()),
   ]);
 
   const homeData = extractJsonLd(homeHtml);
@@ -190,10 +263,17 @@ test("emits parseable, visible, and non-misleading structured data", async () =>
   const faqData = extractJsonLd(faqHtml).find((entry) => entry["@type"] === "FAQPage");
   assert.equal(faqData?.mainEntity?.length, 5);
   for (const question of faqData.mainEntity) assert.ok(faqHtml.includes(question.name));
-  assert.ok(extractJsonLd(articleHtml).some((entry) => entry["@type"] === "Article"));
+  const articleData = extractJsonLd(articleHtml);
+  assert.ok(articleData.some((entry) => entry["@type"] === "Article"));
+  const areaGuideData = extractJsonLd(areaGuideHtml);
+  const areaGuideArticle = areaGuideData.find((entry) => entry["@type"] === "Article");
+  assert.equal(areaGuideArticle?.image, `${siteUrl}/og/properties.jpg`);
+  assert.equal(areaGuideArticle?.author?.url, `${siteUrl}/about`);
+  assert.equal(areaGuideArticle?.publisher?.["@id"], `${siteUrl}/#organization`);
 
-  const allStructuredData = JSON.stringify([...homeData, ...serviceData, ...extractJsonLd(faqHtml), ...extractJsonLd(articleHtml)]);
-  const keys = collectObjectKeys([...homeData, ...serviceData, ...extractJsonLd(faqHtml), ...extractJsonLd(articleHtml)]);
+  const allData = [...homeData, ...serviceData, ...extractJsonLd(faqHtml), ...articleData, ...areaGuideData];
+  const allStructuredData = JSON.stringify(allData);
+  const keys = collectObjectKeys(allData);
   for (const forbiddenKey of ["aggregateRating", "sameAs", "geo", "latitude", "longitude"]) {
     assert.ok(!keys.includes(forbiddenKey), `structured data should not include ${forbiddenKey}`);
   }
@@ -212,20 +292,27 @@ test("publishes crawl controls, sitemap, manifest, and branded discovery assets"
   const robots = await robotsResponse.text();
   assert.match(robots, /^Allow: \/$/m);
   assert.doesNotMatch(robots, /^Disallow: \/$/m);
+  assert.match(robots, /^Disallow: \/studio$/m);
+  assert.match(robots, /^Disallow: \/office$/m);
   assert.match(robots, new RegExp(`Sitemap: ${siteUrl.replaceAll(".", "\\.")}\/sitemap\\.xml`));
 
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
-  for (const path of ["/about", "/services", "/services/residential-development", "/buyers", "/landowners", "/process", "/area-guides/joypurhat-property-decisions", "/projects/nirapad-nibas", "/faq", "/brand-kit", "/privacy"]) {
+  for (const path of ["/about", "/services", "/services/residential-development", "/buyers", "/landowners", "/process", "/solutions", "/joint-venture", "/quality", "/client-care", "/resources", "/property-planner", "/area-guides/joypurhat-property-decisions", "/projects/nirapad-nibas", "/faq", "/brand-kit", "/privacy"]) {
     assert.ok(sitemap.includes(`${siteUrl}${path}`), `sitemap should include ${path}`);
   }
   assert.doesNotMatch(sitemap, /<loc>[^<]*\?|properties\/joypurhat-residence/);
+  assert.match(
+    sitemap,
+    new RegExp(`<loc>${siteUrl.replaceAll(".", "\\.")}\/</loc>\\s*<lastmod>2026-07-13T18:00:00\\.000Z</lastmod>`),
+  );
 
   assert.equal(manifestResponse.status, 200);
   const manifest = JSON.parse(await manifestResponse.text());
   assert.equal(manifest.name, "Abdullah Properties");
   assert.equal(manifest.icons.length, 2);
   assert.ok(manifest.icons.every((icon) => icon.purpose === "any"));
+  assert.equal("orientation" in manifest, false);
 
   const home = await homeResponse.text();
   assert.match(home, new RegExp(`href="${siteUrl.replaceAll(".", "\\.")}\/manifest\\.webmanifest"`));
@@ -248,6 +335,10 @@ test("keeps the CMS authenticated, allowlisted, durable, noindexed, and fail-clo
   const deniedHtml = await denied.text();
   assert.match(deniedHtml, /not an approved editor|allowlists? are not configured|Loading protected content/);
   assert.doesNotMatch(deniedHtml, /Create a blank draft|Import curated content|Structured entries/);
+  assert.doesNotMatch(deniedHtml, /class="site-header"/);
+  assert.doesNotMatch(deniedHtml, /class="site-footer"/);
+  assert.doesNotMatch(deniedHtml, /Skip to content/);
+  assert.doesNotMatch(deniedHtml, /RealEstateAgent/);
   assert.ok(containsRobotsNoIndex(deniedHtml));
 
   const [hosting, migration, schema, authSource, actionSource, workflowSource, publicContentSource, robotsResponse] = await Promise.all([
@@ -276,7 +367,41 @@ test("keeps the CMS authenticated, allowlisted, durable, noindexed, and fail-clo
   assert.match(publicContentSource, /listPublicFaqs/);
   assert.match(publicContentSource, /listPublicAnnouncements/);
   assert.match(publicContentSource, /removeManagedFallback/);
-  assert.match(robotsResponse, /Disallow: \/studio\//);
+  assert.match(robotsResponse, /^Disallow: \/studio$/m);
+  assert.match(robotsResponse, /^Disallow: \/office$/m);
+});
+
+test("keeps Office OS authenticated, private, noindexed, and separate from the public shell", async () => {
+  const anonymous = await render("/office");
+  assert.equal(anonymous.status, 307);
+  assert.match(anonymous.headers.get("location") ?? "", /\/signin-with-chatgpt\?return_to=/);
+  assert.equal(anonymous.headers.get("cache-control"), "private, no-store");
+  assert.equal(anonymous.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
+
+  const previousOwnerEmails = process.env.CMS_OWNER_EMAILS;
+  process.env.CMS_OWNER_EMAILS = "owner@example.com";
+  let ownerWithoutDatabase;
+  try {
+    ownerWithoutDatabase = await render("/office", undefined, {
+      headers: {
+        "oai-authenticated-user-email": "owner@example.com",
+        "oai-authenticated-user-full-name": "Office%20Owner",
+        "oai-authenticated-user-full-name-encoding": "percent-encoded-utf-8",
+      },
+    });
+  } finally {
+    if (previousOwnerEmails === undefined) delete process.env.CMS_OWNER_EMAILS;
+    else process.env.CMS_OWNER_EMAILS = previousOwnerEmails;
+  }
+  assert.equal(ownerWithoutDatabase.status, 200);
+  assert.equal(ownerWithoutDatabase.headers.get("cache-control"), "private, no-store");
+  const html = await ownerWithoutDatabase.text();
+  assert.match(html, /office database is not ready/i);
+  assert.match(html, /Office OS \/ Joypurhat/);
+  assert.ok(containsRobotsNoIndex(html));
+  assert.doesNotMatch(html, /class="site-header"/);
+  assert.doesNotMatch(html, /class="site-footer"/);
+  assert.doesNotMatch(html, /RealEstateAgent/);
 });
 
 test("keeps filters and illustrative detail pages out of the index and noindexes 404 responses", async () => {
@@ -346,13 +471,19 @@ test("ships transparent logos, correct icon sizes, social previews, and a comple
   const tokens = JSON.parse(await readFile(new URL("../public/brand/brand-tokens.json", import.meta.url), "utf8"));
   assert.equal(tokens.colors.housingOrange, "#FF6B2C");
   await access(new URL("app/favicon.ico", templateRoot));
-  await assert.rejects(access(new URL("public/favicon.svg", templateRoot)));
+  const faviconSvg = await readFile(new URL("public/favicon.svg", templateRoot), "utf8");
+  assert.match(faviconSvg, /fill="#0c0c0c"/);
+  assert.match(faviconSvg, /fill="#ff6b2c"/);
+
+  const brandKitPage = await render("/brand-kit").then((response) => response.text());
+  assert.ok(brandKitPage.includes(`${siteUrl}/og/home.jpg`), "brand-kit shares should use a verified Abdullah Properties social card");
+  assert.ok(!brandKitPage.includes(`${siteUrl}/og/brand-kit.jpg`), "the legacy-labelled brand card must not be published in metadata");
 });
 
 test("keeps the starter preview, local paths, and production security regressions out", async () => {
   const [response, page, layout, packageJson, architecture, workerSource] = await Promise.all([
     render("/"),
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/(public)/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../docs/ARCHITECTURE.md", import.meta.url), "utf8"),

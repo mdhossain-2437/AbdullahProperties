@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/company-data";
 import { serviceDetails } from "@/lib/experience-data";
 import { listPublicAreaGuides, listPublicInsights } from "@/features/cms/public-content";
 
-const updatedAt = new Date("2026-07-12T00:00:00+06:00");
+const updatedAt = new Date("2026-07-14T00:00:00+06:00");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [insights, areaGuides] = await Promise.all([listPublicInsights(), listPublicAreaGuides()]);
@@ -14,6 +14,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/process",
     "/buyers",
     "/landowners",
+    "/solutions",
+    "/joint-venture",
+    "/quality",
+    "/client-care",
+    "/resources",
+    "/property-planner",
     "/area-guides",
     "/projects",
     "/projects/nirapad-nibas",

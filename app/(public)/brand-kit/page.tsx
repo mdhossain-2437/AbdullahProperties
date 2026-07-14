@@ -13,7 +13,7 @@ export const metadata: Metadata = createMetadata({
   description:
     "Download the official Abdullah Properties logos, social templates, color references, and typography guidance.",
   path: "/brand-kit",
-  image: "/og/brand-kit.jpg",
+  image: "/og/home.jpg",
 });
 
 const logoAssets = [

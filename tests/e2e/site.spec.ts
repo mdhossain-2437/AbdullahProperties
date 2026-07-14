@@ -12,6 +12,12 @@ const publicRoutes = [
   "/buyers",
   "/landowners",
   "/process",
+  "/solutions",
+  "/joint-venture",
+  "/quality",
+  "/client-care",
+  "/resources",
+  "/property-planner",
   "/area-guides",
   "/area-guides/joypurhat-property-decisions",
   "/about",
@@ -75,7 +81,7 @@ test("mobile navigation is keyboard operable", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
 
-  const trigger = page.getByRole("button", { name: "Open navigation" });
+  const trigger = page.getByRole("button", { name: "Open Explore navigation" });
   await trigger.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -87,8 +93,137 @@ test("mobile navigation is keyboard operable", async ({ page }) => {
   await trigger.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("link", { name: "About", exact: true }).click();
+  await dialog.getByRole("link", { name: /^About\b/ }).click();
   await expect(page).toHaveURL(/\/about$/);
+});
+
+test("desktop Explore navigation opens, dismisses, and restores trigger focus", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const trigger = page.getByRole("button", { name: "Explore", exact: true });
+  await trigger.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Every route to a clearer property decision." })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(trigger).toBeFocused();
+
+  await trigger.click();
+  await page.locator("[data-explore-overlay]").click({ position: { x: 4, y: 4 } });
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test("cinematic homepage story supports keyboard and direct chapter selection", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  await expect(page.getByRole("heading", { level: 1, name: "Property decisions, made clear." })).toBeVisible();
+  const story = page.locator('section[aria-labelledby="decision-story-heading"]');
+  await story.scrollIntoViewIfNeeded();
+  await expect(story.getByRole("heading", { level: 3 })).toHaveCount(5);
+
+  const stage = story.getByLabel("Active process chapter");
+  const verificationChapter = story.getByRole("link", { name: /^Go to chapter 03:/ });
+  await verificationChapter.focus();
+  await page.keyboard.press("Enter");
+  await expect(verificationChapter).toHaveAttribute("aria-current", "step");
+  await expect(stage).toContainText("Chapter 03");
+  await expect(stage.getByAltText("Illustrative Abdullah Properties office and document review environment")).toBeVisible();
+
+  const handoverChapter = story.getByRole("link", { name: /^Go to chapter 05:/ });
+  await handoverChapter.click();
+  await expect(handoverChapter).toHaveAttribute("aria-current", "step");
+  await expect(stage).toContainText("Chapter 05");
+});
+
+test("homepage decision tools and office handoff work by keyboard", async ({ page }) => {
+  await page.setViewportSize({ width: 1720, height: 960 });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const storyIndex = page.getByRole("navigation", { name: "Homepage story chapters" });
+  await expect(storyIndex).toBeVisible();
+  await expect(storyIndex.getByRole("link")).toHaveCount(6);
+
+  const decisionRoom = page.locator("#choose-route");
+  const routes = decisionRoom.locator('details[name="property-decision-route"]');
+  await expect(routes).toHaveCount(3);
+  await expect(routes.nth(0)).toHaveAttribute("open", "");
+
+  const landownerSummary = routes.nth(1).locator("summary");
+  await landownerSummary.focus();
+  await page.keyboard.press("Enter");
+  await expect(routes.nth(1)).toHaveAttribute("open", "");
+  await expect(routes.nth(0)).not.toHaveAttribute("open", "");
+  await expect(routes.nth(1).getByRole("link", { name: "Explore the landowner route" })).toBeVisible();
+
+  const ledger = page.locator('section[aria-labelledby="evidence-ledger-title"]');
+  const ledgerRows = ledger.locator("details");
+  await expect(ledgerRows).toHaveCount(3);
+  const confirmSummary = ledgerRows.nth(1).locator("summary");
+  await confirmSummary.focus();
+  await page.keyboard.press("Enter");
+  await expect(ledgerRows.nth(1)).toHaveAttribute("open", "");
+  await expect(ledgerRows.nth(1)).toContainText("Ownership, plans, specifications, and approvals");
+
+  const office = page.locator("#visit-office");
+  await expect(office.getByText("2nd Floor, Pouro Market")).toBeVisible();
+  await expect(office.getByRole("link", { name: /Call \+880 1735-877654/ })).toHaveAttribute("href", "tel:+8801735877654");
+  await expect(office.getByRole("link", { name: "Choose your contact channel" })).toHaveAttribute("href", "/contact");
+});
+
+test("kinetic rail animates only while visible and respects its keyboard control", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const rail = page.locator('[data-kinetic-rail="true"]');
+  await expect(rail).toHaveAttribute("data-enhanced", "true");
+
+  await page.getByRole("contentinfo").scrollIntoViewIfNeeded();
+  await expect(rail).toHaveAttribute("data-running", "false");
+
+  await rail.scrollIntoViewIfNeeded();
+  await expect(rail).toHaveAttribute("data-running", "true");
+
+  const pauseButton = rail.locator("button");
+  await expect(pauseButton).toHaveAccessibleName("Pause moving text");
+  await pauseButton.focus();
+  await page.keyboard.press("Enter");
+  await expect(pauseButton).toHaveAttribute("aria-pressed", "true");
+  await expect(pauseButton).toHaveAccessibleName("Resume moving text");
+  await expect(rail).toHaveAttribute("data-running", "false");
+
+  await page.keyboard.press("Enter");
+  await expect(pauseButton).toHaveAttribute("aria-pressed", "false");
+  await expect(pauseButton).toHaveAccessibleName("Pause moving text");
+  await expect(rail).toHaveAttribute("data-running", "true");
+
+  await page.getByRole("contentinfo").scrollIntoViewIfNeeded();
+  await expect(rail).toHaveAttribute("data-running", "false");
+});
+
+test("kinetic rail is readable, static, and control-safe without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+
+  try {
+    await page.goto("/", { waitUntil: "networkidle" });
+    const rail = page.locator('[data-kinetic-rail="true"]');
+    await expect(rail).toHaveAttribute("data-enhanced", "false");
+    await expect(rail).toHaveAttribute("data-running", "false");
+    await expect(rail).toContainText("Buy with evidence");
+    await expect(rail.getByRole("button", { name: "Pause moving text", includeHidden: true })).toBeHidden();
+    await expect(rail.locator('[aria-hidden="true"] > div')).toHaveCSS("animation-play-state", "paused");
+
+    const routes = page.locator('#choose-route details[name="property-decision-route"]');
+    await expect(routes).toHaveCount(3);
+    await expect(routes.nth(0)).toHaveAttribute("open", "");
+    await routes.nth(2).locator("summary").click();
+    await expect(routes.nth(2)).toHaveAttribute("open", "");
+    await expect(page.locator("#visit-office")).toContainText("Purbo Bazar, Joypurhat");
+  } finally {
+    await context.close();
+  }
 });
 
 test("property filters expose an empty state and reset cleanly", async ({ page }) => {
@@ -128,6 +263,26 @@ test("enquiry validation and explicit channel handoff work without transmitting 
   await expect(page.getByRole("button", { name: "Prepare enquiry" })).toBeVisible();
 });
 
+test("property planner validates locally and prepares a reviewable summary", async ({ page }) => {
+  await page.goto("/property-planner");
+  await page.getByRole("button", { name: "Prepare summary" }).click();
+  await expect(page.getByText("Choose the conversation you want to prepare.")).toBeVisible();
+
+  await page.getByLabel("Conversation to prepare").selectOption("buyer");
+  await page.getByLabel("Closest intended use").selectOption("home");
+  await page.getByLabel("Location context").fill("Joypurhat town");
+  await page.getByLabel("Decision timeline").selectOption("within-six-months");
+  await page.getByLabel("Budget readiness").selectOption("under-review");
+  await page.getByLabel("Documents and verification").check();
+  await page.getByLabel("Whole cost and responsibilities").check();
+  await page.getByRole("button", { name: "Prepare summary" }).click();
+
+  await expect(page.getByRole("status")).toContainText("summary is ready");
+  await expect(page.getByLabel("Prepared enquiry summary")).toContainText("Joypurhat town");
+  await page.getByRole("button", { name: "Prepare another" }).click();
+  await expect(page.getByRole("button", { name: "Prepare summary" })).toBeVisible();
+});
+
 test("brand kit download returns the packaged ZIP with enforced headers", async ({ request }) => {
   const response = await request.get("/brand/abdullah-properties-brand-kit.zip");
   const body = await response.body();
@@ -143,6 +298,7 @@ for (const route of [
   "/", "/properties", "/properties/joypurhat-residence", "/projects/nirapad-nibas", "/services/residential-development",
   "/about", "/contact", "/faq", "/buyers", "/landowners", "/process", "/area-guides",
   "/area-guides/joypurhat-property-decisions", "/insights/evaluate-land-with-clarity",
+  "/solutions", "/joint-venture", "/quality", "/client-care", "/resources", "/property-planner",
 ] as const) {
   test(`${route} has no automated WCAG A/AA violations`, async ({ page }) => {
     await page.goto(route, { waitUntil: "networkidle" });
@@ -159,12 +315,44 @@ for (const route of [
 
 test("new creative journeys remain mobile-safe at the narrow supported viewport", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 780 });
-  for (const route of ["/", "/buyers", "/landowners", "/process", "/area-guides/purbo-bazar-office-visit", "/services/land-documentation-support"] as const) {
+  for (const route of ["/", "/buyers", "/landowners", "/process", "/solutions", "/joint-venture", "/property-planner", "/area-guides/purbo-bazar-office-visit", "/services/land-documentation-support"] as const) {
     await page.goto(route, { waitUntil: "networkidle" });
     await expect(page.locator("h1")).toHaveCount(1);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
     expect(overflow, `${route} should not overflow at 320px`).toBe(false);
   }
+});
+
+test("cinematic story and legal footer remain readable without mobile overflow", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const storyStage = page.getByLabel("Active process chapter");
+  await storyStage.scrollIntoViewIfNeeded();
+  const stagePosition = await storyStage.evaluate((element) => getComputedStyle(element).position);
+  expect(stagePosition).toBe("relative");
+
+  const footer = page.getByRole("contentinfo");
+  await footer.scrollIntoViewIfNeeded();
+  const signature = footer.locator("[data-footer-ghost-marquee]");
+  await expect(signature).toBeVisible();
+
+  const legal = footer.locator(".site-footer__legal");
+  await expect(legal).toBeVisible();
+  await expect(legal).toContainText(/© \d{4} Abdullah Properties/);
+  const legalLinks = legal.getByRole("link");
+  await expect(legalLinks).toHaveCount(4);
+  expect(
+    await legalLinks.evaluateAll((links) =>
+      links.every((link) => {
+        const style = getComputedStyle(link);
+        return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0 && link.getClientRects().length > 0;
+      }),
+    ),
+  ).toBe(true);
+
+  const hasPageOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+  expect(hasPageOverflow).toBe(false);
 });
 
 test("the CMS is noindexed and fails closed without configured allowlists", async ({ page }) => {
@@ -177,6 +365,14 @@ test("the CMS is noindexed and fails closed without configured allowlists", asyn
   await expect(page.getByRole("heading", { level: 1 })).toContainText(/allowlists are not configured|not an approved editor or owner/i);
   await expect(page.getByRole("link", { name: "New entry" })).toHaveCount(0);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/i);
+});
+
+test("Office OS redirects anonymous visitors and emits private noindex headers", async ({ request }) => {
+  const response = await request.get("/office", { maxRedirects: 0 });
+  expect(response.status()).toBe(307);
+  expect(response.headers()["location"]).toContain("/signin-with-chatgpt?return_to=");
+  expect(response.headers()["cache-control"]).toBe("private, no-store");
+  expect(response.headers()["x-robots-tag"]).toBe("noindex, nofollow, noarchive");
 });
 
 test("unknown routes are a noindex 404 and reduced motion is honored", async ({ page }) => {
@@ -194,4 +390,38 @@ test("unknown routes are a noindex 404 and reduced motion is honored", async ({ 
       .filter((duration): duration is number => typeof duration === "number"),
   );
   expect(durations.every((duration) => duration <= 1)).toBe(true);
+});
+
+test("reduced motion keeps the cinematic hero, story, and footer signature static", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const signature = page.locator("[data-footer-ghost-marquee]");
+  await expect(signature).toHaveAttribute("data-running", "false");
+  await expect(signature.getByRole("button", { name: "Pause footer brand animation", includeHidden: true })).toBeHidden();
+
+  const kineticRail = page.locator('[data-kinetic-rail="true"]');
+  await expect(kineticRail).toHaveAttribute("data-running", "false");
+  await expect(kineticRail.getByRole("button", { name: "Pause moving text", includeHidden: true })).toBeHidden();
+
+  const animationCounts = await page.evaluate(() => {
+    const regions = [
+      document.querySelector<HTMLElement>('section[aria-labelledby="home-hero-title"]'),
+      document.querySelector<HTMLElement>('[data-kinetic-rail="true"]'),
+      document.querySelector<HTMLElement>('section[aria-labelledby="decision-story-heading"]'),
+      document.querySelector<HTMLElement>("[data-footer-ghost-marquee]"),
+    ];
+
+    return regions.map((region) => {
+      if (!region) return -1;
+      return region
+        .getAnimations({ subtree: true })
+        .filter((animation) => {
+          const duration = animation.effect?.getComputedTiming().duration;
+          return typeof duration === "number" && duration > 1;
+        }).length;
+    });
+  });
+
+  expect(animationCounts).toEqual([0, 0, 0, 0]);
 });

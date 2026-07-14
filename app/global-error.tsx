@@ -41,7 +41,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   }, [error]);
 
   return (
-    <html lang="en">
+    <html lang="en-BD">
       <body>
         <main style={mainStyle}>
           <section role="alert" aria-labelledby="application-error-title" style={sectionStyle}>

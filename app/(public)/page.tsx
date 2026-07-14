@@ -10,22 +10,30 @@ import {
   Landmark,
   MapPin,
   Ruler,
-  Search,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
-import { JourneyCard } from "@/components/brand/journey-card";
 import { AppImage as Image } from "@/components/ui/app-image";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "@/features/properties/property-card";
 import { featuredProperties } from "@/features/properties/data";
-import { company, operatingProcess } from "@/lib/company-data";
+import { company } from "@/lib/company-data";
 import { createMetadata } from "@/lib/seo";
 import { proofPoints, services } from "@/lib/site-data";
-import { documentReadiness, journeyPaths } from "@/lib/experience-data";
+import { documentReadiness } from "@/lib/experience-data";
 import { listPublicAnnouncements, listPublicAreaGuides, listPublicInsights } from "@/features/cms/public-content";
+import { CinematicHomeHero } from "@/features/cinematic-experience";
+import { KineticWordRail, OperationsTrustSection, ResourceChecklists } from "@/features/public-experience";
+import { resourceChecklists, solutionRailWords } from "@/features/public-experience/data";
+import { DecisionStory } from "@/features/cinematic-experience/decision-story";
+import { homeDecisionStory } from "@/features/cinematic-experience/decision-story-data";
+import { DecisionRoom } from "@/features/cinematic-experience/decision-room";
+import { EvidenceLedger } from "@/features/cinematic-experience/evidence-ledger";
+import { HomeChapterNav } from "@/features/cinematic-experience/home-chapter-nav";
+import { homeChapters } from "@/features/cinematic-experience/home-experience-data";
+import { OfficeNextStep } from "@/features/cinematic-experience/office-next-step";
 
 export const metadata = createMetadata({
   title: "Real Estate & Joint Venture Housing in Joypurhat",
@@ -50,57 +58,10 @@ export default async function Home() {
   ]);
   return (
     <main>
-      <section className="home-hero">
-        <div className="site-shell">
-          <div className="home-hero__intro">
-            <p>
-              Property decisions carry real weight. We connect local context, clear advice, and delivery thinking so the next move feels considered.
-            </p>
-            <h1>
-              <span>Property</span>
-              <span className="home-hero__title-row">
-                <span className="home-hero__title-image" aria-hidden="true">
-                  <Image src="/properties/joypurhat-residence.jpg" alt="" fill preload sizes="180px" />
-                </span>
-                decisions,
-              </span>
-              <span>made clear.</span>
-            </h1>
-          </div>
+      <HomeChapterNav chapters={homeChapters} />
+      <CinematicHomeHero />
 
-          <Reveal className="hero-stage">
-            <Image
-              className="hero-stage__image"
-              src="/properties/joypurhat-residence.jpg"
-              alt="Contemporary Abdullah Properties residential entrance"
-              fill
-              preload
-              sizes="(max-width: 760px) 100vw, 1240px"
-            />
-            <div className="hero-stage__veil" />
-            <div className="hero-search-panel">
-              <span className="eyebrow eyebrow--light">Housing support / Joypurhat</span>
-              <h2>Looking for a home, land partner, or project route?</h2>
-              <form action="/properties" className="hero-search-panel__form" role="search">
-                <label>
-                  <span className="sr-only">Search by location or property type</span>
-                  <input name="q" placeholder="Search by location or property type" />
-                </label>
-                <button type="submit" aria-label="Search properties"><Search aria-hidden="true" /></button>
-              </form>
-              <nav className="hero-search-panel__chips" aria-label="Popular property filters">
-                <Link href="/properties?type=Residential">Residential</Link>
-                <Link href="/properties?type=Commercial">Commercial</Link>
-                <Link href="/properties?type=Mixed-use">Mixed-use</Link>
-              </nav>
-            </div>
-            <div className="hero-stage__index">
-              <span>AP / 01</span>
-              <span>Illustrative property study</span>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      <KineticWordRail words={solutionRailWords} label="Abdullah Properties decision paths" />
 
       {announcements.length > 0 ? (
         <section className="announcement-strip" aria-labelledby="announcement-strip-title">
@@ -145,20 +106,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="journey-paths" aria-labelledby="journey-paths-heading">
-        <div className="site-shell">
-          <div className="journey-paths__head">
-            <span className="eyebrow">Choose your route</span>
-            <h2 id="journey-paths-heading">One company. Three different starting questions.</h2>
-            <p>Enter through the decision that matches your role; the next useful step should become clearer immediately.</p>
-          </div>
-          <div className="journey-paths__grid">
-            {journeyPaths.map((path) => <JourneyCard item={path} key={path.id} />)}
-          </div>
-        </div>
-      </section>
+      <DecisionRoom />
 
-      <section className="services-section">
+      <section className="services-section" id="operating-system">
         <div className="site-shell">
           <div className="section-heading-row">
             <SectionHeading eyebrow="Services / 06" title="One property journey. Connected support." description="Residential development, joint ventures, documentation, planning, handover, and after-sales each have a clear role." />
@@ -179,23 +129,15 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="consult-section">
-        <div className="site-shell consult-section__frame">
-          <Reveal className="consult-card">
-            <div className="consult-card__media">
-              <Image src="/projects/client-studio.jpg" alt="Illustrative Abdullah Properties client consultation studio" fill sizes="(max-width: 760px) 100vw, 42vw" />
-            </div>
-            <div className="consult-card__content">
-              <span className="eyebrow">Direct enquiry</span>
-              <h2>Consult with our property team.</h2>
-              <p>Bring the plot, the requirement, or the uncertainty. We will help structure the next useful decision.</p>
-              <Button asChild className="brand-button"><Link href="/contact">Plan a consultation <ArrowRight aria-hidden="true" /></Link></Button>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      <DecisionStory id="decision-process" chapters={homeDecisionStory} />
 
-      <section className="featured-section">
+      <OperationsTrustSection
+        title="A better property experience keeps the evidence trail visible."
+        description="The public journey and protected office system use the same operating language: known facts, open questions, named owners, decision gates, and records that remain reviewable."
+        link={{ href: "/quality", label: "Explore the quality gates" }}
+      />
+
+      <section className="featured-section" id="selected-work">
         <div className="site-shell">
           <div className="section-heading-row section-heading-row--dark">
             <SectionHeading inverse eyebrow="Selected work / Visual studies" title="Choose what fits the whole picture." description="These branded studies communicate design and delivery intent. Confirm live inventory and availability directly with the team." />
@@ -210,21 +152,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="evidence-dossier">
-        <div className="site-shell evidence-dossier__grid">
-          <div className="evidence-dossier__index"><span>PROJECT RECORD</span><strong>01</strong></div>
-          <div className="evidence-dossier__copy">
-            <span className="eyebrow">Nirapad Nibas / Dhanmondi, Joypurhat</span>
-            <h2>Publish what is known. Mark what still needs evidence.</h2>
-            <p>The project name and locality are consistently published. Specifications, plans, approvals, ownership, pricing, status, and availability remain confirmation items.</p>
-            <Link href="/projects/nirapad-nibas">Open the evidence dossier <ArrowUpRight aria-hidden="true" /></Link>
-          </div>
-          <div className="evidence-dossier__media">
-            <Image src="/projects/building-signage.jpg" alt="Illustrative Abdullah Properties project identity study" fill sizes="(max-width: 760px) 100vw, 42vw" />
-            <span>Illustrative visual study</span>
-          </div>
-        </div>
-      </section>
+      <EvidenceLedger />
 
       <section className="areas-section">
         <div className="site-shell">
@@ -243,14 +171,19 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="process-section process-section--corridor">
-        <div className="site-shell process-section__grid">
-          <div className="process-section__sticky"><SectionHeading eyebrow="The working process" title="Five visible steps from inquiry to handover." description="The published operating sequence keeps scope, evidence, decisions, and responsibilities understandable." /><Button asChild className="brand-button brand-button--outline"><Link href="/process">Enter the full process <ArrowRight aria-hidden="true" /></Link></Button></div>
-          <ol className="process-list">
-            {operatingProcess.map((step) => (
-              <li key={step.id}><span>{step.id}</span><h3>{step.title}</h3><p>{step.summary}</p></li>
-            ))}
-          </ol>
+      <section className="consult-section">
+        <div className="site-shell consult-section__frame">
+          <Reveal className="consult-card">
+            <div className="consult-card__media">
+              <Image src="/projects/client-studio.jpg" alt="Illustrative Abdullah Properties client consultation studio" fill sizes="(max-width: 760px) 100vw, 42vw" />
+            </div>
+            <div className="consult-card__content">
+              <span className="eyebrow">Direct enquiry</span>
+              <h2>Consult with our property team.</h2>
+              <p>Bring the plot, the requirement, or the uncertainty. We will help structure the next useful decision.</p>
+              <Button asChild className="brand-button"><Link href="/contact">Plan a consultation <ArrowRight aria-hidden="true" /></Link></Button>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -272,6 +205,13 @@ export default async function Home() {
         </div>
       </section>
 
+      <ResourceChecklists
+        resources={resourceChecklists.slice(0, 2)}
+        eyebrow="Practical tools"
+        title="Prepare the buyer or landowner conversation before it begins."
+        description="Use a consistent checklist to organize context and evidence questions, then take the unresolved items into the right professional review."
+      />
+
       <section className="insights-section">
         <div className="site-shell">
           <div className="section-heading-row">
@@ -290,6 +230,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      <OfficeNextStep />
 
       <section className="home-cta">
         <div className="site-shell">

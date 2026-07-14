@@ -1,17 +1,25 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { FooterGhostMarquee } from "@/components/layout/footer-ghost-marquee";
 import { company } from "@/lib/company-data";
 import { siteNavigation } from "@/lib/site-data";
 
 const supportLinks = [
   { href: "/buyers", label: "Buyer journey" },
   { href: "/landowners", label: "Landowner journey" },
+  { href: "/joint-venture", label: "Joint-venture pathway" },
+  { href: "/process", label: "Working process" },
+  { href: "/quality", label: "Quality gates" },
+  { href: "/client-care", label: "Client care" },
   { href: "/area-guides", label: "Area guides" },
+  { href: "/resources", label: "Resources" },
+  { href: "/property-planner", label: "Property planner" },
   { href: "/insights", label: "Insights" },
   { href: "/faq", label: "FAQ" },
   { href: "/brand-kit", label: "Brand kit" },
   { href: "/accessibility", label: "Accessibility" },
+  { href: "/office", label: "Office sign in" },
 ] as const;
 
 const legalLinks = [
@@ -58,6 +66,7 @@ export function SiteFooter() {
           </nav>
         </div>
       </div>
+      <FooterGhostMarquee />
     </footer>
   );
 }

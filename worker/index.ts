@@ -4,6 +4,7 @@ import handler from "vinext/server/app-router-entry";
 interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
+  FILES: R2Bucket;
 }
 
 interface ExecutionContext {
@@ -89,7 +90,12 @@ const worker = {
     }
 
     const response = withSecurityHeaders(await handler.fetch(request, env, ctx));
-    if (url.pathname === "/studio" || url.pathname.startsWith("/studio/")) {
+    if (
+      url.pathname === "/studio" ||
+      url.pathname.startsWith("/studio/") ||
+      url.pathname === "/office" ||
+      url.pathname.startsWith("/office/")
+    ) {
       const headers = new Headers(response.headers);
       headers.set("Cache-Control", "private, no-store");
       headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");

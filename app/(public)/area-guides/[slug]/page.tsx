@@ -31,7 +31,24 @@ export default async function AreaGuidePage({ params }: AreaGuidePageProps) {
   return (
     <main>
       <BreadcrumbJsonLd items={[{ name: "Home", path: "/" }, { name: "Area guides", path: "/area-guides" }, { name: guide.name, path: `/area-guides/${guide.slug}` }]} />
-      <JsonLd data={{ "@context": "https://schema.org", "@type": "Article", headline: guide.title, description: guide.dek, datePublished: guide.updatedAt, dateModified: guide.updatedAt, mainEntityOfPage: absoluteUrl(`/area-guides/${guide.slug}`), author: { "@type": "Organization", name: "Abdullah Properties" } }} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: guide.title,
+          description: guide.dek,
+          datePublished: guide.updatedAt,
+          dateModified: guide.updatedAt,
+          mainEntityOfPage: absoluteUrl(`/area-guides/${guide.slug}`),
+          image: absoluteUrl("/og/properties.jpg"),
+          author: {
+            "@type": "Organization",
+            name: "Abdullah Properties",
+            url: absoluteUrl("/about"),
+          },
+          publisher: { "@id": `${absoluteUrl("/")}#organization` },
+        }}
+      />
       <header className="area-guide-hero">
         <div className="site-shell area-guide-hero__grid">
           <div><span className="eyebrow">{guide.index}</span><h1>{guide.title}</h1></div>

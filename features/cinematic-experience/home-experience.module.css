@@ -1,0 +1,837 @@
+.experienceShell {
+  width: min(calc(100% - 48px), 1280px);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 760;
+  letter-spacing: 0.11em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  width: 0.52rem;
+  height: 0.52rem;
+  flex: 0 0 auto;
+  background: #ff6b2c;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.chapterNav {
+  display: none;
+}
+
+.decisionRoom,
+.evidenceLedger,
+.officeSection,
+:global(#story-start),
+:global(#operating-system),
+:global(#decision-process),
+:global(#selected-work) {
+  scroll-margin-top: 6rem;
+}
+
+.decisionRoom {
+  padding-block: clamp(5.5rem, 10vw, 10rem);
+  background: #f4efec;
+  color: #0c0c0c;
+}
+
+.decisionHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
+  gap: clamp(2rem, 7vw, 7rem);
+  align-items: end;
+  margin-bottom: clamp(3.25rem, 7vw, 6.25rem);
+}
+
+.decisionHeader h2,
+.evidenceIntro h2,
+.officeHeader h2 {
+  margin: 1.35rem 0 0;
+  font-size: clamp(2.8rem, 6.2vw, 6.8rem);
+  font-weight: 650;
+  letter-spacing: -0.064em;
+  line-height: 0.92;
+}
+
+.decisionHeader h2 {
+  max-width: 13ch;
+}
+
+.decisionHeader > p {
+  max-width: 48ch;
+  margin: 0;
+  color: #5f5b59;
+  font-size: clamp(1rem, 0.35vw + 0.925rem, 1.125rem);
+  line-height: 1.68;
+}
+
+.routeList {
+  border-top: 1px solid #0c0c0c;
+}
+
+.route {
+  border-bottom: 1px solid #0c0c0c;
+  background: transparent;
+  transition: background-color 240ms ease-out, color 240ms ease-out;
+}
+
+.route[open] {
+  background: #0c0c0c;
+  color: #fff;
+}
+
+.route summary,
+.ledgerRows summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.route summary::-webkit-details-marker,
+.ledgerRows summary::-webkit-details-marker {
+  display: none;
+}
+
+.route summary {
+  display: grid;
+  grid-template-columns: 4rem minmax(8rem, 0.42fr) minmax(0, 1fr) 2.75rem;
+  gap: clamp(1rem, 3vw, 2.75rem);
+  align-items: center;
+  min-height: 9.25rem;
+  padding: 1.5rem clamp(1rem, 2vw, 1.75rem);
+}
+
+.route summary:focus-visible,
+.ledgerRows summary:focus-visible {
+  outline: 3px solid #ff6b2c;
+  outline-offset: -5px;
+}
+
+.routeIndex,
+.routeLabel,
+.routePrompt > span,
+.routeQuestions > span,
+.routeOutcome > span {
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.routeIndex {
+  color: #9f3000;
+}
+
+.routeLabel {
+  color: #5f5b59;
+}
+
+.route[open] .routeLabel {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.route[open] .routeIndex {
+  color: #ff8754;
+}
+
+.route summary strong {
+  max-width: 23ch;
+  font-size: clamp(1.6rem, 3vw, 3.1rem);
+  font-weight: 620;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.routeToggle,
+.ledgerToggle {
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+}
+
+.routeToggle::before,
+.routeToggle::after,
+.ledgerToggle::before,
+.ledgerToggle::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.8rem;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  transform: translate(-50%, -50%);
+  transition: transform 220ms ease-out;
+}
+
+.routeToggle::after,
+.ledgerToggle::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.route[open] .routeToggle::after,
+.ledgerRows details[open] .ledgerToggle::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.routeBody {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(15rem, 0.72fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  padding: 0 clamp(1rem, 2vw, 1.75rem) clamp(2.5rem, 6vw, 5.5rem) calc(4rem + clamp(1rem, 2vw, 1.75rem) + clamp(1rem, 3vw, 2.75rem));
+}
+
+.routePrompt > span,
+.routeQuestions > span,
+.routeOutcome > span {
+  display: block;
+  margin-bottom: 1.15rem;
+  color: #ff6b2c;
+}
+
+.routePrompt p,
+.routeOutcome p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.66;
+}
+
+.routeQuestions ul {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+}
+
+.routeQuestions li {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  gap: 0.7rem;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.5;
+}
+
+.routeQuestions svg {
+  width: 1rem;
+  color: #ff6b2c;
+}
+
+.routeOutcome {
+  display: flex;
+  flex-direction: column;
+}
+
+.routeOutcome a,
+.evidenceIntro > a,
+.officeAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid currentColor;
+  font-size: 0.76rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.routeOutcome a svg,
+.evidenceIntro > a svg,
+.officeAction svg {
+  width: 1.1rem;
+  transition: transform 200ms ease-out;
+}
+
+.routeOutcome a:hover svg,
+.routeOutcome a:focus-visible svg,
+.evidenceIntro > a:hover svg,
+.evidenceIntro > a:focus-visible svg,
+.officeAction:hover svg,
+.officeAction:focus-visible svg {
+  transform: translate(0.2rem, -0.2rem);
+}
+
+.evidenceLedger {
+  padding-block: clamp(5.5rem, 9vw, 9rem);
+  background: #fbf9f8;
+  color: #0c0c0c;
+}
+
+.evidenceGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(21rem, 0.75fr) minmax(0, 1.05fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: stretch;
+}
+
+.evidenceIntro {
+  display: flex;
+  flex-direction: column;
+}
+
+.evidenceIntro h2 {
+  max-width: 10ch;
+  font-size: clamp(2.7rem, 4.8vw, 5.2rem);
+}
+
+.evidenceIntro > p {
+  max-width: 48ch;
+  margin: 2rem 0 2.5rem;
+  color: #5f5b59;
+  line-height: 1.7;
+}
+
+.evidenceIntro > a {
+  align-self: flex-start;
+  width: min(100%, 22rem);
+}
+
+.evidenceMedia {
+  position: relative;
+  min-height: 34rem;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  background: #d8d2cf;
+}
+
+.evidenceMedia::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 48%, rgba(0, 0, 0, 0.78));
+  content: "";
+}
+
+.evidenceMedia img {
+  object-fit: cover;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.evidenceMedia span {
+  position: absolute;
+  z-index: 1;
+  right: 1.4rem;
+  bottom: 1.4rem;
+  left: 1.4rem;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.ledgerRows {
+  border-top: 1px solid #0c0c0c;
+}
+
+.ledgerRows details {
+  border-bottom: 1px solid #0c0c0c;
+}
+
+.ledgerRows summary {
+  display: grid;
+  grid-template-columns: 1.5rem 6.5rem minmax(0, 1fr) 2.25rem;
+  gap: 1rem;
+  align-items: center;
+  min-height: 6.75rem;
+  padding-block: 1rem;
+}
+
+.ledgerRows summary > svg {
+  width: 1.15rem;
+  color: #ff6b2c;
+}
+
+.ledgerRows summary > span:not(.ledgerToggle) {
+  font-size: 0.68rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ledgerRows summary strong {
+  font-size: clamp(1.15rem, 1.5vw, 1.45rem);
+  font-weight: 620;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.ledgerToggle {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.ledgerRows ul {
+  display: grid;
+  gap: 0;
+  margin: 0 0 2rem 3.5rem;
+  padding: 0;
+}
+
+.ledgerRows li {
+  position: relative;
+  padding: 0.7rem 0 0.7rem 1.35rem;
+  border-top: 1px solid rgba(12, 12, 12, 0.16);
+  color: #5f5b59;
+  line-height: 1.5;
+}
+
+.ledgerRows li::before {
+  position: absolute;
+  top: 1.15rem;
+  left: 0;
+  width: 0.42rem;
+  height: 0.42rem;
+  background: #ff6b2c;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.officeSection {
+  padding-block: clamp(5.5rem, 10vw, 10rem);
+  background: #0c0c0c;
+  color: #fff;
+}
+
+.officeHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-bottom: clamp(3rem, 7vw, 6.5rem);
+}
+
+.officeHeader h2 {
+  max-width: 12ch;
+}
+
+.officeGrid {
+  display: grid;
+  grid-template-columns: minmax(20rem, 0.75fr) minmax(0, 1.25fr);
+  gap: clamp(2rem, 6vw, 6.5rem);
+  align-items: stretch;
+}
+
+.officeCard {
+  display: flex;
+  min-height: 37rem;
+  flex-direction: column;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: 1.75rem;
+  background: #ff6b2c;
+  color: #0c0c0c;
+}
+
+.officeCardTopline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid currentColor;
+  font-size: 0.68rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.officeAddress {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  margin-top: auto;
+}
+
+.officeAddress svg,
+.officeHours svg {
+  width: 1.5rem;
+}
+
+.officeAddress address {
+  font-size: clamp(1.75rem, 3vw, 3.25rem);
+  font-style: normal;
+  font-weight: 620;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.officeHours {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  margin-top: 2.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid currentColor;
+}
+
+.officeHours span {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 760;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.officeHours strong {
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.officeLinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.officeLinks a {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 760;
+  text-align: center;
+}
+
+.officeLinks a:hover,
+.officeLinks a:focus-visible {
+  background: #0c0c0c;
+  color: #fff;
+}
+
+.officeLinks svg {
+  width: 1rem;
+}
+
+.officeProcess {
+  display: flex;
+  flex-direction: column;
+}
+
+.officeProcess > p {
+  max-width: 54ch;
+  margin: 0 0 clamp(2.5rem, 5vw, 4.5rem);
+  color: rgba(255, 255, 255, 0.64);
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  line-height: 1.65;
+}
+
+.officeProcess ol {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.officeProcess li {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.25rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.officeProcess li > span {
+  color: #ff6b2c;
+  font-size: 0.75rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+}
+
+.officeProcess h3 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.4vw, 2.35rem);
+  font-weight: 620;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.officeProcess li p {
+  max-width: 58ch;
+  margin: 0.85rem 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.6;
+}
+
+.officeAction {
+  width: min(100%, 28rem);
+  align-self: flex-end;
+  margin-top: auto;
+  color: #fff;
+}
+
+@media (min-width: 1660px) {
+  .chapterNav {
+    position: fixed;
+    z-index: 25;
+    top: 50%;
+    right: 1.25rem;
+    display: grid;
+    width: 8.5rem;
+    grid-template-columns: 1px 1fr;
+    gap: 0.85rem;
+    align-items: stretch;
+    color: #0c0c0c;
+    transform: translateY(-50%);
+  }
+
+  .chapterTrack {
+    position: relative;
+    display: block;
+    margin-block: 1.1rem;
+    background: rgba(12, 12, 12, 0.2);
+  }
+
+  .chapterTrack > span {
+    position: absolute;
+    inset: 0;
+    background: #ff6b2c;
+    transform-origin: top;
+    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .chapterNav ol {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .chapterNav a {
+    display: grid;
+    grid-template-columns: 1.65rem 1fr;
+    gap: 0.35rem;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.45rem;
+    border-radius: 0.45rem;
+    background: rgba(251, 249, 248, 0.88);
+    box-shadow: 0 0.25rem 1rem rgba(12, 12, 12, 0.08);
+    font-size: 0.65rem;
+    font-weight: 760;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .chapterNav a > span:first-child {
+    color: #7a7470;
+    font-size: 0.6rem;
+  }
+
+  .chapterNav a[aria-current="location"] {
+    background: #0c0c0c;
+    color: #fff;
+  }
+
+  .chapterNav a[aria-current="location"] > span:first-child {
+    color: #ff6b2c;
+  }
+
+  .chapterNav a:focus-visible {
+    outline: 3px solid #ff6b2c;
+    outline-offset: 3px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .route:not([open]) summary:hover {
+    background: rgba(255, 107, 44, 0.12);
+  }
+
+  .evidenceMedia:hover img {
+    transform: scale(1.035);
+  }
+}
+
+@media (max-width: 1050px) {
+  .decisionHeader,
+  .evidenceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .decisionHeader > p {
+    max-width: 60ch;
+  }
+
+  .route summary {
+    grid-template-columns: 3rem minmax(7rem, 0.4fr) minmax(0, 1fr) 2.75rem;
+  }
+
+  .routeBody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-left: 1rem;
+  }
+
+  .routeOutcome {
+    grid-column: 2;
+  }
+
+  .evidenceGrid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  .evidenceIntro {
+    grid-column: 1 / -1;
+  }
+
+  .evidenceIntro h2 {
+    max-width: 13ch;
+  }
+
+  .officeGrid {
+    grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1.18fr);
+  }
+
+  .officeLinks {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .experienceShell {
+    width: min(calc(100% - 32px), 1280px);
+  }
+
+  .decisionRoom,
+  .evidenceLedger,
+  .officeSection {
+    padding-block: 4.75rem;
+  }
+
+  .decisionHeader,
+  .officeHeader {
+    margin-bottom: 3rem;
+  }
+
+  .decisionHeader h2,
+  .officeHeader h2 {
+    font-size: clamp(2.6rem, 12vw, 4.2rem);
+  }
+
+  .route summary {
+    grid-template-columns: 2.25rem minmax(0, 1fr) 2.5rem;
+    gap: 0.75rem;
+    min-height: 8rem;
+    padding-inline: 0.25rem;
+  }
+
+  .routeLabel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .route summary strong {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 1.55rem;
+  }
+
+  .routeIndex {
+    grid-row: 1 / 3;
+  }
+
+  .routeToggle {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .routeBody {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 0.5rem 0.25rem 2.75rem 3rem;
+  }
+
+  .routeOutcome {
+    grid-column: auto;
+  }
+
+  .routeOutcome a {
+    margin-top: 2rem;
+  }
+
+  .evidenceGrid,
+  .officeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .evidenceIntro h2 {
+    font-size: clamp(2.55rem, 11.4vw, 4.1rem);
+  }
+
+  .evidenceMedia {
+    min-height: 28rem;
+  }
+
+  .ledgerRows summary {
+    grid-template-columns: 1.4rem minmax(0, 1fr) 2.25rem;
+    gap: 0.75rem;
+  }
+
+  .ledgerRows summary > span:not(.ledgerToggle) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .ledgerRows summary strong {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .ledgerRows summary > svg,
+  .ledgerToggle {
+    grid-row: 1 / 3;
+  }
+
+  .ledgerRows ul {
+    margin-left: 2.15rem;
+  }
+
+  .officeCard {
+    min-height: 34rem;
+  }
+
+  .officeAddress address {
+    font-size: clamp(1.65rem, 7.6vw, 2.5rem);
+  }
+
+  .officeProcess li {
+    grid-template-columns: 2.5rem 1fr;
+  }
+
+  .officeAction {
+    margin-top: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapterTrack > span,
+  .route,
+  .routeToggle::before,
+  .routeToggle::after,
+  .ledgerToggle::before,
+  .ledgerToggle::after,
+  .routeOutcome a svg,
+  .evidenceIntro > a svg,
+  .officeAction svg,
+  .evidenceMedia img {
+    transition-duration: 0.01ms !important;
+  }
+}
