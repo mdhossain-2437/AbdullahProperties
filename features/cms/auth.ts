@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getChatGPTUser, requireChatGPTUser, type ChatGPTUser } from "@/app/chatgpt-auth";
 
 type RuntimeEnv = {
@@ -21,7 +22,7 @@ function emailSet(value: string | undefined) {
   );
 }
 
-async function cmsAuthorization(): Promise<CmsAuthorization> {
+const cmsAuthorization = cache(async (): Promise<CmsAuthorization> => {
   let runtime: RuntimeEnv = {};
   try {
     const worker = await import("cloudflare:workers");
@@ -34,7 +35,7 @@ async function cmsAuthorization(): Promise<CmsAuthorization> {
     editors: emailSet(runtime.CMS_ALLOWED_EMAILS ?? process.env.CMS_ALLOWED_EMAILS),
     owners: emailSet(runtime.CMS_OWNER_EMAILS ?? process.env.CMS_OWNER_EMAILS),
   };
-}
+});
 
 function roleForEmail(email: string, authorization: CmsAuthorization): CmsRole | null {
   const normalizedEmail = email.trim().toLowerCase();
@@ -43,8 +44,12 @@ function roleForEmail(email: string, authorization: CmsAuthorization): CmsRole |
   return null;
 }
 
+const getCmsRoleForNormalizedEmail = cache(async (normalizedEmail: string): Promise<CmsRole | null> =>
+  roleForEmail(normalizedEmail, await cmsAuthorization()),
+);
+
 export async function getCmsRole(email: string): Promise<CmsRole | null> {
-  return roleForEmail(email, await cmsAuthorization());
+  return getCmsRoleForNormalizedEmail(email.trim().toLowerCase());
 }
 
 export async function isCmsAdministrator(email: string) {

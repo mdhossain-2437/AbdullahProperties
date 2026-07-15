@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -16,7 +17,7 @@ const SIGN_IN_PATH = "/signin-with-chatgpt";
 const SIGN_OUT_PATH = "/signout-with-chatgpt";
 const CALLBACK_PATH = "/callback";
 
-export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
+async function readChatGPTUser(): Promise<ChatGPTUser | null> {
   const requestHeaders = await headers();
   const email = requestHeaders.get(USER_EMAIL_HEADER);
   if (!email) return null;
@@ -34,6 +35,13 @@ export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
     fullName,
   };
 }
+
+/**
+ * Authentication headers are immutable for one Server Component request. React's request cache
+ * prevents a shared layout and its page from decoding the same identity more than once without
+ * retaining identity across requests or Worker invocations.
+ */
+export const getChatGPTUser = cache(readChatGPTUser);
 
 export async function requireChatGPTUser(
   returnTo: string,

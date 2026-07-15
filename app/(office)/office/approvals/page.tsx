@@ -11,7 +11,7 @@ import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDateTime, humanizeOfficeValue } from "@/features/office/presentation";
 import {
-  getOfficeDatabaseHealth,
+  isOfficeDatabaseAvailable,
   listOfficeApprovals,
   type OfficeApprovalEntityType,
 } from "@/features/office/repository";
@@ -34,8 +34,7 @@ function asChoice<const T extends readonly string[]>(value: string | undefined, 
 
 export default async function OfficeApprovalsPage({ searchParams }: { searchParams: ApprovalSearchParams }) {
   const actor = await requireOfficePermission("approvals.read", "/office/approvals");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const status = asChoice(first(params.status), statuses);

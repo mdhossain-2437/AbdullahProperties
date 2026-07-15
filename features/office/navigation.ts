@@ -5,7 +5,7 @@ export type OfficeNavigationItem = {
   label: string;
   description: string;
   permission: OfficePermission;
-  icon: "overview" | "people" | "land" | "projects" | "tasks" | "invoices" | "payments" | "expenses" | "approvals" | "documents" | "reports" | "team" | "audit";
+  icon: "overview" | "people" | "land" | "projects" | "tasks" | "invoices" | "payments" | "expenses" | "approvals" | "documents" | "notices" | "notifications" | "reports" | "team" | "audit" | "settings";
 };
 
 export type OfficeNavigationGroup = {
@@ -35,6 +35,7 @@ export const officeNavigation: readonly OfficeNavigationGroup[] = [
     items: [
       { href: "/office/projects", label: "Projects", description: "Milestones, risks, and progress", permission: "projects.read", icon: "projects" },
       { href: "/office/documents", label: "Documents", description: "Controlled project evidence", permission: "documents.read", icon: "documents" },
+      { href: "/office/notices", label: "Notices", description: "Branded letters and circulars", permission: "documents.read", icon: "notices" },
     ],
   },
   {
@@ -51,6 +52,8 @@ export const officeNavigation: readonly OfficeNavigationGroup[] = [
       { href: "/office/reports", label: "Reports", description: "Pipeline, delivery, and finance", permission: "reports.read", icon: "reports" },
       { href: "/office/team", label: "Team", description: "Membership and roles", permission: "team.read", icon: "team" },
       { href: "/office/audit", label: "Audit", description: "Immutable activity history", permission: "audit.read", icon: "audit" },
+      { href: "/office/notifications", label: "Notifications", description: "Email and SMS delivery queue", permission: "notifications.read", icon: "notifications" },
+      { href: "/office/settings", label: "Settings", description: "Controlled workspace utilities", permission: "settings.manage", icon: "settings" },
     ],
   },
 ] as const;

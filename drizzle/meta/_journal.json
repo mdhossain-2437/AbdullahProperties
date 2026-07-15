@@ -15,6 +15,13 @@
       "when": 1784021349374,
       "tag": "0001_glamorous_kid_colt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1784034363044,
+      "tag": "0002_needy_spectrum",
+      "breakpoints": true
     }
   ]
 }

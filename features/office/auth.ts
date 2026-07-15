@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getChatGPTUser, requireChatGPTUser, type ChatGPTUser } from "@/app/chatgpt-auth";
 import { getD1 } from "@/db";
 import { getCmsRole } from "@/features/cms/auth";
@@ -72,8 +73,9 @@ function isOfficeMembershipStoreUnavailable(error: unknown): boolean {
   return /(?:D1_ERROR:\s*)?no such table:\s*office_members\b/i.test(error.message);
 }
 
-export async function getOfficeMembershipByEmail(email: string): Promise<OfficeMembership | null> {
-  const normalizedEmail = normalizedEmailSchema.parse(email);
+const getOfficeMembershipByNormalizedEmail = cache(async (
+  normalizedEmail: string,
+): Promise<OfficeMembership | null> => {
   let row: OfficeMembershipRow | null;
   try {
     row = await (await getD1())
@@ -88,9 +90,13 @@ export async function getOfficeMembershipByEmail(email: string): Promise<OfficeM
   }
 
   return row ? membershipFromRow(row) : null;
+});
+
+export async function getOfficeMembershipByEmail(email: string): Promise<OfficeMembership | null> {
+  return getOfficeMembershipByNormalizedEmail(normalizedEmailSchema.parse(email));
 }
 
-async function resolveOfficeActor(user: ChatGPTUser): Promise<AuthorizedOfficeActor | null> {
+const resolveOfficeActor = cache(async (user: ChatGPTUser): Promise<AuthorizedOfficeActor | null> => {
   const membership = await getOfficeMembershipByEmail(user.email);
   if (membership) {
     if (membership.status !== "active") return null;
@@ -109,7 +115,7 @@ async function resolveOfficeActor(user: ChatGPTUser): Promise<AuthorizedOfficeAc
     role: "owner",
     source: "cms_owner_bootstrap",
   };
-}
+});
 
 export async function getAuthorizedOfficeActor(): Promise<AuthorizedOfficeActor | null> {
   const user = await getChatGPTUser();

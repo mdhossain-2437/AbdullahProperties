@@ -91,29 +91,6 @@ export const operatingProcess = [
   },
 ] as const;
 
-export const leadershipRoles = [
-  {
-    id: "01",
-    role: "Founder",
-    name: "Approved name pending",
-    status: "Identity and portrait awaiting owner approval",
-    responsibility:
-      "Company direction, customer relationships, housing strategy, and the operating principles behind Abdullah Properties.",
-    image: "/projects/office-identity.jpg",
-    imageAlt: "Abdullah Properties brand environment representing company leadership",
-  },
-  {
-    id: "02",
-    role: "Co-founder",
-    name: "Approved name pending",
-    status: "Identity and portrait awaiting owner approval",
-    responsibility:
-      "Project execution, coordination, quality follow-through, and the connection between client commitments and delivery.",
-    image: "/projects/housing-base-construction.jpg",
-    imageAlt: "Construction coordination representing the Abdullah Properties co-founder role",
-  },
-] as const;
-
 export const companyFaqs = [
   {
     question: "Where is Abdullah Properties located?",

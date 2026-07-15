@@ -15,7 +15,10 @@ import {
   HandCoins,
   MapPinned,
   Menu,
+  BellRing,
   ReceiptText,
+  ScrollText,
+  Settings2,
   Users,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand/brand-logo";
@@ -34,9 +37,12 @@ const icons = {
   expenses: Banknote,
   approvals: ClipboardCheck,
   documents: FolderLock,
+  notices: ScrollText,
+  notifications: BellRing,
   reports: BarChart3,
   team: BadgeCheck,
   audit: FileClock,
+  settings: Settings2,
 } as const;
 
 function isCurrentRoute(pathname: string, href: string) {

@@ -9,7 +9,7 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDate, humanizeOfficeValue } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeContacts, listOfficeTeamMembers } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeContacts, listOfficeTeamMembers } from "@/features/office/repository";
 import type { OfficeContactKind } from "@/features/office/types";
 
 export const metadata: Metadata = { title: "Contacts | Office OS" };
@@ -29,8 +29,7 @@ function asChoice<const T extends readonly string[]>(value: string | undefined, 
 
 export default async function OfficeContactsPage({ searchParams }: { searchParams: ContactsSearchParams }) {
   const actor = await requireOfficePermission("crm.read", "/office/contacts");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const query = first(params.q)?.trim().slice(0, 120) || undefined;

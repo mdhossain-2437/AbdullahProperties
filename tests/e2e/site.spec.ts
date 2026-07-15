@@ -97,6 +97,50 @@ test("mobile navigation is keyboard operable", async ({ page }) => {
   await expect(page).toHaveURL(/\/about$/);
 });
 
+test("language toggle preserves the current page and exposes a hand-written Bengali experience", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/about", { waitUntil: "networkidle" });
+
+  await page.getByRole("link", { name: "এই পাতাটি বাংলায় দেখুন" }).click();
+
+  await expect(page).toHaveURL(/\/bn\/about$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "bn-BD");
+  await expect(page.getByRole("heading", { level: 1, name: "স্থানীয় আবাসনকাজ—সহজ ভাষায়, দৃশ্যমান দায়িত্বে।" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "View this page in English" })).toHaveAttribute("href", "/about");
+
+  const accessibility = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(
+    accessibility.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      targets: violation.nodes.map((node) => node.target),
+    })),
+    "Bengali route accessibility violations",
+  ).toEqual([]);
+
+  const hasPageOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth + 1,
+  );
+  expect(hasPageOverflow).toBe(false);
+});
+
+test("compact bilingual header switches before navigation can overlap", async ({ page }) => {
+  await page.setViewportSize({ width: 1060, height: 780 });
+  await page.goto("/bn", { waitUntil: "networkidle" });
+
+  const header = page.getByRole("banner");
+  await expect(header.getByRole("button", { name: "নেভিগেশন খুলুন" })).toBeVisible();
+  await expect(header.getByRole("navigation", { name: "প্রধান নেভিগেশন" })).toBeHidden();
+  await expect(header.getByRole("navigation", { name: "ভাষা নির্বাচন" })).toBeVisible();
+
+  const headerBounds = await header.boundingBox();
+  expect(headerBounds).not.toBeNull();
+  expect((headerBounds?.x ?? 0) + (headerBounds?.width ?? 0)).toBeLessThanOrEqual(1060);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)).toBe(false);
+});
+
 test("desktop Explore navigation opens, dismisses, and restores trigger focus", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
@@ -323,6 +367,22 @@ test("new creative journeys remain mobile-safe at the narrow supported viewport"
   }
 });
 
+test("Bengali public routes remain readable at the 320px supported viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+
+  for (const route of ["/bn", "/bn/about", "/bn/services", "/bn/properties", "/bn/contact"] as const) {
+    await page.goto(route, { waitUntil: "networkidle" });
+    await expect(page.locator("html")).toHaveAttribute("lang", "bn-BD");
+    await expect(page.locator("h1")).toHaveCount(1);
+    await expect(page.getByRole("button", { name: "নেভিগেশন খুলুন" })).toBeVisible();
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth + 1,
+    );
+    expect(overflow, `${route} should not overflow at 320px`).toBe(false);
+  }
+});
+
 test("cinematic story and legal footer remain readable without mobile overflow", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 780 });
   await page.goto("/", { waitUntil: "networkidle" });
@@ -373,6 +433,20 @@ test("Office OS redirects anonymous visitors and emits private noindex headers",
   expect(response.headers()["location"]).toContain("/signin-with-chatgpt?return_to=");
   expect(response.headers()["cache-control"]).toBe("private, no-store");
   expect(response.headers()["x-robots-tag"]).toBe("noindex, nofollow, noarchive");
+});
+
+test("public tracking fails privately without exposing record details", async ({ page }) => {
+  const response = await page.goto("/track/not-a-valid-tracking-code", { waitUntil: "networkidle" });
+
+  expect(response?.status()).toBe(200);
+  expect(response?.headers()["cache-control"]).toBe("private, no-store");
+  expect(response?.headers()["x-robots-tag"]).toBe("noindex, nofollow, noarchive");
+  expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/i);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Check the printed code");
+  await expect(page.getByText("Recipient", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Amount", { exact: true })).toHaveCount(0);
+  await expect(page.locator("main")).not.toContainText(/\b(?:invoice|receipt|notice)[-_ ]?\d{3,}\b/i);
 });
 
 test("unknown routes are a noindex 404 and reduced motion is honored", async ({ page }) => {

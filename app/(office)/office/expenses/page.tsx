@@ -8,22 +8,21 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDate, formatOfficeMoney, getOfficeLocalDate } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeContacts, listOfficeExpenses, listOfficeProjects } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeContactOptions, listOfficeExpenses, listOfficeProjectOptions } from "@/features/office/repository";
 import { officeExpenseStatusSchema } from "@/features/office/types";
 
 type ExpensePageProps = { searchParams: Promise<{ status?: string }> };
 
 export default async function OfficeExpensesPage({ searchParams }: ExpensePageProps) {
   const actor = await requireOfficePermission("expenses.read", "/office/expenses");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
   const query = await searchParams;
   const parsedStatus = officeExpenseStatusSchema.safeParse(query.status);
   const status = parsedStatus.success ? parsedStatus.data : undefined;
   const [expenses, projects, vendors] = await Promise.all([
     listOfficeExpenses({ limit: 100, status }),
-    listOfficeProjects({ limit: 200 }),
-    listOfficeContacts({ limit: 200, status: "active", kind: "vendor" }),
+    listOfficeProjectOptions({ limit: 200 }),
+    listOfficeContactOptions({ limit: 200, status: "active", kind: "vendor" }),
   ]);
   const canWrite = hasOfficePermission(actor.role, "expenses.write");
   const pending = expenses.filter((expense) => expense.status === "submitted");
@@ -45,7 +44,7 @@ export default async function OfficeExpensesPage({ searchParams }: ExpensePagePr
 
       <section className="office-grid office-record-composer"><article className="office-panel office-panel--four"><div className="office-panel__head"><div><span className="office-eyebrow">Maker-checker</span><h2>Why two steps?</h2></div></div><div className="office-alert office-alert--warning"><FileClock aria-hidden="true" /><div><strong>Draft is not approval</strong><p>Submission records who prepared the request. Approval requires another authorized member and an explicit reason.</p></div></div></article><article className="office-panel office-panel--eight"><div className="office-panel__head"><div><span className="office-eyebrow">Control boundary</span><h2>Not a general ledger.</h2></div></div><div className="office-alert"><CircleDollarSign aria-hidden="true" /><div><strong>Operational expense control</strong><p>This first release coordinates evidence and decisions. It does not claim statutory accounting, bank reconciliation, depreciation, withholding, or tax return functionality.</p></div></div></article></section>
 
-      {canWrite ? <section className="office-panel office-panel--wide office-record-composer" id="new-expense"><div className="office-panel__head"><div><span className="office-eyebrow">New expense</span><h2>Capture the evidence once.</h2></div></div><OfficeExpenseForm projects={projects.map((project) => ({ id: project.id, label: `${project.code} · ${project.name}` }))} vendors={vendors.map((vendor) => ({ id: vendor.id, label: vendor.displayName }))} incurredAt={getOfficeLocalDate()} /></section> : null}
+      {canWrite ? <section className="office-panel office-panel--wide office-record-composer" id="new-expense"><div className="office-panel__head"><div><span className="office-eyebrow">New expense</span><h2>Capture the evidence once.</h2></div></div><OfficeExpenseForm projects={projects.map((project) => ({ id: project.id, label: `${project.detail} · ${project.label}` }))} vendors={vendors.map((vendor) => ({ id: vendor.id, label: vendor.label }))} incurredAt={getOfficeLocalDate()} /></section> : null}
     </>
   );
 }

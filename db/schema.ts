@@ -412,6 +412,13 @@ export const officeInvoices = sqliteTable(
       .notNull()
       .references(() => officeContacts.id, { onDelete: "restrict" }),
     projectId: text("project_id").references(() => officeProjects.id, { onDelete: "set null" }),
+    kind: text("kind", {
+      enum: ["service", "consultation", "booking", "installment", "construction", "other"],
+    })
+      .notNull()
+      .default("service"),
+    purpose: text("purpose").notNull().default("Property services"),
+    locale: text("locale", { enum: ["en", "bn"] }).notNull().default("en"),
     status: text("status", {
       enum: ["draft", "pending_approval", "approved", "issued", "partially_paid", "paid", "overdue", "void"],
     })
@@ -431,6 +438,10 @@ export const officeInvoices = sqliteTable(
     taxSnapshot: text("tax_snapshot"),
     termsSnapshot: text("terms_snapshot").notNull(),
     notes: text("notes"),
+    trackingCode: text("tracking_code"),
+    trackingIssuedAt: text("tracking_issued_at"),
+    publicAccessRevokedAt: text("public_access_revoked_at"),
+    templateVersion: text("template_version").notNull().default("ap-invoice-v1"),
     approvedByMemberId: text("approved_by_member_id").references(() => officeMembers.id, {
       onDelete: "set null",
     }),
@@ -447,6 +458,7 @@ export const officeInvoices = sqliteTable(
   },
   (table) => [
     uniqueIndex("office_invoices_number_unique").on(table.number),
+    uniqueIndex("office_invoices_tracking_code_unique").on(table.trackingCode),
     index("office_invoices_status_due_idx").on(table.status, table.dueDate),
     index("office_invoices_contact_created_idx").on(table.contactId, table.createdAt),
     index("office_invoices_project_status_idx").on(table.projectId, table.status),
@@ -491,6 +503,7 @@ export const officePayments = sqliteTable(
       .notNull()
       .references(() => officeContacts.id, { onDelete: "restrict" }),
     projectId: text("project_id").references(() => officeProjects.id, { onDelete: "set null" }),
+    clientOperationId: text("client_operation_id"),
     status: text("status", { enum: ["draft", "posted", "void", "refunded"] })
       .notNull()
       .default("draft"),
@@ -502,6 +515,11 @@ export const officePayments = sqliteTable(
     paidAt: text("paid_at").notNull(),
     reference: text("reference"),
     note: text("note"),
+    locale: text("locale", { enum: ["en", "bn"] }).notNull().default("en"),
+    trackingCode: text("tracking_code"),
+    trackingIssuedAt: text("tracking_issued_at"),
+    publicAccessRevokedAt: text("public_access_revoked_at"),
+    templateVersion: text("template_version").notNull().default("ap-receipt-v1"),
     receivedByMemberId: text("received_by_member_id").references(() => officeMembers.id, {
       onDelete: "set null",
     }),
@@ -516,6 +534,8 @@ export const officePayments = sqliteTable(
   },
   (table) => [
     uniqueIndex("office_payments_receipt_number_unique").on(table.receiptNumber),
+    uniqueIndex("office_payments_client_operation_unique").on(table.clientOperationId),
+    uniqueIndex("office_payments_tracking_code_unique").on(table.trackingCode),
     index("office_payments_status_paid_at_idx").on(table.status, table.paidAt),
     index("office_payments_contact_paid_at_idx").on(table.contactId, table.paidAt),
     index("office_payments_project_status_idx").on(table.projectId, table.status),
@@ -694,7 +714,7 @@ export const officeSequences = sqliteTable(
     id: text("id").primaryKey(),
     branchCode: text("branch_code").notNull(),
     fiscalYear: text("fiscal_year").notNull(),
-    documentType: text("document_type", { enum: ["invoice", "receipt", "expense"] }).notNull(),
+    documentType: text("document_type", { enum: ["invoice", "receipt", "expense", "notice"] }).notNull(),
     currentValue: integer("current_value").notNull().default(0),
     version: integer("version").notNull().default(1),
     updatedAt: text("updated_at").notNull(),
@@ -706,6 +726,150 @@ export const officeSequences = sqliteTable(
       table.documentType,
     ),
   ],
+);
+
+export const officeNotices = sqliteTable(
+  "office_notices",
+  {
+    id: text("id").primaryKey(),
+    number: text("number"),
+    branchCode: text("branch_code").notNull().default("JOY"),
+    fiscalYear: text("fiscal_year"),
+    sequenceValue: integer("sequence_value"),
+    kind: text("kind", {
+      enum: ["general", "payment_reminder", "project_update", "appointment", "handover", "other"],
+    })
+      .notNull()
+      .default("general"),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    locale: text("locale", { enum: ["en", "bn"] }).notNull().default("en"),
+    contactId: text("contact_id").references(() => officeContacts.id, { onDelete: "set null" }),
+    projectId: text("project_id").references(() => officeProjects.id, { onDelete: "set null" }),
+    status: text("status", { enum: ["draft", "issued", "archived"] }).notNull().default("draft"),
+    recipientSnapshot: text("recipient_snapshot"),
+    companySnapshot: text("company_snapshot").notNull(),
+    issueDate: text("issue_date"),
+    effectiveDate: text("effective_date"),
+    expiresAt: text("expires_at"),
+    trackingCode: text("tracking_code"),
+    trackingIssuedAt: text("tracking_issued_at"),
+    publicAccessRevokedAt: text("public_access_revoked_at"),
+    templateVersion: text("template_version").notNull().default("ap-notice-v1"),
+    issuedByMemberId: text("issued_by_member_id").references(() => officeMembers.id, {
+      onDelete: "set null",
+    }),
+    issuedAt: text("issued_at"),
+    version: integer("version").notNull().default(1),
+    createdByEmail: text("created_by_email").notNull(),
+    updatedByEmail: text("updated_by_email").notNull(),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+    archivedAt: text("archived_at"),
+  },
+  (table) => [
+    uniqueIndex("office_notices_number_unique").on(table.number),
+    uniqueIndex("office_notices_tracking_code_unique").on(table.trackingCode),
+    index("office_notices_status_issue_idx").on(table.status, table.issueDate),
+    index("office_notices_contact_created_idx").on(table.contactId, table.createdAt),
+    index("office_notices_project_status_idx").on(table.projectId, table.status),
+    index("office_notices_fiscal_sequence_idx").on(table.branchCode, table.fiscalYear, table.sequenceValue),
+  ],
+);
+
+export const officeNoticeRevisions = sqliteTable(
+  "office_notice_revisions",
+  {
+    id: text("id").primaryKey(),
+    noticeId: text("notice_id")
+      .notNull()
+      .references(() => officeNotices.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    snapshot: text("snapshot").notNull(),
+    actorEmail: text("actor_email").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("office_notice_revisions_notice_version_unique").on(table.noticeId, table.version),
+    index("office_notice_revisions_notice_created_idx").on(table.noticeId, table.createdAt),
+  ],
+);
+
+export const officeNotificationOutbox = sqliteTable(
+  "office_notification_outbox",
+  {
+    id: text("id").primaryKey(),
+    eventType: text("event_type").notNull(),
+    entityType: text("entity_type", { enum: ["invoice", "payment", "notice"] }).notNull(),
+    entityId: text("entity_id").notNull(),
+    channel: text("channel", { enum: ["email", "sms"] }).notNull(),
+    recipient: text("recipient").notNull(),
+    template: text("template").notNull(),
+    locale: text("locale", { enum: ["en", "bn"] }).notNull().default("en"),
+    payload: text("payload").notNull(),
+    status: text("status", {
+      enum: ["pending", "processing", "sent", "failed", "dead", "cancelled"],
+    })
+      .notNull()
+      .default("pending"),
+    idempotencyKey: text("idempotency_key").notNull(),
+    attemptCount: integer("attempt_count").notNull().default(0),
+    maxAttempts: integer("max_attempts").notNull().default(5),
+    availableAt: text("available_at").notNull(),
+    claimedAt: text("claimed_at"),
+    claimToken: text("claim_token"),
+    providerReference: text("provider_reference"),
+    errorCode: text("error_code"),
+    errorSummary: text("error_summary"),
+    sentAt: text("sent_at"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("office_notification_outbox_idempotency_unique").on(table.idempotencyKey),
+    index("office_notification_outbox_dispatch_idx").on(table.status, table.availableAt, table.createdAt),
+    index("office_notification_outbox_entity_idx").on(table.entityType, table.entityId, table.createdAt),
+  ],
+);
+
+export const officeNotificationAttempts = sqliteTable(
+  "office_notification_attempts",
+  {
+    id: text("id").primaryKey(),
+    outboxId: text("outbox_id")
+      .notNull()
+      .references(() => officeNotificationOutbox.id, { onDelete: "cascade" }),
+    attemptNo: integer("attempt_no").notNull(),
+    status: text("status", { enum: ["processing", "sent", "failed"] }).notNull(),
+    providerReference: text("provider_reference"),
+    errorCode: text("error_code"),
+    errorSummary: text("error_summary"),
+    startedAt: text("started_at").notNull(),
+    completedAt: text("completed_at"),
+  },
+  (table) => [
+    uniqueIndex("office_notification_attempts_outbox_attempt_unique").on(table.outboxId, table.attemptNo),
+    index("office_notification_attempts_outbox_started_idx").on(table.outboxId, table.startedAt),
+  ],
+);
+
+export const officeContactPreferences = sqliteTable(
+  "office_contact_preferences",
+  {
+    contactId: text("contact_id")
+      .primaryKey()
+      .references(() => officeContacts.id, { onDelete: "cascade" }),
+    preferredLocale: text("preferred_locale", { enum: ["en", "bn"] }).notNull().default("bn"),
+    transactionalEmailEnabled: integer("transactional_email_enabled", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    transactionalSmsEnabled: integer("transactional_sms_enabled", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    updatedByEmail: text("updated_by_email").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [index("office_contact_preferences_locale_idx").on(table.preferredLocale)],
 );
 
 export const officeAuditEvents = sqliteTable(

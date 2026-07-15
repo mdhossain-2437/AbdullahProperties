@@ -18,7 +18,7 @@ import { requireOfficePermission } from "@/features/office/auth";
 import { formatOfficeDate, formatOfficeMoney } from "@/features/office/presentation";
 import {
   getOfficeDashboard,
-  getOfficeDatabaseHealth,
+  isOfficeDatabaseAvailable,
   listOfficeLeads,
   listOfficeProjects,
   listOfficeTasks,
@@ -26,8 +26,7 @@ import {
 
 export default async function OfficeOverviewPage() {
   await requireOfficePermission("dashboard.read", "/office");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const [dashboard, leads, tasks, projects] = await Promise.all([
     getOfficeDashboard(),

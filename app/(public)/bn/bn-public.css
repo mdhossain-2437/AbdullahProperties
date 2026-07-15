@@ -1,0 +1,580 @@
+.page {
+  --bn-font: "Noto Sans Bengali", "Hind Siliguri", "Nirmala UI", "Vrinda", ui-sans-serif, system-ui, sans-serif;
+  background: #fbf9f8;
+  color: #0c0c0c;
+  font-family: var(--bn-font);
+}
+
+.page :is(h1, h2, h3, p, a, span, strong, li) {
+  font-family: var(--bn-font);
+}
+
+.page :is(h1, h2, h3) {
+  letter-spacing: -0.018em;
+  text-transform: none;
+  text-wrap: balance;
+}
+
+.hero {
+  padding: clamp(4.5rem, 8vw, 7.5rem) 0 clamp(4rem, 7vw, 6.5rem);
+  background:
+    radial-gradient(circle at 88% 6%, rgb(255 107 44 / 15%), transparent 26rem),
+    #fbf9f8;
+}
+
+.heroShell {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  color: #595553;
+  font-size: 0.88rem;
+}
+
+.breadcrumb a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: #802900;
+  font-weight: 700;
+  text-underline-offset: 0.24em;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(22rem, 0.95fr);
+  gap: clamp(2.5rem, 7vw, 7rem);
+  align-items: end;
+}
+
+.heroCopy {
+  min-width: 0;
+}
+
+.eyebrow {
+  display: inline-flex;
+  gap: 0.65rem;
+  align-items: center;
+  margin: 0;
+  color: #802900;
+  font-size: clamp(0.84rem, 0.25vw + 0.8rem, 0.95rem);
+  font-weight: 750;
+  letter-spacing: 0.015em;
+  line-height: 1.5;
+}
+
+.eyebrow::before {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  background: #ff6b2c;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.hero h1 {
+  max-width: 12ch;
+  margin: 1.45rem 0 0;
+  font-size: clamp(3.1rem, 7.5vw, 7.2rem);
+  font-weight: 760;
+  line-height: 1.04;
+}
+
+.heroDescription {
+  max-width: 59ch;
+  margin: clamp(1.5rem, 3vw, 2.3rem) 0 0;
+  color: #444748;
+  font-size: clamp(1.05rem, 0.45vw + 0.95rem, 1.28rem);
+  line-height: 1.78;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2.1rem;
+}
+
+.primaryAction,
+.secondaryAction,
+.ctaLink {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: 999px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 750;
+  transition: transform 180ms ease-out, background-color 180ms ease-out, color 180ms ease-out;
+}
+
+.primaryAction {
+  background: #ff6b2c;
+  color: #0c0c0c;
+}
+
+.secondaryAction {
+  border: 1px solid #0c0c0c;
+  color: #0c0c0c;
+}
+
+.primaryAction:hover,
+.secondaryAction:hover,
+.ctaLink:hover {
+  transform: translateY(-2px);
+}
+
+.heroMedia {
+  position: relative;
+  min-height: clamp(28rem, 52vw, 43rem);
+  overflow: hidden;
+  border: 1px solid #0c0c0c;
+  border-radius: clamp(1.5rem, 3vw, 2.5rem);
+  background: #d9d3cf;
+}
+
+.heroImage {
+  object-fit: cover;
+}
+
+.mediaVeil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 62%), transparent 45%);
+}
+
+.mediaCaption {
+  position: absolute;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: white;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.notice {
+  border-block: 1px solid #0c0c0c;
+  background: #ff6b2c;
+}
+
+.notice > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.25fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  padding-block: 1.3rem;
+}
+
+.notice strong {
+  font-size: 0.9rem;
+}
+
+.notice p {
+  max-width: 83ch;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.story {
+  padding: clamp(5.5rem, 10vw, 10rem) 0;
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.38fr) minmax(0, 1fr);
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: start;
+}
+
+.storyIndex {
+  position: sticky;
+  top: 7rem;
+}
+
+.storyIndex h2,
+.nextRoutesHeading h2 {
+  margin: 1rem 0 0;
+  font-size: clamp(2rem, 3.6vw, 3.7rem);
+  font-weight: 700;
+  line-height: 1.14;
+}
+
+.storyIndex ol {
+  display: grid;
+  gap: 0;
+  margin: 2rem 0 0;
+  padding: 0;
+  border-top: 1px solid rgb(12 12 12 / 20%);
+  list-style: none;
+}
+
+.storyIndex a {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  border-bottom: 1px solid rgb(12 12 12 / 20%);
+  padding: 0.85rem 0;
+  color: #444748;
+  line-height: 1.5;
+}
+
+.storyIndex a:hover {
+  color: #802900;
+}
+
+.storyIndex a span {
+  font-variant-numeric: tabular-nums;
+  color: #802900;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.sections {
+  border-top: 1px solid #0c0c0c;
+}
+
+.section {
+  scroll-margin-top: 7rem;
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.85fr) minmax(18rem, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  border-bottom: 1px solid #0c0c0c;
+  padding: clamp(2.2rem, 5vw, 4.5rem) 0;
+}
+
+.sectionHeading {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.sectionHeading > span {
+  margin-top: 0.35rem;
+  color: #802900;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 3.25rem);
+  font-weight: 720;
+  line-height: 1.15;
+}
+
+.section > p {
+  margin: 0;
+  color: #444748;
+  font-size: clamp(1rem, 0.25vw + 0.95rem, 1.14rem);
+  line-height: 1.8;
+}
+
+.section ul {
+  grid-column: 2;
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section li {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  line-height: 1.6;
+}
+
+.section li svg {
+  width: 1rem;
+  margin-top: 0.28rem;
+  color: #802900;
+}
+
+.nextRoutes {
+  padding: clamp(5.5rem, 9vw, 8.5rem) 0;
+  background: #e7ded9;
+}
+
+.nextRoutesHeading {
+  max-width: 50rem;
+}
+
+.routeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.routeCard {
+  position: relative;
+  min-height: 18rem;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #0c0c0c;
+  border-radius: 1.5rem;
+  background: #fbf9f8;
+  padding: 1.5rem;
+  transition: transform 220ms ease-out, background-color 220ms ease-out;
+}
+
+.routeCard:hover {
+  background: #ff6b2c;
+  transform: translateY(-4px);
+}
+
+.routeCard > span {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.routeCard h3 {
+  max-width: 14ch;
+  margin: auto 0 0;
+  font-size: clamp(1.5rem, 2.5vw, 2.45rem);
+  font-weight: 720;
+  line-height: 1.16;
+}
+
+.routeCard p {
+  margin: 0.8rem 2.5rem 0 0;
+  color: #444748;
+  line-height: 1.65;
+}
+
+.routeCard > svg {
+  position: absolute;
+  right: 1.35rem;
+  bottom: 1.35rem;
+}
+
+.contactBand {
+  border-block: 1px solid #0c0c0c;
+}
+
+.contactBandGrid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+}
+
+.contactBandGrid > * {
+  min-width: 0;
+  min-height: 7.5rem;
+  display: grid;
+  grid-template-columns: 1.4rem 1fr;
+  gap: 0.55rem 0.75rem;
+  align-content: center;
+  border-right: 1px solid #0c0c0c;
+  padding: 1.3rem;
+}
+
+.contactBandGrid > *:last-child {
+  border-right: 0;
+}
+
+.contactBandGrid svg {
+  width: 1.15rem;
+  color: #802900;
+}
+
+.contactBandGrid span {
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.contactBandGrid p {
+  grid-column: 2;
+  margin: 0;
+  color: #444748;
+  line-height: 1.55;
+}
+
+.contactBandGrid a:hover span {
+  color: #802900;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.cta {
+  padding: clamp(5.5rem, 10vw, 9rem) 0;
+  background: #0c0c0c;
+  color: white;
+}
+
+.ctaInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2.5rem;
+  align-items: end;
+}
+
+.cta .eyebrow {
+  color: #ffb79a;
+}
+
+.cta h2 {
+  max-width: 13ch;
+  margin: 1rem 0 0;
+  font-size: clamp(2.8rem, 6vw, 6.5rem);
+  font-weight: 760;
+  line-height: 1.08;
+}
+
+.cta h2 + p {
+  max-width: 58ch;
+  margin: 1.4rem 0 0;
+  color: rgb(255 255 255 / 72%);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.ctaLink {
+  min-width: 12rem;
+  background: white;
+  color: #0c0c0c;
+}
+
+.page :is(a, button):focus-visible {
+  outline: 3px solid #fbf9f8;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #802900;
+}
+
+@media (max-width: 960px) {
+  .heroGrid,
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroMedia {
+    min-height: min(72vh, 38rem);
+  }
+
+  .storyIndex {
+    position: static;
+  }
+
+  .storyIndex ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .storyIndex li:nth-child(odd) a {
+    border-right: 1px solid rgb(12 12 12 / 20%);
+    padding-right: 0.75rem;
+  }
+
+  .routeGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contactBandGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contactBandGrid > *:nth-child(2) {
+    border-right: 0;
+  }
+
+  .contactBandGrid > *:nth-child(-n + 2) {
+    border-bottom: 1px solid #0c0c0c;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    padding-top: 3.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.75rem, 13.4vw, 4.45rem);
+    line-height: 1.08;
+  }
+
+  .heroActions,
+  .primaryAction,
+  .secondaryAction {
+    width: 100%;
+  }
+
+  .heroMedia {
+    min-height: 28rem;
+  }
+
+  .mediaCaption {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .notice > div,
+  .section,
+  .ctaInner {
+    grid-template-columns: 1fr;
+  }
+
+  .section ul {
+    grid-column: auto;
+  }
+
+  .storyIndex ol,
+  .routeGrid,
+  .contactBandGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .storyIndex li:nth-child(odd) a {
+    border-right: 0;
+    padding-right: 0;
+  }
+
+  .routeCard {
+    min-height: 15rem;
+  }
+
+  .contactBandGrid > * {
+    min-height: 6.25rem;
+    border-right: 0;
+    border-bottom: 1px solid #0c0c0c;
+  }
+
+  .contactBandGrid > *:last-child {
+    border-bottom: 0;
+  }
+
+  .ctaLink {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryAction,
+  .secondaryAction,
+  .routeCard,
+  .ctaLink {
+    transition: none;
+  }
+
+  .primaryAction:hover,
+  .secondaryAction:hover,
+  .routeCard:hover,
+  .ctaLink:hover {
+    transform: none;
+  }
+}

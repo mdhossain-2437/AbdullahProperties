@@ -98,6 +98,15 @@
   white-space: nowrap;
 }
 
+.name:lang(bn) {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", "Nirmala UI", "Vrinda", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(4.35rem, 12.5vw, 11.5rem);
+  font-weight: 760;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-transform: none;
+}
+
 @keyframes ghost-marquee {
   to {
     transform: translate3d(-50%, 0, 0);
@@ -122,6 +131,10 @@
 
   .name {
     font-size: clamp(3.25rem, 18vw, 5.5rem);
+  }
+
+  .name:lang(bn) {
+    font-size: clamp(2.8rem, 15vw, 4.8rem);
   }
 }
 
@@ -159,5 +172,10 @@
   .name {
     font-size: clamp(1.25rem, 4.4vw, 4rem);
     letter-spacing: -0.045em;
+  }
+
+
+  .name:lang(bn) {
+    font-size: clamp(1.2rem, 4vw, 3.6rem);
   }
 }

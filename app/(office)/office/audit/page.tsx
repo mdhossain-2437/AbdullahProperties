@@ -7,7 +7,7 @@ import { OfficeMetricCard } from "@/components/office/metric-card";
 import { OfficePageHeader } from "@/components/office/page-header";
 import { requireOfficePermission } from "@/features/office/auth";
 import { formatOfficeDateTime, humanizeOfficeValue } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeAuditEvents } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeAuditEvents } from "@/features/office/repository";
 
 export const metadata: Metadata = { title: "Audit history | Office OS" };
 
@@ -29,8 +29,7 @@ function auditContext(metadata: Readonly<Record<string, unknown>>) {
 
 export default async function OfficeAuditPage({ searchParams }: { searchParams: AuditSearchParams }) {
   await requireOfficePermission("audit.read", "/office/audit");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const action = boundedFilter(first(params.action));

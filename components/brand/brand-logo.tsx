@@ -6,13 +6,21 @@ type BrandLogoProps = {
   tone?: "light" | "dark";
   className?: string;
   preload?: boolean;
+  homeHref?: string;
+  homeLabel?: string;
 };
 
-export function BrandLogo({ tone = "light", className, preload = false }: BrandLogoProps) {
+export function BrandLogo({
+  tone = "light",
+  className,
+  preload = false,
+  homeHref = "/",
+  homeLabel = "Abdullah Properties home",
+}: BrandLogoProps) {
   const isDark = tone === "dark";
 
   return (
-    <Link className={cn("brand-logo", `brand-logo--${tone}`, className)} href="/" aria-label="Abdullah Properties home">
+    <Link className={cn("brand-logo", `brand-logo--${tone}`, className)} href={homeHref} aria-label={homeLabel}>
       <Image
         className="brand-logo__image"
         src={isDark ? "/brand/logo-dark.png" : "/brand/logo-primary.png"}

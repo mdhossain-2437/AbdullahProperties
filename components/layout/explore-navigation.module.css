@@ -58,6 +58,67 @@
   gap: 10px;
 }
 
+.languageToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--peach) 82%, white);
+  padding: 3px;
+}
+
+.languageOption {
+  min-width: 42px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 10px;
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.languageOption[lang="bn"] {
+  min-width: 58px;
+  font-family: "Noto Sans Bengali", "Hind Siliguri", "Nirmala UI", "Vrinda", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.82rem;
+}
+
+.languageOption[aria-current="page"] {
+  background: var(--ink);
+  color: white;
+}
+
+.languageOption:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--orange) 80%, white);
+  outline-offset: 3px;
+}
+
+.headerInner:lang(bn-BD),
+.dialogContent:lang(bn-BD),
+.mobilePanel:lang(bn-BD) {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", "Nirmala UI", "Vrinda", ui-sans-serif, system-ui, sans-serif;
+}
+
+.headerInner:lang(bn-BD) :is(a, button, span),
+.dialogContent:lang(bn-BD) :is(h1, h2, h3, p, a, button, span, strong, small),
+.mobilePanel:lang(bn-BD) :is(h1, h2, h3, p, a, button, span, strong, small) {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", "Nirmala UI", "Vrinda", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.dialogContent:lang(bn-BD) .dialogTitle,
+.mobilePanel:lang(bn-BD) .mobileTitle {
+  line-height: 1.08;
+}
+
 .exploreTrigger,
 .talkButton {
   min-height: 42px !important;
@@ -432,6 +493,8 @@
 .mobileOnly {
   display: none;
   justify-self: end;
+  align-items: center;
+  gap: 8px;
 }
 
 .mobileTrigger {
@@ -565,7 +628,10 @@
   }
 }
 
-@media (max-width: 1050px) {
+/* Bengali navigation needs a little more room than English. Collapse to the
+   fully accessible mobile explorer before either language can overlap the
+   action cluster on compact laptops and split-screen windows. */
+@media (max-width: 1120px) {
   .headerInner {
     grid-template-columns: 1fr auto;
   }
@@ -576,7 +642,7 @@
   }
 
   .mobileOnly {
-    display: block;
+    display: flex;
   }
 }
 
@@ -605,6 +671,29 @@
 }
 
 @media (max-width: 420px) {
+  .headerInner {
+    column-gap: 8px;
+  }
+
+  .headerInner :global(.brand-logo) {
+    width: 128px;
+    height: 40px;
+  }
+
+  .mobileOnly .languageToggle {
+    min-height: 42px;
+  }
+
+  .mobileOnly .languageOption {
+    min-width: 36px;
+    min-height: 34px;
+    padding-inline: 8px;
+  }
+
+  .mobileOnly .languageOption[lang="bn"] {
+    min-width: 52px;
+  }
+
   .mobilePanel {
     width: 100vw !important;
   }

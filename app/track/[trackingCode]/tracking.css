@@ -1,0 +1,118 @@
+.tracking-page {
+  min-height: 100svh;
+  padding: clamp(18px, 4vw, 56px);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 107, 44, 0.18), transparent 30%),
+    #111212;
+  color: #f8f4f1;
+}
+
+.tracking-page__shell {
+  width: min(900px, 100%);
+  margin-inline: auto;
+}
+
+.tracking-page__header,
+.tracking-page__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.tracking-page__header { padding-block: 8px 28px; }
+.tracking-page__header .brand-logo { width: 190px; }
+.tracking-page__header > span {
+  color: #a9a3a0;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tracking-card {
+  overflow: hidden;
+  border: 1px solid #3c3b3a;
+  border-radius: 28px;
+  background: #f6f1ed;
+  color: #111212;
+  box-shadow: 0 28px 100px rgba(0, 0, 0, 0.28);
+}
+
+.tracking-card__status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 12px 24px;
+  background: #ff6b2c;
+  font-weight: 800;
+}
+
+.tracking-card[data-state="revoked"] .tracking-card__status,
+.tracking-card[data-state="not_found"] .tracking-card__status { background: #e3b36e; }
+.tracking-card[data-state="unavailable"] .tracking-card__status { background: #d7d2ce; }
+.tracking-card__status svg { width: 22px; height: 22px; }
+
+.tracking-card__title { padding: clamp(28px, 6vw, 68px); }
+.tracking-card__title > span {
+  color: #655f5c;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.tracking-card__title h1 {
+  max-width: 760px;
+  margin-top: 18px;
+  font-family: var(--font-anybody);
+  font-size: clamp(2.3rem, 8vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  overflow-wrap: anywhere;
+}
+.tracking-card__title p {
+  max-width: 650px;
+  margin-top: 24px;
+  color: #655f5c;
+  font-size: clamp(0.95rem, 2vw, 1.12rem);
+  line-height: 1.65;
+}
+
+.tracking-card__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid #d4ceca;
+}
+.tracking-card__facts > div { min-height: 120px; padding: 24px; }
+.tracking-card__facts > div:nth-child(even) { border-left: 1px solid #d4ceca; }
+.tracking-card__facts > div:nth-child(n + 3) { border-top: 1px solid #d4ceca; }
+.tracking-card__facts dt {
+  color: #6f6965;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.tracking-card__facts dd { margin-top: 14px; font-size: 1.1rem; font-weight: 780; text-transform: capitalize; }
+
+.tracking-page__footer {
+  flex-wrap: wrap;
+  padding-block: 26px;
+  color: #bcb5b1;
+  font-size: 0.78rem;
+}
+.tracking-page__footer > div { display: flex; align-items: center; gap: 8px; }
+.tracking-page__footer svg { width: 17px; color: #ff6b2c; }
+.tracking-page__footer a { min-height: 44px; display: inline-flex; align-items: center; color: #f8f4f1; text-decoration: underline; text-underline-offset: 4px; }
+
+@media (max-width: 620px) {
+  .tracking-page__header { align-items: flex-start; flex-direction: column; }
+  .tracking-card__facts { grid-template-columns: 1fr; }
+  .tracking-card__facts > div:nth-child(even) { border-left: 0; }
+  .tracking-card__facts > div + div { border-top: 1px solid #d4ceca; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tracking-page * { scroll-behavior: auto !important; }
+}

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import { SITE_URL, company } from "@/lib/company-data";
 
@@ -53,13 +54,16 @@ export const viewport: Viewport = {
   themeColor: "#fbf9f8",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const requestHeaders = await headers();
+  const locale = requestHeaders.get("x-abdullah-public-locale") === "bn-BD" ? "bn-BD" : "en-BD";
+
   return (
-    <html lang="en-BD">
+    <html lang={locale}>
       <body>{children}</body>
     </html>
   );

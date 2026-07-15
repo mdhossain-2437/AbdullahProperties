@@ -10,7 +10,7 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDateTime, humanizeOfficeValue } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeTeamMembers } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeTeamMembers } from "@/features/office/repository";
 import type { OfficeMemberStatus, OfficeRole } from "@/features/office/types";
 
 export const metadata: Metadata = { title: "Team | Office OS" };
@@ -30,8 +30,7 @@ function asChoice<const T extends readonly string[]>(value: string | undefined, 
 
 export default async function OfficeTeamPage({ searchParams }: { searchParams: TeamSearchParams }) {
   const actor = await requireOfficePermission("team.read", "/office/team");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const query = first(params.q)?.trim().slice(0, 120) || undefined;

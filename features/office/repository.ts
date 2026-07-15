@@ -1,4 +1,6 @@
 import { getD1, getOptionalD1 } from "@/db";
+import { normalizeBangladeshPhone } from "@/features/office/notifications";
+import { createTrackingCode, trackingUrl } from "@/features/office/tracking";
 import {
   calculateInvoiceTotals,
   minorUnitsSchema,
@@ -11,10 +13,15 @@ import {
   type OfficeContactKind,
   type OfficeExpenseStatus,
   type OfficeInvoiceDraftInput,
+  type OfficeInvoiceKind,
   type OfficeInvoiceStatus,
   type OfficeLandStage,
   type OfficeLeadStage,
   type OfficeMemberStatus,
+  type OfficeLocale,
+  type OfficeNoticeKind,
+  type OfficeNoticeStatus,
+  type OfficeNotificationStatus,
   type OfficePaymentStatus,
   type OfficeProjectStatus,
   type OfficeRole,
@@ -44,6 +51,11 @@ const REQUIRED_OFFICE_TABLES = [
   "office_approvals",
   "office_documents",
   "office_sequences",
+  "office_notices",
+  "office_notice_revisions",
+  "office_notification_outbox",
+  "office_notification_attempts",
+  "office_contact_preferences",
   "office_audit_events",
 ] as const;
 
@@ -92,7 +104,7 @@ export type OfficeApprovalKind =
   | "document_review"
   | "project_gate"
   | "land_review";
-export type OfficeDocumentType = "invoice" | "receipt" | "expense";
+export type OfficeDocumentType = "invoice" | "receipt" | "expense" | "notice";
 export type OfficeApprovalDecision = "approved" | "rejected";
 
 export type OfficeRepositoryActor = Readonly<{
@@ -106,6 +118,17 @@ export type OfficeListOptions = Readonly<{
   limit?: number;
   offset?: number;
 }>;
+
+export type OfficeReferenceOption = Readonly<{
+  id: string;
+  label: string;
+  detail: string;
+}>;
+
+export type OfficeContactReferenceOption = OfficeReferenceOption &
+  Readonly<{
+    hasBillingAddress: boolean;
+  }>;
 
 export type OfficeDatabaseHealth = Readonly<{
   available: boolean;
@@ -279,6 +302,9 @@ export type OfficeInvoiceSummary = Readonly<{
   contactName: string;
   projectId: string | null;
   projectName: string | null;
+  kind: OfficeInvoiceKind;
+  purpose: string;
+  locale: OfficeLocale;
   status: OfficeInvoiceStatus;
   issueDate: string | null;
   dueDate: string | null;
@@ -289,6 +315,10 @@ export type OfficeInvoiceSummary = Readonly<{
   totalMinor: number;
   paidMinor: number;
   balanceMinor: number;
+  trackingCode: string | null;
+  trackingIssuedAt: string | null;
+  publicAccessRevokedAt: string | null;
+  templateVersion: string;
   version: number;
   createdByEmail: string;
   updatedByEmail: string;
@@ -347,6 +377,7 @@ export type OfficePaymentView = Readonly<{
   contactName: string;
   projectId: string | null;
   projectName: string | null;
+  clientOperationId: string | null;
   invoiceId: string | null;
   invoiceNumber: string | null;
   allocatedMinor: number | null;
@@ -357,12 +388,71 @@ export type OfficePaymentView = Readonly<{
   paidAt: string;
   reference: string | null;
   note: string | null;
+  locale: OfficeLocale;
+  trackingCode: string | null;
+  trackingIssuedAt: string | null;
+  publicAccessRevokedAt: string | null;
+  templateVersion: string;
   receivedByMemberId: string | null;
   receivedByMemberName: string | null;
   postedByMemberId: string | null;
   postedAt: string | null;
   version: number;
   createdByEmail: string;
+  createdAt: string;
+  updatedAt: string;
+}>;
+
+export type OfficeNoticeView = Readonly<{
+  id: string;
+  number: string | null;
+  branchCode: string;
+  fiscalYear: string | null;
+  sequenceValue: number | null;
+  kind: OfficeNoticeKind;
+  title: string;
+  body: string;
+  locale: OfficeLocale;
+  contactId: string | null;
+  contactName: string | null;
+  projectId: string | null;
+  projectName: string | null;
+  status: OfficeNoticeStatus;
+  recipientSnapshot: OfficeInvoicePartySnapshot | null;
+  companySnapshot: OfficeInvoicePartySnapshot;
+  issueDate: string | null;
+  effectiveDate: string | null;
+  expiresAt: string | null;
+  trackingCode: string | null;
+  trackingIssuedAt: string | null;
+  publicAccessRevokedAt: string | null;
+  templateVersion: string;
+  issuedByMemberId: string | null;
+  issuedAt: string | null;
+  version: number;
+  createdByEmail: string;
+  updatedByEmail: string;
+  createdAt: string;
+  updatedAt: string;
+  archivedAt: string | null;
+}>;
+
+export type OfficeNotificationOutboxView = Readonly<{
+  id: string;
+  eventType: string;
+  entityType: "invoice" | "payment" | "notice";
+  entityId: string;
+  channel: "email" | "sms";
+  recipientMasked: string;
+  template: string;
+  locale: OfficeLocale;
+  status: OfficeNotificationStatus;
+  attemptCount: number;
+  maxAttempts: number;
+  availableAt: string;
+  errorCode: string | null;
+  errorSummary: string | null;
+  sentAt: string | null;
   createdAt: string;
   updatedAt: string;
 }>;
@@ -560,9 +650,32 @@ export type RecordOfficePaymentInput = Readonly<{
   paidAt: string;
   fiscalYear: string;
   branchCode?: string;
+  clientOperationId?: string | null;
+  locale?: OfficeLocale;
   reference?: string | null;
   note?: string | null;
   receivedByMemberId?: string | null;
+}>;
+
+export type CreateOfficeNoticeInput = Readonly<{
+  kind: OfficeNoticeKind;
+  title: string;
+  body: string;
+  locale: OfficeLocale;
+  contactId?: string | null;
+  projectId?: string | null;
+  issueDate?: string | null;
+  effectiveDate?: string | null;
+  expiresAt?: string | null;
+  company: OfficeInvoicePartySnapshot;
+  recipient?: OfficeInvoicePartySnapshot | null;
+}>;
+
+export type IssueOfficeNoticeInput = Readonly<{
+  noticeId: string;
+  expectedVersion: number;
+  fiscalYear: string;
+  branchCode?: string;
 }>;
 
 export type CreateOfficeExpenseInput = Readonly<{
@@ -789,6 +902,9 @@ type InvoiceRow = {
   contact_name: string;
   project_id: string | null;
   project_name: string | null;
+  kind: OfficeInvoiceKind;
+  purpose: string;
+  locale: OfficeLocale;
   status: OfficeInvoiceStatus;
   issue_date: string | null;
   due_date: string | null;
@@ -799,6 +915,10 @@ type InvoiceRow = {
   total_minor: number;
   paid_minor: number;
   balance_minor: number;
+  tracking_code: string | null;
+  tracking_issued_at: string | null;
+  public_access_revoked_at: string | null;
+  template_version: string;
   customer_snapshot: string;
   company_snapshot: string;
   tax_snapshot: string | null;
@@ -864,6 +984,7 @@ type PaymentRow = {
   contact_name: string;
   project_id: string | null;
   project_name: string | null;
+  client_operation_id: string | null;
   invoice_id: string | null;
   invoice_number: string | null;
   allocated_minor: number | null;
@@ -874,6 +995,11 @@ type PaymentRow = {
   paid_at: string;
   reference: string | null;
   note: string | null;
+  locale: OfficeLocale;
+  tracking_code: string | null;
+  tracking_issued_at: string | null;
+  public_access_revoked_at: string | null;
+  template_version: string;
   received_by_member_id: string | null;
   received_by_member_name: string | null;
   posted_by_member_id: string | null;
@@ -968,11 +1094,18 @@ type SequenceRow = {
 
 type InvoiceAllocationGuardRow = {
   id: string;
+  number: string;
   contact_id: string;
+  contact_email: string | null;
+  contact_phone: string | null;
   project_id: string | null;
   status: OfficeInvoiceStatus;
   currency: string;
   balance_minor: number;
+  locale: OfficeLocale;
+  preferred_locale: OfficeLocale | null;
+  transactional_email_enabled: number | null;
+  transactional_sms_enabled: number | null;
 };
 
 type DashboardRow = {
@@ -1270,6 +1403,9 @@ function mapInvoiceSummary(row: InvoiceSummaryRow): OfficeInvoiceSummary {
     contactName: row.contact_name,
     projectId: row.project_id,
     projectName: row.project_name,
+    kind: row.kind,
+    purpose: row.purpose,
+    locale: row.locale,
     status: row.status,
     issueDate: row.issue_date,
     dueDate: row.due_date,
@@ -1280,6 +1416,10 @@ function mapInvoiceSummary(row: InvoiceSummaryRow): OfficeInvoiceSummary {
     totalMinor: row.total_minor,
     paidMinor: row.paid_minor,
     balanceMinor: row.balance_minor,
+    trackingCode: row.tracking_code,
+    trackingIssuedAt: row.tracking_issued_at,
+    publicAccessRevokedAt: row.public_access_revoked_at,
+    templateVersion: row.template_version,
     version: row.version,
     createdByEmail: row.created_by_email,
     updatedByEmail: row.updated_by_email,
@@ -1329,6 +1469,7 @@ function mapPayment(row: PaymentRow): OfficePaymentView {
     contactName: row.contact_name,
     projectId: row.project_id,
     projectName: row.project_name,
+    clientOperationId: row.client_operation_id,
     invoiceId: row.invoice_id,
     invoiceNumber: row.invoice_number,
     allocatedMinor: row.allocated_minor,
@@ -1339,6 +1480,11 @@ function mapPayment(row: PaymentRow): OfficePaymentView {
     paidAt: row.paid_at,
     reference: row.reference,
     note: row.note,
+    locale: row.locale,
+    trackingCode: row.tracking_code,
+    trackingIssuedAt: row.tracking_issued_at,
+    publicAccessRevokedAt: row.public_access_revoked_at,
+    templateVersion: row.template_version,
     receivedByMemberId: row.received_by_member_id,
     receivedByMemberName: row.received_by_member_name,
     postedByMemberId: row.posted_by_member_id,
@@ -1568,6 +1714,198 @@ export async function getOfficeDashboard(): Promise<OfficeDashboardAggregate> {
     pendingExpenseMinor: row.pending_expense_minor,
     pendingApprovals: row.pending_approvals,
   };
+}
+
+type OfficeReferenceOptionRow = {
+  id: string;
+  label: string;
+  detail: string;
+};
+
+type OfficeContactReferenceOptionRow = OfficeReferenceOptionRow & {
+  has_billing_address: number;
+};
+
+function mapReferenceOption(row: OfficeReferenceOptionRow): OfficeReferenceOption {
+  return { id: row.id, label: row.label, detail: row.detail };
+}
+
+/**
+ * Composer selectors deliberately use narrow projections instead of loading full register views.
+ * They remain bounded because large datasets should move to searchable combobox endpoints rather
+ * than ever-expanding HTML select payloads.
+ */
+export async function listOfficeContactOptions(
+  options: OfficeListOptions &
+    Readonly<{ kind?: OfficeContactKind; status?: OfficeContactStatus }> = {},
+): Promise<OfficeContactReferenceOption[]> {
+  const database = await getD1();
+  const conditions: string[] = [];
+  const bindings: unknown[] = [];
+  if (options.kind) {
+    conditions.push("contact.kind = ?");
+    bindings.push(options.kind);
+  }
+  if (options.status) {
+    conditions.push("contact.status = ?");
+    bindings.push(options.status);
+  }
+
+  const result = await prepareBoundedList(
+    database,
+    `SELECT contact.id, contact.display_name AS label, contact.kind AS detail,
+      CASE WHEN contact.address IS NOT NULL AND TRIM(contact.address) <> '' THEN 1 ELSE 0 END AS has_billing_address
+     FROM office_contacts contact`,
+    conditions,
+    bindings,
+    "ORDER BY contact.normalized_name ASC, contact.id ASC",
+    options,
+  ).all<OfficeContactReferenceOptionRow>();
+
+  return result.results.map((row) => ({
+    ...mapReferenceOption(row),
+    hasBillingAddress: row.has_billing_address === 1,
+  }));
+}
+
+export async function listOfficeLeadOptions(
+  options: OfficeListOptions = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const result = await prepareBoundedList(
+    database,
+    `SELECT lead.id, lead.title AS label, contact.display_name AS detail
+     FROM office_leads lead
+     INNER JOIN office_contacts contact ON contact.id = lead.contact_id`,
+    ["lead.archived_at IS NULL"],
+    [],
+    "ORDER BY lead.title ASC, lead.id ASC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
+}
+
+export async function listOfficeLandParcelOptions(
+  options: OfficeListOptions = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const result = await prepareBoundedList(
+    database,
+    "SELECT land.id, land.title AS label, land.reference_code AS detail FROM office_land_parcels land",
+    ["land.archived_at IS NULL"],
+    [],
+    "ORDER BY land.title ASC, land.id ASC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
+}
+
+export async function listOfficeProjectOptions(
+  options: OfficeListOptions = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const result = await prepareBoundedList(
+    database,
+    "SELECT project.id, project.name AS label, project.code AS detail FROM office_projects project",
+    ["project.archived_at IS NULL"],
+    [],
+    "ORDER BY project.name ASC, project.id ASC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
+}
+
+export async function listOfficeTeamMemberOptions(
+  options: OfficeListOptions & Readonly<{ status?: OfficeMemberStatus }> = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const conditions: string[] = [];
+  const bindings: unknown[] = [];
+  if (options.status) {
+    conditions.push("member.status = ?");
+    bindings.push(options.status);
+  }
+  const result = await prepareBoundedList(
+    database,
+    "SELECT member.id, member.display_name AS label, member.role AS detail FROM office_members member",
+    conditions,
+    bindings,
+    "ORDER BY member.display_name ASC, member.id ASC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
+}
+
+export async function listOfficeInvoiceOptions(
+  options: OfficeListOptions = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const result = await prepareBoundedList(
+    database,
+    `SELECT invoice.id,
+      COALESCE(invoice.number, 'Draft ' || SUBSTR(invoice.id, 1, 8)) AS label,
+      contact.display_name AS detail
+     FROM office_invoices invoice
+     INNER JOIN office_contacts contact ON contact.id = invoice.contact_id`,
+    [],
+    [],
+    "ORDER BY COALESCE(invoice.issue_date, invoice.created_at) DESC, invoice.id DESC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
+}
+
+export async function listOfficePaymentOptions(
+  options: OfficeListOptions = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const result = await prepareBoundedList(
+    database,
+    `SELECT payment.id,
+      COALESCE(payment.receipt_number, 'Pending ' || SUBSTR(payment.id, 1, 8)) AS label,
+      contact.display_name AS detail
+     FROM office_payments payment
+     INNER JOIN office_contacts contact ON contact.id = payment.contact_id`,
+    [],
+    [],
+    "ORDER BY payment.paid_at DESC, payment.id DESC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
+}
+
+export async function listOfficeExpenseOptions(
+  options: OfficeListOptions = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const result = await prepareBoundedList(
+    database,
+    `SELECT expense.id, COALESCE(expense.number, expense.category) AS label,
+      COALESCE(project.name, vendor.display_name, 'General office') AS detail
+     FROM office_expenses expense
+     LEFT JOIN office_projects project ON project.id = expense.project_id
+     LEFT JOIN office_contacts vendor ON vendor.id = expense.vendor_contact_id`,
+    [],
+    [],
+    "ORDER BY expense.incurred_at DESC, expense.id DESC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
+}
+
+export async function listOfficeApprovalOptions(
+  options: OfficeListOptions = {},
+): Promise<OfficeReferenceOption[]> {
+  const database = await getD1();
+  const result = await prepareBoundedList(
+    database,
+    "SELECT approval.id, approval.kind AS label, approval.entity_type AS detail FROM office_approvals approval",
+    [],
+    [],
+    "ORDER BY approval.requested_at DESC, approval.id DESC",
+    options,
+  ).all<OfficeReferenceOptionRow>();
+  return result.results.map(mapReferenceOption);
 }
 
 const CONTACT_SELECT = `SELECT
@@ -2233,9 +2571,11 @@ export async function createOfficeTask(
 const INVOICE_SUMMARY_SELECT = `SELECT
   invoice.id, invoice.number, invoice.branch_code, invoice.fiscal_year, invoice.sequence_value,
   invoice.contact_id, contact.display_name AS contact_name, invoice.project_id,
-  project.name AS project_name, invoice.status, invoice.issue_date, invoice.due_date,
+  project.name AS project_name, invoice.kind, invoice.purpose, invoice.locale,
+  invoice.status, invoice.issue_date, invoice.due_date,
   invoice.currency, invoice.subtotal_minor, invoice.discount_minor, invoice.tax_minor,
-  invoice.total_minor, invoice.paid_minor, invoice.balance_minor, invoice.version,
+  invoice.total_minor, invoice.paid_minor, invoice.balance_minor, invoice.tracking_code,
+  invoice.tracking_issued_at, invoice.public_access_revoked_at, invoice.template_version, invoice.version,
   invoice.created_by_email, invoice.updated_by_email, invoice.created_at, invoice.updated_at
 FROM office_invoices invoice
 INNER JOIN office_contacts contact ON contact.id = invoice.contact_id
@@ -2244,9 +2584,12 @@ LEFT JOIN office_projects project ON project.id = invoice.project_id`;
 const INVOICE_DETAIL_SELECT = `SELECT
   invoice.id, invoice.number, invoice.branch_code, invoice.fiscal_year, invoice.sequence_value,
   invoice.contact_id, contact.display_name AS contact_name, invoice.project_id,
-  project.name AS project_name, invoice.status, invoice.issue_date, invoice.due_date,
+  project.name AS project_name, invoice.kind, invoice.purpose, invoice.locale,
+  invoice.status, invoice.issue_date, invoice.due_date,
   invoice.currency, invoice.subtotal_minor, invoice.discount_minor, invoice.tax_minor,
-  invoice.total_minor, invoice.paid_minor, invoice.balance_minor, invoice.customer_snapshot,
+  invoice.total_minor, invoice.paid_minor, invoice.balance_minor, invoice.tracking_code,
+  invoice.tracking_issued_at, invoice.public_access_revoked_at, invoice.template_version,
+  invoice.customer_snapshot,
   invoice.company_snapshot, invoice.tax_snapshot, invoice.terms_snapshot, invoice.notes,
   invoice.approved_by_member_id, invoice.approved_at, invoice.posted_by_member_id,
   invoice.posted_at, invoice.version, invoice.created_by_email, invoice.updated_by_email,
@@ -2384,6 +2727,9 @@ export async function createOfficeInvoice(
     metadata: {
       contactId: draft.contactId,
       projectId: draft.projectId,
+      kind: draft.kind,
+      purpose: draft.purpose,
+      locale: draft.locale,
       currency: draft.currency,
       totalMinor: totals.totalMinor,
       itemCount: totals.lines.length,
@@ -2395,13 +2741,26 @@ export async function createOfficeInvoice(
   await database.batch([
     database
       .prepare(
-        "INSERT INTO office_invoices (id, number, branch_code, fiscal_year, sequence_value, contact_id, project_id, status, issue_date, due_date, currency, subtotal_minor, discount_minor, tax_minor, total_minor, paid_minor, balance_minor, customer_snapshot, company_snapshot, tax_snapshot, terms_snapshot, notes, approved_by_member_id, approved_at, posted_by_member_id, posted_at, version, created_by_email, updated_by_email, created_at, updated_at) VALUES (?, NULL, ?, NULL, NULL, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, 1, ?, ?, ?, ?)",
+        `INSERT INTO office_invoices
+          (id, number, branch_code, fiscal_year, sequence_value, contact_id, project_id,
+           kind, purpose, locale, status, issue_date, due_date, currency, subtotal_minor,
+           discount_minor, tax_minor, total_minor, paid_minor, balance_minor, customer_snapshot,
+           company_snapshot, tax_snapshot, terms_snapshot, notes, tracking_code,
+           tracking_issued_at, public_access_revoked_at, template_version,
+           approved_by_member_id, approved_at, posted_by_member_id, posted_at, version,
+           created_by_email, updated_by_email, created_at, updated_at)
+         VALUES (?, NULL, ?, NULL, NULL, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, 0, ?,
+                 ?, ?, ?, ?, ?, NULL, NULL, NULL, 'ap-invoice-v1', NULL, NULL, NULL, NULL, 1,
+                 ?, ?, ?, ?)`,
       )
       .bind(
         id,
         DEFAULT_BRANCH_CODE,
         draft.contactId,
         draft.projectId,
+        draft.kind,
+        draft.purpose,
+        draft.locale,
         draft.issueDate,
         draft.dueDate,
         draft.currency,
@@ -2447,6 +2806,7 @@ const DOCUMENT_PREFIX: Readonly<Record<OfficeDocumentType, string>> = {
   invoice: "INV",
   receipt: "RCT",
   expense: "EXP",
+  notice: "NTC",
 };
 
 const OFFICE_SEQUENCE_UPSERT_SQL = `INSERT INTO office_sequences
@@ -2475,7 +2835,12 @@ export async function issueOfficeInvoice(
   if (current.version !== input.expectedVersion) {
     throw new OfficeRepositoryError("optimistic_conflict", "Invoice changed before issuing.");
   }
-  if (current.number !== null || current.sequenceValue !== null || current.postedAt !== null) {
+  if (
+    current.number !== null ||
+    current.sequenceValue !== null ||
+    current.postedAt !== null ||
+    current.trackingCode !== null
+  ) {
     throw new OfficeRepositoryError(
       "invalid_state",
       "A draft invoice with an existing posting identity cannot be issued again.",
@@ -2485,6 +2850,7 @@ export async function issueOfficeInvoice(
   const branchCode = normalizeBranchCode(input.branchCode);
   const fiscalYear = normalizeFiscalYear(input.fiscalYear);
   const now = new Date().toISOString();
+  const trackingCode = createTrackingCode("inv");
   const nextVersion = current.version + 1;
   const actorEmail = normalizeEmail(actor.email);
   const audit = createOfficeAuditEvent({
@@ -2511,10 +2877,12 @@ export async function issueOfficeInvoice(
                branch_code = ?, fiscal_year = ?,
                sequence_value = (SELECT current_value FROM office_sequences
                  WHERE branch_code = ? AND fiscal_year = ? AND document_type = 'invoice'),
-               status = 'issued', posted_by_member_id = ?, posted_at = ?, version = ?,
+               status = 'issued', tracking_code = ?, tracking_issued_at = ?,
+               posted_by_member_id = ?, posted_at = ?, version = ?,
                updated_by_email = ?, updated_at = ?
            WHERE id = ? AND status = 'draft' AND version = ?
-             AND number IS NULL AND sequence_value IS NULL AND posted_at IS NULL`,
+             AND number IS NULL AND sequence_value IS NULL AND posted_at IS NULL
+             AND tracking_code IS NULL`,
         )
         .bind(
           branchCode,
@@ -2525,6 +2893,8 @@ export async function issueOfficeInvoice(
           fiscalYear,
           branchCode,
           fiscalYear,
+          trackingCode,
+          now,
           actor.memberId,
           now,
           nextVersion,
@@ -2635,9 +3005,12 @@ export async function allocateOfficeDocumentSequence(
 const PAYMENT_SELECT = `SELECT
   payment.id, payment.receipt_number, payment.branch_code, payment.fiscal_year,
   payment.sequence_value, payment.contact_id, contact.display_name AS contact_name,
-  payment.project_id, project.name AS project_name, allocation.invoice_id, invoice.number AS invoice_number,
+  payment.project_id, project.name AS project_name, payment.client_operation_id,
+  allocation.invoice_id, invoice.number AS invoice_number,
   allocation.amount_minor AS allocated_minor, payment.status, payment.method, payment.amount_minor,
-  payment.currency, payment.paid_at, payment.reference, payment.note, payment.received_by_member_id,
+  payment.currency, payment.paid_at, payment.reference, payment.note, payment.locale,
+  payment.tracking_code, payment.tracking_issued_at, payment.public_access_revoked_at,
+  payment.template_version, payment.received_by_member_id,
   receiver.display_name AS received_by_member_name, payment.posted_by_member_id, payment.posted_at,
   payment.version, payment.created_by_email, payment.created_at, payment.updated_at
 FROM office_payments payment
@@ -2665,6 +3038,10 @@ async function getOfficePaymentById(
     .bind(id)
     .first<PaymentRow>();
   return row ? mapPayment(row) : null;
+}
+
+export async function getOfficePayment(id: string): Promise<OfficePaymentView | null> {
+  return getOfficePaymentById(await getD1(), id);
 }
 
 export async function listOfficePayments(
@@ -2713,9 +3090,27 @@ export async function recordOfficePayment(
 ): Promise<OfficePaymentView> {
   const database = await getD1();
   const amountMinor = positiveMinorUnitsSchema.parse(input.amountMinor);
+  const clientOperationId = input.clientOperationId?.trim() || crypto.randomUUID();
+  if (!/^[A-Za-z0-9:_-]{8,160}$/.test(clientOperationId)) {
+    throw new TypeError("Payment operation ID must be 8–160 URL-safe characters.");
+  }
+
+  const existingPayment = await database
+    .prepare(`${PAYMENT_SELECT} WHERE payment.client_operation_id = ? LIMIT 1`)
+    .bind(clientOperationId)
+    .first<PaymentRow>();
+  if (existingPayment) return mapPayment(existingPayment);
+
   const invoice = await database
     .prepare(
-      "SELECT id, contact_id, project_id, status, currency, balance_minor FROM office_invoices WHERE id = ? LIMIT 1",
+      `SELECT invoice.id, invoice.number, invoice.contact_id, contact.email AS contact_email,
+              contact.phone AS contact_phone, invoice.project_id, invoice.status, invoice.currency,
+              invoice.balance_minor, invoice.locale, preference.preferred_locale,
+              preference.transactional_email_enabled, preference.transactional_sms_enabled
+       FROM office_invoices invoice
+       INNER JOIN office_contacts contact ON contact.id = invoice.contact_id
+       LEFT JOIN office_contact_preferences preference ON preference.contact_id = contact.id
+       WHERE invoice.id = ? LIMIT 1`,
     )
     .bind(input.invoiceId)
     .first<InvoiceAllocationGuardRow>();
@@ -2741,23 +3136,22 @@ export async function recordOfficePayment(
     throw new OfficeRepositoryError("allocation_invalid", allocationError.message);
   }
 
-  const sequence = await allocateOfficeDocumentSequence({
-    branchCode: input.branchCode,
-    fiscalYear: input.fiscalYear,
-    documentType: "receipt",
-  });
+  const branchCode = normalizeBranchCode(input.branchCode);
+  const fiscalYear = normalizeFiscalYear(input.fiscalYear);
   const id = crypto.randomUUID();
   const allocationId = crypto.randomUUID();
   const now = new Date().toISOString();
   const actorEmail = normalizeEmail(actor.email);
   const balanceAfter = invoice.balance_minor - amountMinor;
+  const trackingCode = createTrackingCode("rct");
+  const locale = input.locale ?? invoice.preferred_locale ?? invoice.locale;
+  const publicTrackingUrl = trackingUrl(trackingCode);
   const paymentEvent = createOfficeAuditEvent({
     actor,
     action: "payment.recorded",
     entityType: "payment",
     entityId: id,
     metadata: {
-      receiptNumber: sequence.number,
       invoiceId: invoice.id,
       amountMinor,
       currency: invoice.currency,
@@ -2780,33 +3174,117 @@ export async function recordOfficePayment(
     createdAt: now,
   });
 
-  const results = await database.batch([
-    database
+  const notificationStatements: D1PreparedStatement[] = [];
+  const emailRecipient = invoice.contact_email?.trim().toLowerCase() || null;
+  const phoneRecipient = invoice.contact_phone
+    ? normalizeBangladeshPhone(invoice.contact_phone)
+    : null;
+  const notificationTargets = [
+    invoice.transactional_email_enabled !== 0 && emailRecipient
+      ? { channel: "email" as const, recipient: emailRecipient }
+      : null,
+    invoice.transactional_sms_enabled !== 0 && phoneRecipient
+      ? { channel: "sms" as const, recipient: phoneRecipient }
+      : null,
+  ].filter((target): target is { channel: "email" | "sms"; recipient: string } => target !== null);
+
+  for (const target of notificationTargets) {
+    notificationStatements.push(
+      database
+        .prepare(
+          `INSERT INTO office_notification_outbox
+            (id, event_type, entity_type, entity_id, channel, recipient, template, locale,
+             payload, status, idempotency_key, attempt_count, max_attempts, available_at,
+             claimed_at, claim_token, provider_reference, error_code, error_summary, sent_at,
+             created_at, updated_at)
+           VALUES (
+             ?, 'payment.receipt.created', 'payment', ?, ?, ?, 'payment-receipt-v1', ?,
+             (SELECT json_object(
+                'receiptNumber', receipt_number,
+                'invoiceNumber', ?,
+                'amountMinor', ?,
+                'balanceMinor', ?,
+                'trackingUrl', ?
+              ) FROM office_payments WHERE id = ?),
+             'pending', ?, 0, 5, ?, NULL, NULL, NULL, NULL, NULL, NULL, ?, ?
+           )`,
+        )
+        .bind(
+          crypto.randomUUID(),
+          id,
+          target.channel,
+          target.recipient,
+          locale,
+          invoice.number,
+          amountMinor,
+          balanceAfter,
+          publicTrackingUrl,
+          id,
+          `payment:${id}:receipt:${target.channel}:v1`,
+          now,
+          now,
+          now,
+        ),
+    );
+  }
+
+  let results: D1Result[];
+  try {
+    results = await database.batch([
+      database
+      .prepare(OFFICE_SEQUENCE_UPSERT_SQL)
+      .bind(crypto.randomUUID(), branchCode, fiscalYear, "receipt", now),
+      database
       .prepare(
-        "INSERT INTO office_payments (id, receipt_number, branch_code, fiscal_year, sequence_value, contact_id, project_id, status, method, amount_minor, currency, paid_at, reference, note, received_by_member_id, posted_by_member_id, posted_at, version, created_by_email, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'posted', ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)",
+        `INSERT INTO office_payments
+          (id, receipt_number, branch_code, fiscal_year, sequence_value, contact_id, project_id,
+           client_operation_id, status, method, amount_minor, currency, paid_at, reference, note,
+           locale, tracking_code, tracking_issued_at, public_access_revoked_at, template_version,
+           received_by_member_id, posted_by_member_id, posted_at, version, created_by_email,
+           created_at, updated_at)
+         SELECT
+           ?, ? || '-RCT-' || ? || '-' || printf('%06d',
+                (SELECT current_value FROM office_sequences
+                 WHERE branch_code = ? AND fiscal_year = ? AND document_type = 'receipt')),
+           ?, ?,
+           (SELECT current_value FROM office_sequences
+            WHERE branch_code = ? AND fiscal_year = ? AND document_type = 'receipt'),
+           guarded.contact_id, guarded.project_id, ?, 'posted', ?, ?, guarded.currency, ?, ?, ?,
+           ?, ?, ?, NULL, 'ap-receipt-v1', ?, ?, ?, 1, ?, ?, ?
+         FROM office_invoices guarded
+         WHERE guarded.id = ?
+           AND guarded.status IN ('issued', 'partially_paid', 'overdue')
+           AND guarded.balance_minor >= ?`,
       )
       .bind(
         id,
-        sequence.number,
-        sequence.branchCode,
-        sequence.fiscalYear,
-        sequence.value,
-        invoice.contact_id,
-        invoice.project_id,
+        branchCode,
+        fiscalYear,
+        branchCode,
+        fiscalYear,
+        branchCode,
+        fiscalYear,
+        branchCode,
+        fiscalYear,
+        clientOperationId,
         input.method,
         amountMinor,
-        invoice.currency,
         input.paidAt,
         optionalText(input.reference),
         optionalText(input.note),
+        locale,
+        trackingCode,
+        now,
         input.receivedByMemberId ?? actor.memberId,
         actor.memberId,
         now,
         actorEmail,
         now,
         now,
+        invoice.id,
+        amountMinor,
       ),
-    database
+      database
       .prepare(
         `INSERT INTO office_payment_allocations
           (id, payment_id, invoice_id, amount_minor, created_by_email, created_at)
@@ -2830,7 +3308,7 @@ export async function recordOfficePayment(
         actorEmail,
         now,
       ),
-    database
+      database
       .prepare(
         `UPDATE office_invoices
          SET paid_minor = paid_minor + ?, balance_minor = balance_minor - ?,
@@ -2849,10 +3327,58 @@ export async function recordOfficePayment(
         allocationId,
         invoice.id,
       ),
-    prepareOfficeAuditInsert(database, paymentEvent),
-    prepareOfficeAuditInsert(database, invoiceEvent),
-  ]);
-  requireChanged(results[2], "Invoice balance changed before payment allocation completed.");
+      ...notificationStatements,
+      database
+      .prepare(
+        `INSERT INTO office_audit_events
+          (id, actor_member_id, actor_email, action, entity_type, entity_id, metadata,
+           request_id, ip_hash, created_at)
+         VALUES (
+           ?, ?, ?, ?, 'payment', ?,
+           (SELECT json_object(
+              'receiptNumber', receipt_number,
+              'invoiceId', ?,
+              'amountMinor', ?,
+              'currency', currency,
+              'method', method,
+              'notificationCount', ?
+            ) FROM office_payments WHERE id = ?),
+           ?, ?, ?
+         )`,
+      )
+      .bind(
+        paymentEvent.id,
+        paymentEvent.actorMemberId,
+        paymentEvent.actorEmail,
+        paymentEvent.action,
+        id,
+        invoice.id,
+        amountMinor,
+        notificationStatements.length,
+        id,
+        paymentEvent.requestId,
+        paymentEvent.ipHash,
+        paymentEvent.createdAt,
+      ),
+      prepareOfficeAuditInsert(database, invoiceEvent),
+    ]);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      /office_payments_client_operation_unique|office_payments\.client_operation_id|UNIQUE constraint failed:\s*office_payments\.client_operation_id/i.test(
+        error.message,
+      )
+    ) {
+      const existing = await database
+        .prepare(`${PAYMENT_SELECT} WHERE payment.client_operation_id = ? LIMIT 1`)
+        .bind(clientOperationId)
+        .first<PaymentRow>();
+      if (existing) return mapPayment(existing);
+    }
+    throw error;
+  }
+  requireChanged(results[1], "Invoice balance changed before payment record creation.");
+  requireChanged(results[3], "Invoice balance changed before payment allocation completed.");
 
   const payment = await getOfficePaymentById(database, id);
   if (!payment) throw new OfficeRepositoryError("not_found", "Recorded payment could not be read.");

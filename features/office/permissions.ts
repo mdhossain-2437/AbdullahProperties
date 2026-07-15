@@ -34,6 +34,8 @@ export const officePermissionValues = [
   "team.read",
   "team.manage",
   "audit.read",
+  "notifications.read",
+  "notifications.manage",
   "settings.manage",
 ] as const;
 
@@ -75,6 +77,7 @@ export const officePermissions = {
     "reports.read",
     "team.read",
     "audit.read",
+    "notifications.read",
   ],
   sales: [
     "dashboard.read",
@@ -121,6 +124,7 @@ export const officePermissions = {
     "documents.read",
     "documents.write",
     "reports.read",
+    "notifications.read",
   ],
   viewer: [
     "dashboard.read",

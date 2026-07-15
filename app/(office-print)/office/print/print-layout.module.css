@@ -1,0 +1,50 @@
+.surface {
+  min-height: 100vh;
+  padding: clamp(18px, 4vw, 48px);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255, 107, 44, 0.12), transparent 28rem),
+    #eee9e5;
+  color: #111212;
+}
+
+.content { width: 100%; }
+
+.state {
+  width: min(100%, 720px);
+  margin: 10vh auto 0;
+  padding: clamp(28px, 6vw, 64px);
+  border: 1px solid #111212;
+  border-radius: 24px;
+  background: #fffdfb;
+}
+
+.state span {
+  color: #ff6b2c;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.state h1 { margin-top: 14px; font-size: clamp(2.2rem, 7vw, 5rem); line-height: 0.92; letter-spacing: -0.055em; }
+.state p { max-width: 58ch; margin-top: 18px; color: #6c6561; line-height: 1.65; }
+.state a { display: inline-flex; margin-top: 22px; color: #111212; font-weight: 750; text-underline-offset: 4px; }
+.state a:focus-visible { outline: 3px solid #ff6b2c; outline-offset: 4px; }
+.stateActions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 22px; }
+.stateActions a { margin-top: 0; }
+.stateActions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #ff6b2c;
+  border-radius: 999px;
+  background: #ff6b2c;
+  color: #111212;
+  font-weight: 760;
+  cursor: pointer;
+}
+.stateActions button:focus-visible { outline: 3px solid #111212; outline-offset: 3px; }
+
+@media print {
+  .surface { min-height: 0; padding: 0; background: white; }
+  .state { margin: 0; border: 0; }
+}

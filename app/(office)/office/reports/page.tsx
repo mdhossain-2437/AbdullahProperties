@@ -9,7 +9,7 @@ import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeMoney, formatOfficePercent } from "@/features/office/presentation";
 import {
-  getOfficeDatabaseHealth,
+  isOfficeDatabaseAvailable,
   listOfficeExpenses,
   listOfficeInvoices,
   listOfficeLandParcels,
@@ -24,8 +24,7 @@ export const metadata: Metadata = { title: "Operational reports | Office OS" };
 
 export default async function OfficeReportsPage() {
   const actor = await requireOfficePermission("reports.read", "/office/reports");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const canReadCrm = hasOfficePermission(actor.role, "crm.read");
   const canReadLand = hasOfficePermission(actor.role, "land.read");

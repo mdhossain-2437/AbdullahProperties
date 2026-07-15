@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_URL, company } from "@/lib/company-data";
+import { publicLanguageAlternates } from "@/lib/i18n/public-locale";
 
 type CreateMetadataInput = {
   title: string;
@@ -29,8 +30,10 @@ export function createMetadata({
   modifiedTime,
 }: CreateMetadataInput): Metadata {
   const socialTitle = title.includes(company.name) ? title : `${title} | ${company.name}`;
+  const languageAlternates = publicLanguageAlternates(path);
   const commonOpenGraph = {
     locale: "en_BD",
+    alternateLocale: languageAlternates ? ["bn_BD"] : undefined,
     siteName: company.name,
     title: socialTitle,
     description,
@@ -50,6 +53,7 @@ export function createMetadata({
     description,
     alternates: {
       canonical: path,
+      languages: languageAlternates ?? undefined,
     },
     openGraph: type === "article"
       ? { ...commonOpenGraph, type: "article", publishedTime, modifiedTime }

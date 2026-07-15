@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { LocalizedSkipLink } from "@/components/layout/localized-skip-link";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL, company, verifiedServiceLines } from "@/lib/company-data";
@@ -89,20 +90,18 @@ export default function PublicLayout({
               name: company.name,
               alternateName: company.nameBn,
               description: company.description,
-              inLanguage: "en-BD",
+              inLanguage: ["en-BD", "bn-BD"],
               publisher: { "@id": `${SITE_URL}/#organization` },
             },
           ],
         }}
       />
-      <a className="skip-link" href="#main-content">
-        Skip to content
-      </a>
+      <LocalizedSkipLink />
       <SiteHeader />
       <div id="main-content" tabIndex={-1}>
         {children}
       </div>
-      <SiteFooter />
+      <SiteFooter year={new Date().getUTCFullYear()} />
     </>
   );
 }

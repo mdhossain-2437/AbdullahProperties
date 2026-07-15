@@ -215,6 +215,8 @@ export async function recordOfficePaymentAction(_previous: OfficeActionState, fo
       method: parsed.data.method,
       amountMinor: parsed.data.amount,
       paidAt: parsed.data.paidAt,
+      clientOperationId: parsed.data.clientOperationId,
+      locale: parsed.data.locale,
       reference: parsed.data.reference,
       note: parsed.data.note,
       fiscalYear: parsed.data.paidAt.slice(0, 4),

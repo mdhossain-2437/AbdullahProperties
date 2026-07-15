@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { AppImage as Image } from "@/components/ui/app-image";
+import type { PublicLocale } from "@/lib/i18n/public-locale";
 import styles from "./footer-ghost-marquee.module.css";
 
-function BrandSignature({ duplicate = false }: { duplicate?: boolean }) {
+function BrandSignature({ locale, duplicate = false }: { locale: PublicLocale; duplicate?: boolean }) {
+  const isBengali = locale === "bn-BD";
   return (
     <span
       className={`${styles.group} ${duplicate ? styles.duplicate : ""}`}
@@ -19,14 +21,21 @@ function BrandSignature({ duplicate = false }: { duplicate?: boolean }) {
         height={309}
         sizes="(max-width: 640px) 15vw, 9vw"
       />
-      <span className={styles.name}>Abdullah Properties</span>
+      <span className={styles.name} lang={isBengali ? "bn" : "en"}>
+        {isBengali ? "আব্দুল্লাহ প্রোপার্টিজ" : "Abdullah Properties"}
+      </span>
     </span>
   );
 }
 
-export function FooterGhostMarquee() {
+type FooterGhostMarqueeProps = {
+  readonly locale?: PublicLocale;
+};
+
+export function FooterGhostMarquee({ locale = "en-BD" }: FooterGhostMarqueeProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
+  const isBengali = locale === "bn-BD";
 
   useEffect(() => {
     const root = rootRef.current;
@@ -84,13 +93,15 @@ export function FooterGhostMarquee() {
       data-footer-ghost-marquee="true"
     >
       <div className={styles.track} aria-hidden="true">
-        <BrandSignature />
-        <BrandSignature duplicate />
+        <BrandSignature locale={locale} />
+        <BrandSignature locale={locale} duplicate />
       </div>
       <button
         type="button"
         className={styles.motionControl}
-        aria-label={paused ? "Resume footer brand animation" : "Pause footer brand animation"}
+        aria-label={paused
+          ? isBengali ? "ফুটারের ব্র্যান্ড অ্যানিমেশন চালু করুন" : "Resume footer brand animation"
+          : isBengali ? "ফুটারের ব্র্যান্ড অ্যানিমেশন থামান" : "Pause footer brand animation"}
         aria-pressed={paused}
         onClick={() => setPaused((current) => !current)}
       >

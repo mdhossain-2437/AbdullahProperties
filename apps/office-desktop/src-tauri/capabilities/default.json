@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "office-main",
+  "description": "Least-privilege local database access for the Abdullah Properties Office main window",
+  "windows": ["main"],
+  "platforms": ["windows"],
+  "permissions": [
+    "core:path:default",
+    "core:event:default",
+    "core:app:default",
+    "core:resources:default",
+    "sql:default",
+    "sql:allow-execute"
+  ]
+}

@@ -1,7 +1,9 @@
 import { z } from "zod";
 import {
   officeContactKindSchema,
+  officeInvoiceKindSchema,
   officeInvoiceLineInputSchema,
+  officeLocaleSchema,
   officeLeadStageSchema,
   officeLandStageSchema,
   officeProjectStatusSchema,
@@ -191,6 +193,9 @@ const invoiceBuilderLineSchema = z.strictObject({
 export const officeInvoiceFormSchema = z.strictObject({
   contactId: uuidSchema,
   projectId: optionalUuid,
+  kind: officeInvoiceKindSchema.default("service"),
+  purpose: z.string().trim().min(3).max(240),
+  locale: officeLocaleSchema.default("en"),
   issueDate: localDateSchema,
   dueDate: localDateSchema,
   currency: z.string().trim().length(3).transform((value) => value.toUpperCase()).default("BDT"),
@@ -203,6 +208,11 @@ export const officeInvoiceFormSchema = z.strictObject({
 
 export const officePaymentFormSchema = z.strictObject({
   invoiceId: uuidSchema,
+  clientOperationId: z.preprocess(
+    (value) => typeof value === "string" && value.trim().length > 0 ? value.trim() : null,
+    z.string().regex(/^[A-Za-z0-9:_-]{8,160}$/).nullable(),
+  ),
+  locale: officeLocaleSchema.default("bn"),
   method: z.enum(["cash", "bank_transfer", "card", "mobile_financial_service", "cheque", "other"]),
   amount: z.string().transform((value, context) => {
     try {

@@ -8,22 +8,21 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { addOfficeLocalDays, formatOfficeDate, formatOfficeMoney, getOfficeLocalDate } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeContacts, listOfficeInvoices, listOfficeProjects } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeContactOptions, listOfficeInvoices, listOfficeProjectOptions } from "@/features/office/repository";
 import { officeInvoiceStatusSchema } from "@/features/office/types";
 
 type InvoicePageProps = { searchParams: Promise<{ status?: string }> };
 
 export default async function OfficeInvoicesPage({ searchParams }: InvoicePageProps) {
   const actor = await requireOfficePermission("finance.read", "/office/invoices");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
   const query = await searchParams;
   const parsedStatus = officeInvoiceStatusSchema.safeParse(query.status);
   const status = parsedStatus.success ? parsedStatus.data : undefined;
   const [invoices, contacts, projects] = await Promise.all([
     listOfficeInvoices({ limit: 100, status }),
-    listOfficeContacts({ limit: 200, status: "active" }),
-    listOfficeProjects({ limit: 200 }),
+    listOfficeContactOptions({ limit: 200, status: "active" }),
+    listOfficeProjectOptions({ limit: 200 }),
   ]);
   const canWrite = hasOfficePermission(actor.role, "finance.write");
   const issueDate = getOfficeLocalDate();
@@ -68,8 +67,8 @@ export default async function OfficeInvoicesPage({ searchParams }: InvoicePagePr
         <section className="office-panel office-panel--wide office-record-composer" id="new-invoice">
           <div className="office-panel__head"><div><span className="office-eyebrow">New commercial draft</span><h2>Build the evidence before issuing.</h2></div></div>
           <OfficeInvoiceBuilder
-            contacts={contacts.map((contact) => ({ id: contact.id, label: contact.displayName, meta: contact.address ? undefined : "billing address needed" }))}
-            projects={projects.map((project) => ({ id: project.id, label: `${project.code} · ${project.name}` }))}
+            contacts={contacts.map((contact) => ({ id: contact.id, label: contact.label, meta: contact.hasBillingAddress ? undefined : "billing address needed" }))}
+            projects={projects.map((project) => ({ id: project.id, label: `${project.detail} · ${project.label}` }))}
             issueDate={issueDate}
             dueDate={addOfficeLocalDays(issueDate, 14)}
           />

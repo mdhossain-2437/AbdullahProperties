@@ -9,7 +9,7 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDate, formatOfficeMoney, formatOfficePercent, humanizeOfficeValue } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeContacts, listOfficeLandParcels, listOfficeProjects, listOfficeTeamMembers } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeContactOptions, listOfficeLandParcelOptions, listOfficeProjects, listOfficeTeamMemberOptions } from "@/features/office/repository";
 import type { OfficeProjectStatus } from "@/features/office/types";
 
 export const metadata: Metadata = { title: "Projects | Office OS" };
@@ -23,8 +23,7 @@ function asChoice<const T extends readonly string[]>(value: string | undefined, 
 
 export default async function OfficeProjectsPage({ searchParams }: { searchParams: ProjectsSearchParams }) {
   const actor = await requireOfficePermission("projects.read", "/office/projects");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const query = first(params.q)?.trim().slice(0, 120) || undefined;
@@ -34,13 +33,13 @@ export default async function OfficeProjectsPage({ searchParams }: { searchParam
   const canAssign = hasOfficePermission(actor.role, "projects.manage");
   const [projects, landParcels, contacts, team] = await Promise.all([
     listOfficeProjects({ query, status, riskLevel, limit: 100 }),
-    canWrite ? listOfficeLandParcels({ limit: 200 }) : Promise.resolve([]),
-    canWrite ? listOfficeContacts({ status: "active", limit: 200 }) : Promise.resolve([]),
-    canAssign ? listOfficeTeamMembers({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeLandParcelOptions({ limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeContactOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canAssign ? listOfficeTeamMemberOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
   ]);
-  const landOptions: OfficeSelectOption[] = landParcels.map((land) => ({ value: land.id, label: land.title, detail: land.referenceCode }));
-  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.displayName, detail: humanizeOfficeValue(contact.kind) }));
-  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.displayName, detail: humanizeOfficeValue(member.role) }));
+  const landOptions: OfficeSelectOption[] = landParcels.map((land) => ({ value: land.id, label: land.label, detail: land.detail }));
+  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.label, detail: humanizeOfficeValue(contact.detail) }));
+  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.label, detail: humanizeOfficeValue(member.detail) }));
   const filtered = Boolean(query || status || riskLevel);
 
   return (

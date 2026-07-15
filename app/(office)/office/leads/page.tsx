@@ -9,7 +9,7 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDate, formatOfficeMoney, humanizeOfficeValue } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeContacts, listOfficeLeads, listOfficeTeamMembers } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeContactOptions, listOfficeLeads, listOfficeTeamMemberOptions } from "@/features/office/repository";
 import type { OfficeLeadStage } from "@/features/office/types";
 
 export const metadata: Metadata = { title: "Leads | Office OS" };
@@ -23,8 +23,7 @@ function asChoice<const T extends readonly string[]>(value: string | undefined, 
 
 export default async function OfficeLeadsPage({ searchParams }: { searchParams: LeadsSearchParams }) {
   const actor = await requireOfficePermission("crm.read", "/office/leads");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const query = first(params.q)?.trim().slice(0, 120) || undefined;
@@ -34,11 +33,11 @@ export default async function OfficeLeadsPage({ searchParams }: { searchParams: 
   const canAssign = hasOfficePermission(actor.role, "crm.assign");
   const [leads, contacts, team] = await Promise.all([
     listOfficeLeads({ query, stage, priority, limit: 100 }),
-    canWrite ? listOfficeContacts({ status: "active", limit: 200 }) : Promise.resolve([]),
-    canAssign ? listOfficeTeamMembers({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeContactOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canAssign ? listOfficeTeamMemberOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
   ]);
-  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.displayName, detail: humanizeOfficeValue(contact.kind) }));
-  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.displayName, detail: humanizeOfficeValue(member.role) }));
+  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.label, detail: humanizeOfficeValue(contact.detail) }));
+  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.label, detail: humanizeOfficeValue(member.detail) }));
   const filtered = Boolean(query || stage || priority);
 
   return (

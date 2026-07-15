@@ -67,6 +67,8 @@ test("exposes a complete, role-keyed permission matrix", () => {
   assert.equal(hasOfficePermission("sales", "payments.post"), false);
   assert.equal(hasOfficePermission("accounts", "finance.write"), true);
   assert.equal(hasOfficePermission("accounts", "finance.post"), false);
+  assert.equal(hasOfficePermission("accounts", "notifications.read"), true);
+  assert.equal(hasOfficePermission("accounts", "notifications.manage"), false);
   assert.equal(hasOfficePermission("viewer", "documents.read"), true);
   assert.equal(hasOfficePermission("viewer", "documents.write"), false);
 });
@@ -188,9 +190,10 @@ test("prevents over-allocation and cross-currency allocation", () => {
 });
 
 test("applies the additive office migration without changing the CMS baseline", async () => {
-  const [baseline, officeMigration] = await Promise.all([
+  const [baseline, officeMigration, officeDocumentsMigration] = await Promise.all([
     readFile(new URL("../drizzle/0000_many_living_tribunal.sql", import.meta.url), "utf8"),
     readFile(new URL("../drizzle/0001_glamorous_kid_colt.sql", import.meta.url), "utf8"),
+    readFile(new URL("../drizzle/0002_needy_spectrum.sql", import.meta.url), "utf8"),
   ]);
   const database = new DatabaseSync(":memory:");
 
@@ -198,6 +201,7 @@ test("applies the additive office migration without changing the CMS baseline", 
     database.exec("PRAGMA foreign_keys = ON;");
     database.exec(baseline);
     database.exec(officeMigration);
+    database.exec(officeDocumentsMigration);
 
     const tableRows = database
       .prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
@@ -208,6 +212,11 @@ test("applies the additive office migration without changing the CMS baseline", 
     assert.equal(tableNames.includes("office_invoices"), true);
     assert.equal(tableNames.includes("office_payment_allocations"), true);
     assert.equal(tableNames.includes("office_audit_events"), true);
+    assert.equal(tableNames.includes("office_notices"), true);
+    assert.equal(tableNames.includes("office_notice_revisions"), true);
+    assert.equal(tableNames.includes("office_notification_outbox"), true);
+    assert.equal(tableNames.includes("office_notification_attempts"), true);
+    assert.equal(tableNames.includes("office_contact_preferences"), true);
     assert.equal(database.prepare("PRAGMA foreign_key_check").all().length, 0);
   } finally {
     database.close();

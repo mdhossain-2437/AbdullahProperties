@@ -11,17 +11,17 @@ import { OfficePageHeader } from "@/components/office/page-header";
 import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
-import { formatOfficeDateTime, formatOfficeMoney, humanizeOfficeValue } from "@/features/office/presentation";
+import { formatOfficeDateTime, humanizeOfficeValue } from "@/features/office/presentation";
 import {
-  getOfficeDatabaseHealth,
-  listOfficeApprovals,
-  listOfficeContacts,
-  listOfficeExpenses,
-  listOfficeInvoices,
-  listOfficeLandParcels,
-  listOfficeLeads,
-  listOfficePayments,
-  listOfficeProjects,
+  isOfficeDatabaseAvailable,
+  listOfficeApprovalOptions,
+  listOfficeContactOptions,
+  listOfficeExpenseOptions,
+  listOfficeInvoiceOptions,
+  listOfficeLandParcelOptions,
+  listOfficeLeadOptions,
+  listOfficePaymentOptions,
+  listOfficeProjectOptions,
 } from "@/features/office/repository";
 import {
   getOptionalOfficeFilesBucket,
@@ -56,8 +56,7 @@ function humanFileSize(sizeBytes: number) {
 
 export default async function OfficeDocumentsPage({ searchParams }: { searchParams: DocumentSearchParams }) {
   const actor = await requireOfficePermission("documents.read", "/office/documents");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const query = first(params.q)?.trim().slice(0, 120) || undefined;
@@ -65,8 +64,11 @@ export default async function OfficeDocumentsPage({ searchParams }: { searchPara
   const classification = asChoice(first(params.classification), classifications);
   const reviewStatus = asChoice(first(params.reviewStatus), reviewStatuses);
   const canWrite = hasOfficePermission(actor.role, "documents.write");
-  const filesAvailable = canWrite ? Boolean(await getOptionalOfficeFilesBucket()) : false;
-  const documents = await listOfficeDocuments(actor, { query, entityType, classification, reviewStatus, limit: 100 });
+  const [filesBucket, documents] = await Promise.all([
+    canWrite ? getOptionalOfficeFilesBucket() : Promise.resolve(null),
+    listOfficeDocuments(actor, { query, entityType, classification, reviewStatus, limit: 100 }),
+  ]);
+  const filesAvailable = Boolean(filesBucket);
   const filtered = Boolean(query || entityType || classification || reviewStatus);
 
   const canReadCrm = canWrite && hasOfficePermission(actor.role, "crm.read");
@@ -77,25 +79,25 @@ export default async function OfficeDocumentsPage({ searchParams }: { searchPara
   const canReadApprovals = canWrite && hasOfficePermission(actor.role, "approvals.read");
 
   const [contacts, leads, landParcels, projects, invoices, payments, expenses, approvals] = filesAvailable ? await Promise.all([
-    canReadCrm ? listOfficeContacts({ status: "active", limit: 25 }) : Promise.resolve([]),
-    canReadCrm ? listOfficeLeads({ limit: 25 }) : Promise.resolve([]),
-    canReadLand ? listOfficeLandParcels({ limit: 25 }) : Promise.resolve([]),
-    canReadProjects ? listOfficeProjects({ limit: 25 }) : Promise.resolve([]),
-    canReadFinance ? listOfficeInvoices({ limit: 25 }) : Promise.resolve([]),
-    canReadFinance ? listOfficePayments({ limit: 25 }) : Promise.resolve([]),
-    canReadExpenses ? listOfficeExpenses({ limit: 25 }) : Promise.resolve([]),
-    canReadApprovals ? listOfficeApprovals({ limit: 25 }) : Promise.resolve([]),
+    canReadCrm ? listOfficeContactOptions({ status: "active", limit: 25 }) : Promise.resolve([]),
+    canReadCrm ? listOfficeLeadOptions({ limit: 25 }) : Promise.resolve([]),
+    canReadLand ? listOfficeLandParcelOptions({ limit: 25 }) : Promise.resolve([]),
+    canReadProjects ? listOfficeProjectOptions({ limit: 25 }) : Promise.resolve([]),
+    canReadFinance ? listOfficeInvoiceOptions({ limit: 25 }) : Promise.resolve([]),
+    canReadFinance ? listOfficePaymentOptions({ limit: 25 }) : Promise.resolve([]),
+    canReadExpenses ? listOfficeExpenseOptions({ limit: 25 }) : Promise.resolve([]),
+    canReadApprovals ? listOfficeApprovalOptions({ limit: 25 }) : Promise.resolve([]),
   ]) : [[], [], [], [], [], [], [], []] as const;
 
   const targets: OfficeDocumentTarget[] = [
-    ...contacts.map((record) => ({ entityType: "contact" as const, entityId: record.id, label: record.displayName, context: humanizeOfficeValue(record.kind) })),
-    ...leads.map((record) => ({ entityType: "lead" as const, entityId: record.id, label: record.title, context: record.contactName })),
-    ...landParcels.map((record) => ({ entityType: "land_parcel" as const, entityId: record.id, label: record.title, context: record.referenceCode })),
-    ...projects.map((record) => ({ entityType: "project" as const, entityId: record.id, label: record.name, context: record.code })),
-    ...invoices.map((record) => ({ entityType: "invoice" as const, entityId: record.id, label: record.number ?? "Draft invoice", context: record.contactName })),
-    ...payments.map((record) => ({ entityType: "payment" as const, entityId: record.id, label: record.receiptNumber ?? "Unnumbered payment", context: formatOfficeMoney(record.amountMinor, record.currency) })),
-    ...expenses.map((record) => ({ entityType: "expense" as const, entityId: record.id, label: record.number ?? record.category, context: formatOfficeMoney(record.amountMinor, record.currency) })),
-    ...approvals.map((record) => ({ entityType: "approval" as const, entityId: record.id, label: `${humanizeOfficeValue(record.kind)} approval`, context: humanizeOfficeValue(record.entityType) })),
+    ...contacts.map((record) => ({ entityType: "contact" as const, entityId: record.id, label: record.label, context: humanizeOfficeValue(record.detail) })),
+    ...leads.map((record) => ({ entityType: "lead" as const, entityId: record.id, label: record.label, context: record.detail })),
+    ...landParcels.map((record) => ({ entityType: "land_parcel" as const, entityId: record.id, label: record.label, context: record.detail })),
+    ...projects.map((record) => ({ entityType: "project" as const, entityId: record.id, label: record.label, context: record.detail })),
+    ...invoices.map((record) => ({ entityType: "invoice" as const, entityId: record.id, label: record.label, context: record.detail })),
+    ...payments.map((record) => ({ entityType: "payment" as const, entityId: record.id, label: record.label, context: record.detail })),
+    ...expenses.map((record) => ({ entityType: "expense" as const, entityId: record.id, label: record.label, context: record.detail })),
+    ...approvals.map((record) => ({ entityType: "approval" as const, entityId: record.id, label: `${humanizeOfficeValue(record.label)} approval`, context: humanizeOfficeValue(record.detail) })),
   ];
 
   return (

@@ -120,7 +120,7 @@ test("server-renders every public route with unique SEO metadata", async () => {
     ["/property-planner", /Prepare the questions before the enquiry\./],
     ["/area-guides", /Read the place before the property/],
     ["/area-guides/joypurhat-property-decisions", /A practical lens for property decisions in Joypurhat/],
-    ["/about", /Leadership details without invented identities/],
+    ["/about", /Responsibility without placeholder people/],
     ["/insights", /Think clearly before the property carries weight/],
     ["/insights/evaluate-land-with-clarity", /How to evaluate land with more clarity/],
     ["/contact", /Talk to the Joypurhat office/],
@@ -169,8 +169,8 @@ test("renders verified company data, responsible leadership boundaries, and dire
   assert.match(services, /Joint-venture housing/);
   assert.match(services, /Land &amp; documentation support|Land & documentation support/);
   assert.match(services, /Inspection &amp; handover|Inspection & handover/);
-  assert.match(about, /Approved name pending/);
-  assert.match(about, /Representative company image/);
+  assert.match(about, /Identity and portrait will appear only after owner-supplied evidence is approved/);
+  assert.doesNotMatch(about, /Approved name pending|Representative company image|Md\. Co-Founder Name/);
   assert.match(project, /Dhanmondi, Joypurhat/);
   assert.match(contact, /mailto:abdullahproperties\.24@gmail\.com/);
   assert.match(contact, /https:\/\/wa\.me\/8801735877654/);
@@ -304,8 +304,10 @@ test("publishes crawl controls, sitemap, manifest, and branded discovery assets"
   assert.doesNotMatch(sitemap, /<loc>[^<]*\?|properties\/joypurhat-residence/);
   assert.match(
     sitemap,
-    new RegExp(`<loc>${siteUrl.replaceAll(".", "\\.")}\/</loc>\\s*<lastmod>2026-07-13T18:00:00\\.000Z</lastmod>`),
+    new RegExp(`<loc>${siteUrl.replaceAll(".", "\\.")}\/</loc>[\\s\\S]*?<lastmod>2026-07-13T18:00:00\\.000Z</lastmod>`),
   );
+  assert.match(sitemap, new RegExp(`hreflang="en-BD" href="${siteUrl.replaceAll(".", "\\.")}\/"`));
+  assert.match(sitemap, new RegExp(`hreflang="bn-BD" href="${siteUrl.replaceAll(".", "\\.")}\/bn"`));
 
   assert.equal(manifestResponse.status, 200);
   const manifest = JSON.parse(await manifestResponse.text());

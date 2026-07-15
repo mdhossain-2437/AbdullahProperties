@@ -9,7 +9,7 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDate, humanizeOfficeValue } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeContacts, listOfficeLandParcels, listOfficeLeads, listOfficeProjects, listOfficeTasks, listOfficeTeamMembers } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeContactOptions, listOfficeLandParcelOptions, listOfficeLeadOptions, listOfficeProjectOptions, listOfficeTasks, listOfficeTeamMemberOptions } from "@/features/office/repository";
 import type { OfficeTaskStatus } from "@/features/office/types";
 
 export const metadata: Metadata = { title: "Tasks | Office OS" };
@@ -23,8 +23,7 @@ function asChoice<const T extends readonly string[]>(value: string | undefined, 
 
 export default async function OfficeTasksPage({ searchParams }: { searchParams: TasksSearchParams }) {
   const actor = await requireOfficePermission("tasks.read", "/office/tasks");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const query = first(params.q)?.trim().slice(0, 120) || undefined;
@@ -35,17 +34,17 @@ export default async function OfficeTasksPage({ searchParams }: { searchParams: 
   const canAssign = hasOfficePermission(actor.role, "tasks.assign");
   const [tasks, contacts, leads, landParcels, projects, team] = await Promise.all([
     listOfficeTasks({ query, status, priority, overdueOnly, limit: 100 }),
-    canWrite ? listOfficeContacts({ status: "active", limit: 200 }) : Promise.resolve([]),
-    canWrite ? listOfficeLeads({ limit: 200 }) : Promise.resolve([]),
-    canWrite ? listOfficeLandParcels({ limit: 200 }) : Promise.resolve([]),
-    canWrite ? listOfficeProjects({ limit: 200 }) : Promise.resolve([]),
-    canAssign ? listOfficeTeamMembers({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeContactOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeLeadOptions({ limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeLandParcelOptions({ limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeProjectOptions({ limit: 200 }) : Promise.resolve([]),
+    canAssign ? listOfficeTeamMemberOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
   ]);
-  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.displayName, detail: humanizeOfficeValue(contact.kind) }));
-  const leadOptions: OfficeSelectOption[] = leads.map((lead) => ({ value: lead.id, label: lead.title, detail: lead.contactName }));
-  const landOptions: OfficeSelectOption[] = landParcels.map((land) => ({ value: land.id, label: land.title, detail: land.referenceCode }));
-  const projectOptions: OfficeSelectOption[] = projects.map((project) => ({ value: project.id, label: project.name, detail: project.code }));
-  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.displayName, detail: humanizeOfficeValue(member.role) }));
+  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.label, detail: humanizeOfficeValue(contact.detail) }));
+  const leadOptions: OfficeSelectOption[] = leads.map((lead) => ({ value: lead.id, label: lead.label, detail: lead.detail }));
+  const landOptions: OfficeSelectOption[] = landParcels.map((land) => ({ value: land.id, label: land.label, detail: land.detail }));
+  const projectOptions: OfficeSelectOption[] = projects.map((project) => ({ value: project.id, label: project.label, detail: project.detail }));
+  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.label, detail: humanizeOfficeValue(member.detail) }));
   const filtered = Boolean(query || status || priority || overdueOnly);
 
   return (

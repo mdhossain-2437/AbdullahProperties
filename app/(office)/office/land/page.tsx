@@ -9,7 +9,7 @@ import { OfficeStatusBadge } from "@/components/office/status-badge";
 import { requireOfficePermission } from "@/features/office/auth";
 import { hasOfficePermission } from "@/features/office/permissions";
 import { formatOfficeDate, humanizeOfficeValue } from "@/features/office/presentation";
-import { getOfficeDatabaseHealth, listOfficeContacts, listOfficeLandParcels, listOfficeTeamMembers } from "@/features/office/repository";
+import { isOfficeDatabaseAvailable, listOfficeContactOptions, listOfficeLandParcels, listOfficeTeamMemberOptions } from "@/features/office/repository";
 import type { OfficeLandStage } from "@/features/office/types";
 
 export const metadata: Metadata = { title: "Land & Joint Venture | Office OS" };
@@ -23,8 +23,7 @@ function asChoice<const T extends readonly string[]>(value: string | undefined, 
 
 export default async function OfficeLandPage({ searchParams }: { searchParams: LandSearchParams }) {
   const actor = await requireOfficePermission("land.read", "/office/land");
-  const health = await getOfficeDatabaseHealth();
-  if (!health.healthy) return <OfficeAccessState kind="storage" />;
+  if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
 
   const params = await searchParams;
   const query = first(params.q)?.trim().slice(0, 120) || undefined;
@@ -34,11 +33,11 @@ export default async function OfficeLandPage({ searchParams }: { searchParams: L
   const canAssign = hasOfficePermission(actor.role, "land.review");
   const [landParcels, contacts, team] = await Promise.all([
     listOfficeLandParcels({ query, stage, reviewStatus, limit: 100 }),
-    canWrite ? listOfficeContacts({ status: "active", limit: 200 }) : Promise.resolve([]),
-    canAssign ? listOfficeTeamMembers({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canWrite ? listOfficeContactOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
+    canAssign ? listOfficeTeamMemberOptions({ status: "active", limit: 200 }) : Promise.resolve([]),
   ]);
-  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.displayName, detail: humanizeOfficeValue(contact.kind) }));
-  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.displayName, detail: humanizeOfficeValue(member.role) }));
+  const contactOptions: OfficeSelectOption[] = contacts.map((contact) => ({ value: contact.id, label: contact.label, detail: humanizeOfficeValue(contact.detail) }));
+  const teamOptions: OfficeSelectOption[] = team.map((member) => ({ value: member.id, label: member.label, detail: humanizeOfficeValue(member.detail) }));
   const filtered = Boolean(query || stage || reviewStatus);
 
   return (

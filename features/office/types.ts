@@ -67,6 +67,32 @@ export const officeInvoiceStatusSchema = z.enum([
   "void",
 ]);
 export const officePaymentStatusSchema = z.enum(["draft", "posted", "void", "refunded"]);
+export const officeLocaleSchema = z.enum(["en", "bn"]);
+export const officeInvoiceKindSchema = z.enum([
+  "service",
+  "consultation",
+  "booking",
+  "installment",
+  "construction",
+  "other",
+]);
+export const officeNoticeKindSchema = z.enum([
+  "general",
+  "payment_reminder",
+  "project_update",
+  "appointment",
+  "handover",
+  "other",
+]);
+export const officeNoticeStatusSchema = z.enum(["draft", "issued", "archived"]);
+export const officeNotificationStatusSchema = z.enum([
+  "pending",
+  "processing",
+  "sent",
+  "failed",
+  "dead",
+  "cancelled",
+]);
 export const officeExpenseStatusSchema = z.enum([
   "draft",
   "submitted",
@@ -86,6 +112,11 @@ export type OfficeProjectStatus = z.infer<typeof officeProjectStatusSchema>;
 export type OfficeTaskStatus = z.infer<typeof officeTaskStatusSchema>;
 export type OfficeInvoiceStatus = z.infer<typeof officeInvoiceStatusSchema>;
 export type OfficePaymentStatus = z.infer<typeof officePaymentStatusSchema>;
+export type OfficeLocale = z.infer<typeof officeLocaleSchema>;
+export type OfficeInvoiceKind = z.infer<typeof officeInvoiceKindSchema>;
+export type OfficeNoticeKind = z.infer<typeof officeNoticeKindSchema>;
+export type OfficeNoticeStatus = z.infer<typeof officeNoticeStatusSchema>;
+export type OfficeNotificationStatus = z.infer<typeof officeNotificationStatusSchema>;
 export type OfficeExpenseStatus = z.infer<typeof officeExpenseStatusSchema>;
 export type OfficeApprovalStatus = z.infer<typeof officeApprovalStatusSchema>;
 
@@ -145,6 +176,9 @@ export const officeInvoiceDraftInputSchema = z
   .strictObject({
     contactId: uuidSchema,
     projectId: uuidSchema.nullable().default(null),
+    kind: officeInvoiceKindSchema.default("service"),
+    purpose: z.string().trim().min(3).max(240).default("Property services"),
+    locale: officeLocaleSchema.default("en"),
     issueDate: localDateSchema,
     dueDate: localDateSchema,
     currency: currencySchema.default("BDT"),

@@ -4,8 +4,23 @@ import { PageHero } from "@/components/layout/page-hero";
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import { Button } from "@/components/ui/button";
 import { AppImage as Image } from "@/components/ui/app-image";
-import { company, contentVerification, leadershipRoles } from "@/lib/company-data";
+import { company, contentVerification } from "@/lib/company-data";
 import { createMetadata } from "@/lib/seo";
+
+const leadershipResponsibilities = [
+  {
+    id: "01",
+    role: "Founder",
+    heading: "Company direction",
+    responsibility: "Business direction, customer relationships, housing strategy, and the principles used to evaluate commitments before they are made.",
+  },
+  {
+    id: "02",
+    role: "Co-founder",
+    heading: "Delivery oversight",
+    responsibility: "Project coordination, quality follow-through, decision ownership, and the connection between written commitments and day-to-day delivery.",
+  },
+] as const;
 
 export const metadata = createMetadata({
   title: "About Abdullah Properties in Joypurhat",
@@ -73,26 +88,22 @@ export default function AboutPage() {
         <div className="site-shell leadership-section">
           <div className="leadership-section__head">
             <div className="editorial-copy">
-              <span className="eyebrow">Founder & co-founder</span>
-              <h2 id="leadership-heading">Leadership details without invented identities.</h2>
+              <span className="eyebrow">Leadership disclosure</span>
+              <h2 id="leadership-heading">Responsibility without placeholder people.</h2>
             </div>
             <p>
-              The previous website did not provide a verifiable co-founder name or authentic leadership portraits. These role profiles stay intentionally protected until the company supplies approved legal names, titles, biographies, and original headshots.
+              Verified legal names, titles, biographies, and original portraits are not present in the approved evidence set. Until the company supplies them, this page publishes the work each role owns—never a guessed identity or stock-image profile.
             </p>
           </div>
           <div className="leadership-grid">
-            {leadershipRoles.map((leader) => (
+            {leadershipResponsibilities.map((leader) => (
               <article className="leadership-card" key={leader.id}>
-                <div className="leadership-card__media">
-                  <Image src={leader.image} alt={leader.imageAlt} fill sizes="(max-width: 760px) 100vw, 50vw" />
-                  <span>Representative company image — not a portrait</span>
-                </div>
                 <div className="leadership-card__body">
                   <div><span>{leader.id}</span><UserRoundCheck aria-hidden="true" /></div>
                   <p className="leadership-card__role">{leader.role}</p>
-                  <h3>{leader.name}</h3>
+                  <h3>{leader.heading}</h3>
                   <p>{leader.responsibility}</p>
-                  <small>{leader.status}</small>
+                  <small>Identity and portrait will appear only after owner-supplied evidence is approved.</small>
                 </div>
               </article>
             ))}

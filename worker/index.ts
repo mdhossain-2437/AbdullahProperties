@@ -94,11 +94,16 @@ const worker = {
       url.pathname === "/studio" ||
       url.pathname.startsWith("/studio/") ||
       url.pathname === "/office" ||
-      url.pathname.startsWith("/office/")
+      url.pathname.startsWith("/office/") ||
+      url.pathname === "/track" ||
+      url.pathname.startsWith("/track/")
     ) {
       const headers = new Headers(response.headers);
       headers.set("Cache-Control", "private, no-store");
       headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+      if (url.pathname === "/track" || url.pathname.startsWith("/track/")) {
+        headers.set("Referrer-Policy", "no-referrer");
+      }
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,

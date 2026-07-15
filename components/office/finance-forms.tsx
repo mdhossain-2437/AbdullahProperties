@@ -34,6 +34,9 @@ type InvoiceLineValues = {
 type InvoiceBuilderValues = {
   contactId: string;
   projectId: string;
+  kind: "service" | "consultation" | "booking" | "installment" | "construction" | "other";
+  purpose: string;
+  locale: "en" | "bn";
   issueDate: string;
   dueDate: string;
   terms: string;
@@ -49,6 +52,9 @@ export function OfficeInvoiceBuilder({ contacts, projects, issueDate, dueDate }:
     defaultValues: {
       contactId: "",
       projectId: "",
+      kind: "service",
+      purpose: "Property services and project support",
+      locale: "en",
       issueDate,
       dueDate,
       terms: "Payment is due by the stated date. Scope, exclusions, and any tax treatment must match the signed commercial record.",
@@ -67,6 +73,9 @@ export function OfficeInvoiceBuilder({ contacts, projects, issueDate, dueDate }:
     const payload = new FormData();
     payload.set("contactId", values.contactId);
     payload.set("projectId", values.projectId);
+    payload.set("kind", values.kind);
+    payload.set("purpose", values.purpose);
+    payload.set("locale", values.locale);
     payload.set("issueDate", values.issueDate);
     payload.set("dueDate", values.dueDate);
     payload.set("currency", "BDT");
@@ -85,6 +94,9 @@ export function OfficeInvoiceBuilder({ contacts, projects, issueDate, dueDate }:
         <div className="office-form-grid">
           <label><span>Billing contact</span><select {...register("contactId", { required: "Choose a billing contact." })}><option value="">Choose contact</option>{contacts.map((option) => <option key={option.id} value={option.id}>{option.label}{option.meta ? ` · ${option.meta}` : ""}</option>)}</select><FieldError message={errors.contactId?.message ?? state.fieldErrors?.contactId} /></label>
           <label><span>Project <small>optional</small></span><select {...register("projectId")}><option value="">No linked project</option>{projects.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label>
+          <label><span>Invoice type</span><select {...register("kind")}><option value="service">Service</option><option value="consultation">Consultation</option><option value="booking">Booking</option><option value="installment">Installment</option><option value="construction">Construction</option><option value="other">Other</option></select></label>
+          <label><span>Document language</span><select {...register("locale")}><option value="en">English</option><option value="bn">বাংলা</option></select></label>
+          <label className="office-field--wide"><span>Purpose</span><input {...register("purpose", { required: "Describe what this invoice is for.", minLength: { value: 3, message: "Add a clearer purpose." } })} /><FieldError message={errors.purpose?.message ?? state.fieldErrors?.purpose} /></label>
           <label><span>Issue date</span><input type="date" {...register("issueDate", { required: "Choose an issue date." })} /><FieldError message={errors.issueDate?.message ?? state.fieldErrors?.issueDate} /></label>
           <label><span>Due date</span><input type="date" {...register("dueDate", { required: "Choose a due date." })} /><FieldError message={errors.dueDate?.message ?? state.fieldErrors?.dueDate} /></label>
         </div>
@@ -132,6 +144,7 @@ export function OfficePaymentForm({ invoices, paidAt }: { invoices: readonly Sel
     <label className="office-field--wide"><span>Issued invoice</span><select name="invoiceId" required defaultValue=""><option value="">Choose an outstanding invoice</option>{invoices.map((option) => <option key={option.id} value={option.id}>{option.label}{option.meta ? ` · ${option.meta}` : ""}</option>)}</select><FieldError message={state.fieldErrors?.invoiceId} /></label>
     <label><span>Amount (BDT)</span><input name="amount" inputMode="decimal" required placeholder="0.00" /><FieldError message={state.fieldErrors?.amount} /></label>
     <label><span>Payment method</span><select name="method" defaultValue="bank_transfer"><option value="bank_transfer">Bank transfer</option><option value="mobile_financial_service">Mobile financial service</option><option value="cheque">Cheque</option><option value="cash">Cash</option><option value="card">Card</option><option value="other">Other</option></select></label>
+    <label><span>Receipt language</span><select name="locale" defaultValue="bn"><option value="bn">বাংলা</option><option value="en">English</option></select></label>
     <label><span>Paid date</span><input name="paidAt" type="date" defaultValue={paidAt} required /></label>
     <label><span>Reference <small>optional</small></span><input name="reference" /></label>
     <label className="office-field--wide"><span>Note <small>optional</small></span><textarea name="note" /></label>

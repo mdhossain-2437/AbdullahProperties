@@ -10,11 +10,14 @@ const budgets = {
   // Per-file caps protect route payloads while aggregate caps catch accidental bloat.
   largestCssGzip: 25 * 1024,
   // The public homepage deliberately combines the shared multi-route system with
-  // three progressive decision sections. Keep the release-wide split total tight
-  // while allowing that verified experience to ship without inflating any file.
-  totalCssGzip: 42 * 1024,
+  // three progressive decision sections. The curated Bengali locale and protected
+  // A4 document routes add isolated CSS that public pages never download together.
+  // Keep the release-wide split total tight while retaining the stricter per-file cap.
+  totalCssGzip: 48 * 1024,
   largestJavaScriptGzip: 65 * 1024,
-  totalJavaScriptGzip: 260 * 1024,
+  // The QR renderer is isolated to protected document routes; keep aggregate
+  // headroom for that split chunk without relaxing the 65 KiB per-file ceiling.
+  totalJavaScriptGzip: 272 * 1024,
 };
 
 function formatBytes(bytes) {
