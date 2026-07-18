@@ -33,6 +33,22 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+.dev.vars*
+
+# local credentials and signing material
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# local application data (desktop SQLite/offline stores)
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
 
 # vercel
 .vercel

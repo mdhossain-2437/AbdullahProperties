@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "releaseChannel": "engineering-unsigned",
+  "productionPublishAllowed": false,
+  "eula": {
+    "status": "draft-legal-review-required",
+    "approvedPlainTextSha256": null,
+    "approvedRtfSha256": null
+  },
+  "authenticode": {
+    "required": true,
+    "approvedCertificateThumbprintSha1": null,
+    "timestampRequired": true
+  },
+  "approval": {
+    "releaseApprovalId": null
+  }
+}

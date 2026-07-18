@@ -1,0 +1,78 @@
+name: Desktop Windows Failure Issue
+
+on:
+  workflow_run:
+    workflows: ["Desktop Windows"]
+    types: [completed]
+
+# This workflow intentionally does not check out or execute code from the
+# triggering run. Its token can write Issues and nothing else.
+permissions:
+  issues: write
+
+concurrency:
+  group: desktop-windows-failure-issue-main
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: Maintain desktop verification issue
+    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPOSITORY: ${{ github.repository }}
+      RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      RUN_URL: ${{ github.event.workflow_run.html_url }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      ISSUE_TITLE: Desktop Windows verification is failing
+      ISSUE_LABEL: desktop-ci
+    steps:
+      - name: Create, update, or resolve the deduplicated issue
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh label create "$ISSUE_LABEL" \
+            --repo "$REPOSITORY" \
+            --color "b60205" \
+            --description "Automated desktop installer verification status" \
+            --force
+
+          issue_number="$(
+            gh issue list \
+              --repo "$REPOSITORY" \
+              --state open \
+              --label "$ISSUE_LABEL" \
+              --limit 100 \
+              --json number,title \
+              --jq '.[] | select(.title == "Desktop Windows verification is failing") | .number' \
+              | head -n 1
+          )"
+
+          if [[ "$RUN_CONCLUSION" == "failure" || "$RUN_CONCLUSION" == "timed_out" ]]; then
+            body="$(printf '%s\n\n%s\n%s\n%s\n\n%s' \
+              'The protected Windows installer verification workflow did not complete successfully on main.' \
+              "- Conclusion: $RUN_CONCLUSION" \
+              "- Commit: $HEAD_SHA" \
+              "- Run: [$RUN_ID]($RUN_URL)" \
+              'No build logs or artifact contents are copied into this issue. Review the linked run, fix the root cause, and rerun the gate.')"
+
+            if [[ -n "$issue_number" ]]; then
+              gh issue comment "$issue_number" --repo "$REPOSITORY" --body "$body"
+            else
+              gh issue create \
+                --repo "$REPOSITORY" \
+                --title "$ISSUE_TITLE" \
+                --label "$ISSUE_LABEL" \
+                --body "$body"
+            fi
+          elif [[ "$RUN_CONCLUSION" == "success" && -n "$issue_number" ]]; then
+            recovery="$(printf '%s\n\n%s' \
+              'Desktop Windows verification recovered on main.' \
+              "Successful run: [$RUN_ID]($RUN_URL)")"
+            gh issue comment "$issue_number" --repo "$REPOSITORY" --body "$recovery"
+            gh issue close "$issue_number" --repo "$REPOSITORY" --reason completed
+          fi

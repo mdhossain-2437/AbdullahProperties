@@ -35,13 +35,54 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis", "msi"],
+    "publisher": "Abdullah Properties",
+    "homepage": "https://abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site",
+    "copyright": "Copyright 2026 Abdullah Properties. All rights reserved.",
+    "licenseFile": "windows/EULA.rtf",
+    "category": "Business",
+    "shortDescription": "Secure offline-first office operations for Abdullah Properties.",
+    "longDescription": "Abdullah Properties Office helps authorised staff capture leads, prepare provisional documents, retain work offline and synchronize approved draft operations through the Abdullah Properties platform.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "allowDowngrades": false,
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "template": "windows/nsis/installer.nsi",
+        "headerImage": "windows/branding/nsis-header.bmp",
+        "sidebarImage": "windows/branding/nsis-sidebar.bmp",
+        "installerIcon": "windows/branding/installer-icon.ico",
+        "uninstallerIcon": "windows/branding/installer-icon.ico",
+        "uninstallerHeaderImage": "windows/branding/nsis-uninstaller-header.bmp",
+        "installMode": "perMachine",
+        "languages": ["English"],
+        "customLanguageFiles": {
+          "English": "windows/nsis/English.nsh"
+        },
+        "displayLanguageSelector": false,
+        "compression": "lzma",
+        "startMenuFolder": "Abdullah Properties"
+      },
+      "wix": {
+        "upgradeCode": "b5730b85-512f-5749-a1e3-9e20f93b259b",
+        "language": {
+          "en-US": {
+            "localePath": "windows/wix/en-US.wxl"
+          }
+        },
+        "bannerPath": "windows/branding/wix-banner.bmp",
+        "dialogImagePath": "windows/branding/wix-dialog.bmp"
+      }
+    }
   }
 }

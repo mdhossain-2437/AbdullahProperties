@@ -22,4 +22,8 @@ tauri = { version = "2", features = [] }
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
+reqwest = { version = "0.13.4", default-features = false, features = ["json", "rustls"] }
+sqlx = { version = "0.8.6", default-features = false, features = ["runtime-tokio", "sqlite"] }
+uuid = { version = "1", features = ["v4"] }
+windows = { version = "0.61.3", features = ["Win32_Foundation", "Win32_Security_Cryptography"] }
+zeroize = { version = "1.9.0", features = ["derive"] }

@@ -427,12 +427,30 @@ test("the CMS is noindexed and fails closed without configured allowlists", asyn
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/i);
 });
 
-test("Office OS redirects anonymous visitors and emits private noindex headers", async ({ request }) => {
-  const response = await request.get("/office", { maxRedirects: 0 });
+for (const route of ["/office", "/office/settings", "/office/payroll", "/office/desktop-inbox"] as const) {
+  test(`${route} redirects anonymous visitors back to the requested private route`, async ({ request }) => {
+    const response = await request.get(route, { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(response.headers()["location"]).toContain(
+      `/signin-with-chatgpt?return_to=${encodeURIComponent(route)}`,
+    );
+    expect(response.headers()["cache-control"]).toBe("private, no-store");
+    expect(response.headers()["x-robots-tag"]).toBe("noindex, nofollow, noarchive");
+  });
+}
+
+test("Office return paths are derived from the request instead of a client-supplied header", async ({ request }) => {
+  const returnTo = "/office/payroll?view=pending";
+  const response = await request.get(returnTo, {
+    headers: { "x-abdullah-office-return-to": "https://attacker.example/collect" },
+    maxRedirects: 0,
+  });
+
   expect(response.status()).toBe(307);
-  expect(response.headers()["location"]).toContain("/signin-with-chatgpt?return_to=");
-  expect(response.headers()["cache-control"]).toBe("private, no-store");
-  expect(response.headers()["x-robots-tag"]).toBe("noindex, nofollow, noarchive");
+  expect(response.headers()["location"]).toContain(
+    `/signin-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`,
+  );
+  expect(response.headers()["location"]).not.toContain("attacker.example");
 });
 
 test("public tracking fails privately without exposing record details", async ({ page }) => {

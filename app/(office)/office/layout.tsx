@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { OfficeAccessState } from "@/components/office/access-state";
 import { OfficeShell } from "@/components/office/office-shell";
 import { getOfficePageSession } from "@/features/office/auth";
@@ -26,7 +27,10 @@ const roleLabels = {
 } as const;
 
 export default async function OfficeLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const session = await getOfficePageSession("/office");
+  // The proxy overwrites this internal header for every request, so a client cannot inject an
+  // external return URL. The auth boundary still validates it as a same-origin relative path.
+  const returnTo = (await headers()).get("x-abdullah-office-return-to") ?? "/office";
+  const session = await getOfficePageSession(returnTo);
 
   if (!session.authorized || !session.actor) {
     return <><style>{officeCss}</style><div className="office-surface office-surface--gate"><OfficeAccessState kind="denied" email={session.user.email} /></div></>;

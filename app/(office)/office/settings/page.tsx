@@ -1,15 +1,23 @@
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { OfficeAccessState } from "@/components/office/access-state";
 import { OfficeDemoDataForm } from "@/components/office/demo-data-form";
+import { OfficeDesktopDeviceManager } from "@/components/office/desktop-device-manager";
 import { OfficePageHeader } from "@/components/office/page-header";
 import { requireOfficePermission } from "@/features/office/auth";
 import { isOfficeDemoSeedEnabled } from "@/features/office/demo-data";
 import { isOfficeDatabaseAvailable } from "@/features/office/repository";
+import { listOfficeDesktopDevices } from "@/features/office/desktop-sync-repository";
+import { readOfficeDesktopPairingFlash } from "@/features/office/desktop-device-actions";
 
-export default async function OfficeSettingsPage() {
-  await requireOfficePermission("settings.manage", "/office/settings");
+export default async function OfficeSettingsPage({ searchParams }: { searchParams: Promise<{ desktop?: string }> }) {
+  const actor = await requireOfficePermission("settings.manage", "/office/settings");
   if (!(await isOfficeDatabaseAvailable())) return <OfficeAccessState kind="storage" />;
   const demoEnabled = isOfficeDemoSeedEnabled();
+  const [desktopDevices, pairing, query] = await Promise.all([
+    actor.memberId ? listOfficeDesktopDevices(actor.memberId) : Promise.resolve([]),
+    readOfficeDesktopPairingFlash(),
+    searchParams,
+  ]);
   return (
     <>
       <OfficePageHeader
@@ -36,6 +44,16 @@ export default async function OfficeSettingsPage() {
           </ul>
         </aside>
       </section>
+      <div className="office-record-composer">
+        {actor.memberId ? (
+          <OfficeDesktopDeviceManager initialDevices={desktopDevices} pairing={pairing} noticeCode={query.desktop} />
+        ) : (
+          <div className="office-alert office-alert--warning" role="status">
+            <AlertTriangle aria-hidden="true" />
+            <div><strong>Activate the bootstrap owner membership first.</strong><p>A durable Office member identity is required before a revocable Windows credential can be tied to this account.</p></div>
+          </div>
+        )}
+      </div>
     </>
   );
 }

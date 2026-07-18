@@ -14,6 +14,21 @@
 }
 .office-surface--gate { display: block; }
 
+.office-code-block {
+  max-width: 42rem;
+  max-height: 18rem;
+  overflow: auto;
+  margin: 0.75rem 0 0;
+  border-radius: 12px;
+  background: #111212;
+  color: #f8eee7;
+  padding: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
 .office-skip-link {
   position: fixed;
   z-index: 100;
@@ -287,6 +302,67 @@
 .office-page-actions { display: flex; flex-wrap: wrap; gap: 9px; }
 .office-panel .office-alert + .office-alert { margin-top: 12px; }
 
+.office-device-manager { display: grid; gap: 20px; }
+.office-device-manager__pair { margin-top: 0; }
+.office-device-credential {
+  display: grid;
+  gap: 14px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 2px solid var(--office-orange);
+  border-radius: 18px;
+  background: #fff7f1;
+}
+.office-device-credential p { margin-top: 5px; color: var(--office-muted); font-size: .74rem; line-height: 1.5; }
+.office-device-credential code {
+  display: block;
+  max-height: 280px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 14px;
+  border: 1px solid var(--office-ink);
+  border-radius: 11px;
+  background: white;
+  font-size: .78rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  user-select: all;
+}
+.office-device-list { display: grid; gap: 10px; }
+.office-device-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--office-line);
+  border-radius: 16px;
+  background: #f7f3ef;
+}
+.office-device-row > svg { width: 23px; color: var(--office-orange); }
+.office-device-glyph,
+.office-alert__mark {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--office-ink);
+  color: white;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.office-alert__mark { width: 22px; height: 22px; background: #8a4a00; }
+.office-device-row > div { min-width: 0; }
+.office-device-row p,.office-device-row small { color: var(--office-muted); font-size: .68rem; line-height: 1.45; overflow-wrap: anywhere; }
+.office-device-row p { margin-top: 4px; }
+.office-device-list__empty { min-height: 260px; }
+.office-device-list__empty h2 { font-size: clamp(1.8rem, 3vw, 3rem); }
+.office-device-manager .office-alert svg[data-lucide="loader-circle"] { animation: office-spin .8s linear infinite; }
+@keyframes office-spin { to { transform: rotate(360deg); } }
+
 .office-empty {
   min-height: 380px;
   display: flex;
@@ -327,9 +403,17 @@
   letter-spacing: 0.05em;
   text-transform: capitalize;
 }
-.office-status[data-status="won"],.office-status[data-status="paid"],.office-status[data-status="approved"],.office-status[data-status="complete"],.office-status[data-status="active"] { color: #176339; }
+.office-status[data-status="won"],.office-status[data-status="paid"],.office-status[data-status="approved"],.office-status[data-status="posted"],.office-status[data-status="complete"],.office-status[data-status="active"] { color: #176339; }
 .office-status[data-status="overdue"],.office-status[data-status="rejected"],.office-status[data-status="lost"],.office-status[data-status="blocked"] { color: #9a271f; }
-.office-status[data-status="qualified"],.office-status[data-status="submitted"],.office-status[data-status="in-progress"],.office-status[data-status="part-paid"] { color: #8a4a00; }
+.office-status[data-status="qualified"],.office-status[data-status="submitted"],.office-status[data-status="pending-approval"],.office-status[data-status="in-progress"],.office-status[data-status="part-paid"] { color: #8a4a00; }
+
+.payroll-table { min-width: 1280px; }
+.payroll-control-cell { min-width: 220px; }
+.payroll-transition { display: grid; gap: 8px; justify-items: start; }
+.payroll-transition .office-button { min-height: 38px; padding: 8px 12px; white-space: nowrap; }
+.payroll-transition__success,.payroll-transition__error { max-width: 32ch; font-size: .65rem; line-height: 1.4; }
+.payroll-transition__success { color: #176339; }
+.payroll-transition__error { color: #9a271f; }
 
 .office-filter-bar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin: 26px 0 18px; }
 .office-filter-bar__actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -485,6 +569,8 @@
   .invoice-builder__line > strong,.invoice-builder__line .office-field--wide { grid-column: auto; }
   .invoice-sheet__brand > div:last-child { text-align: left; }
   .invoice-sheet__totals > div { grid-column: 1 / -1; }
+  .office-device-row { grid-template-columns: 34px minmax(0, 1fr); }
+  .office-device-row > .office-status,.office-device-row > .office-button { grid-column: 2; justify-self: start; }
 }
 
 @media print {

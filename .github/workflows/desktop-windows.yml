@@ -1,0 +1,117 @@
+name: Desktop Windows
+
+on:
+  pull_request:
+    paths:
+      - "apps/office-desktop/**"
+      - "features/office/offline-core.ts"
+      - ".github/workflows/desktop-windows.yml"
+      - ".node-version"
+  push:
+    branches: [main]
+    paths:
+      - "apps/office-desktop/**"
+      - "features/office/offline-core.ts"
+      - ".github/workflows/desktop-windows.yml"
+      - ".node-version"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-windows-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-and-bundle:
+    name: Verify and build unsigned installers
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      CI: "true"
+      CARGO_TERM_COLOR: always
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: apps/office-desktop
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Configure Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: apps/office-desktop/package-lock.json
+
+      - name: Install locked frontend dependencies
+        run: npm ci
+
+      - name: Verify frontend and offline domain
+        run: npm run check
+
+      - name: Audit production frontend dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Configure Rust stable MSVC
+        run: |
+          rustup toolchain install stable-x86_64-pc-windows-msvc --profile minimal --component rustfmt --component clippy
+          rustup default stable-x86_64-pc-windows-msvc
+          rustc --version --verbose
+          cargo --version
+
+      - name: Verify the committed Rust lockfile
+        run: |
+          if (-not (Test-Path "src-tauri/Cargo.lock")) {
+            throw "src-tauri/Cargo.lock is required for a reproducible desktop build."
+          }
+          cargo metadata --manifest-path src-tauri/Cargo.toml --locked --no-deps --format-version 1 | Out-Null
+
+      - name: Check Rust formatting
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check
+
+      - name: Lint Rust with warnings denied
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features --locked -- -D warnings
+
+      - name: Test Rust targets
+        run: cargo test --manifest-path src-tauri/Cargo.toml --all-features --locked
+
+      - name: Check Rust targets
+        run: cargo check --manifest-path src-tauri/Cargo.toml --all-targets --all-features --locked
+
+      - name: Build unsigned Tauri installers
+        run: npm run bundle
+
+      - name: Stamp engineering-only artifact policy
+        run: |
+          $bundleRoot = Resolve-Path "src-tauri/target/release/bundle"
+          Copy-Item "src-tauri/windows/release-policy.json" (Join-Path $bundleRoot "release-policy.json") -Force
+          @(
+            "ABDULLAH PROPERTIES OFFICE — UNSIGNED ENGINEERING ARTIFACT"
+            ""
+            "This package is not an approved production release."
+            "The installer EULA requires legal approval and the binaries are not Authenticode-signed."
+            "Do not distribute to staff or customers. Do not create a GitHub Release from these files."
+            "Source commit: $env:GITHUB_SHA"
+          ) | Set-Content (Join-Path $bundleRoot "ENGINEERING-ONLY.txt") -Encoding utf8
+          Get-ChildItem $bundleRoot -Recurse -File | Where-Object { $_.Extension -in ".exe", ".msi" } | ForEach-Object {
+            $relativePath = [System.IO.Path]::GetRelativePath($bundleRoot, $_.FullName).Replace("\", "/")
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash *$relativePath"
+          } | Set-Content (Join-Path $bundleRoot "SHA256SUMS.txt") -Encoding ascii
+
+      - name: Upload unsigned Windows installers
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: UNSIGNED-ENGINEERING-abdullah-properties-office-windows-${{ github.sha }}
+          path: |
+            apps/office-desktop/src-tauri/target/release/bundle/**/*.msi
+            apps/office-desktop/src-tauri/target/release/bundle/**/*.exe
+            apps/office-desktop/src-tauri/target/release/bundle/ENGINEERING-ONLY.txt
+            apps/office-desktop/src-tauri/target/release/bundle/release-policy.json
+            apps/office-desktop/src-tauri/target/release/bundle/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 7

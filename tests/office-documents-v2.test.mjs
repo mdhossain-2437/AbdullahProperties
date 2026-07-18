@@ -160,11 +160,19 @@ test("keeps print documents shell-free, authenticated, and explicit about manual
 });
 
 test("posts a payment and its notification intents through one idempotent transaction", async () => {
-  const repository = await readFile(new URL("../features/office/repository.ts", import.meta.url), "utf8");
+  const [repository, actions, paymentsPage] = await Promise.all([
+    readFile(new URL("../features/office/repository.ts", import.meta.url), "utf8"),
+    readFile(new URL("../features/office/actions.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/(office)/office/payments/page.tsx", import.meta.url), "utf8"),
+  ]);
   const start = repository.indexOf("export async function recordOfficePayment");
   const end = repository.indexOf("export async function createOfficeExpense", start);
+  const actionStart = actions.indexOf("export async function recordOfficePaymentAction");
+  const actionEnd = actions.indexOf("export async function createOfficeExpenseAction", actionStart);
   assert.ok(start >= 0 && end > start);
+  assert.ok(actionStart >= 0 && actionEnd > actionStart);
   const paymentSource = repository.slice(start, end);
+  const paymentActionSource = actions.slice(actionStart, actionEnd);
   assert.match(paymentSource, /clientOperationId/);
   assert.match(paymentSource, /office_notification_outbox/);
   assert.match(paymentSource, /idempotency_key/);
@@ -173,6 +181,9 @@ test("posts a payment and its notification intents through one idempotent transa
   assert.match(paymentSource, /payment\.recorded/);
   assert.match(paymentSource, /client_operation_id, status/);
   assert.match(paymentSource, /'posted'/);
+  assert.match(paymentActionSource, /authorize\("payments\.post"\)/);
+  assert.doesNotMatch(paymentActionSource, /authorize\("payments\.record"\)/);
+  assert.match(paymentsPage, /hasOfficePermission\(actor\.role, "payments\.post"\)/);
 });
 
 test("keeps demo records permission-gated, environment-gated, fictional, and idempotent", async () => {

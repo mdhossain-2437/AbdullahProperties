@@ -1,0 +1,329 @@
+.native-sync-layout {
+  display: grid;
+  gap: 18px;
+  padding-bottom: 32px;
+}
+
+.native-sync-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 18px;
+}
+
+.native-sync-pairing,
+.native-sync-action {
+  min-width: 0;
+}
+
+.native-sync-form {
+  display: grid;
+  gap: 14px;
+}
+
+.native-sync-form > p,
+.native-sync-action > p,
+.native-sync-empty p,
+.native-sync-device p,
+.native-sync-feedback p,
+.native-sync-guardrail p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.native-sync-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.native-sync-form input,
+.native-sync-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  padding: 12px 14px;
+  font-weight: 500;
+  letter-spacing: normal;
+  resize: vertical;
+}
+
+.native-sync-service {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--success) 28%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--success) 6%, white);
+  padding: 11px 13px;
+  color: var(--ink);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.native-sync-service svg {
+  width: 18px;
+  flex: 0 0 auto;
+  color: var(--success);
+}
+
+.native-sync-service code {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.native-sync-form textarea {
+  min-height: 128px;
+  max-height: 260px;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.native-sync-empty,
+.native-sync-feedback,
+.native-sync-guardrail {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.native-sync-empty svg,
+.native-sync-feedback svg,
+.native-sync-guardrail svg {
+  width: 19px;
+  flex: 0 0 auto;
+  color: var(--orange);
+}
+
+.native-sync-feedback {
+  margin-top: 14px;
+  align-items: center;
+}
+
+.native-sync-feedback.is-error {
+  border-color: rgba(165, 45, 45, 0.35);
+  background: rgba(165, 45, 45, 0.06);
+}
+
+.native-sync-feedback.is-success {
+  border-color: rgba(23, 103, 72, 0.3);
+  background: rgba(23, 103, 72, 0.06);
+}
+
+.native-sync-device {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+}
+
+.native-sync-device__icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: white;
+}
+
+.native-sync-device h3 {
+  margin: 2px 0 5px;
+  font-family: "Anybody", sans-serif;
+  font-size: 1.35rem;
+}
+
+.native-sync-device dl {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0 0;
+}
+
+.native-sync-device dl div {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.native-sync-device dt {
+  color: var(--muted);
+}
+
+.native-sync-device dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.native-sync-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.native-sync-text-button svg {
+  width: 16px;
+}
+
+.native-sync-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.native-sync-action > span {
+  margin-top: 16px;
+  color: var(--orange);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.native-sync-action h2 {
+  margin: 6px 0 10px;
+}
+
+.native-sync-orbit {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: white;
+  position: relative;
+}
+
+.native-sync-orbit[data-ready="true"] {
+  background: var(--success);
+}
+
+.native-sync-orbit svg {
+  width: 34px;
+  height: 34px;
+  opacity: 0.28;
+}
+
+.native-sync-orbit span {
+  position: absolute;
+  font-family: "Anybody", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.native-sync-readiness {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin: 18px 0;
+}
+
+.native-sync-readiness div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.native-sync-readiness svg {
+  width: 17px;
+  color: var(--orange);
+}
+
+.native-sync-auto {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 16px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.native-sync-auto input {
+  width: 17px;
+  height: 17px;
+  margin: 2px 0 0;
+  accent-color: var(--orange);
+}
+
+.native-sync-auto span {
+  display: grid;
+  gap: 2px;
+}
+
+.native-sync-auto small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.native-sync-now {
+  width: 100%;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.native-sync-action > small {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.native-sync-guardrail {
+  border-color: rgba(255, 107, 44, 0.28);
+  background: rgba(255, 107, 44, 0.07);
+}
+
+.is-spinning {
+  animation: native-sync-spin 0.8s linear infinite;
+}
+
+@keyframes native-sync-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1050px) {
+  .native-sync-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .native-sync-device {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .native-sync-text-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-spinning {
+    animation: none;
+  }
+}
+
+@media print {
+  .native-sync-layout {
+    display: none !important;
+  }
+}

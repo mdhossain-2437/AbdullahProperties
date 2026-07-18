@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BadgeCheck,
+  BadgeDollarSign,
   Banknote,
   BarChart3,
   Building2,
@@ -15,6 +16,7 @@ import {
   HandCoins,
   MapPinned,
   Menu,
+  MonitorUp,
   BellRing,
   ReceiptText,
   ScrollText,
@@ -35,6 +37,7 @@ const icons = {
   invoices: ReceiptText,
   payments: HandCoins,
   expenses: Banknote,
+  payroll: BadgeDollarSign,
   approvals: ClipboardCheck,
   documents: FolderLock,
   notices: ScrollText,
@@ -42,6 +45,7 @@ const icons = {
   reports: BarChart3,
   team: BadgeCheck,
   audit: FileClock,
+  desktop: MonitorUp,
   settings: Settings2,
 } as const;
 

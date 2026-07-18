@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "apps/office-desktop/dist/**",
+    "apps/office-desktop/src-tauri/target/**",
     "next-env.d.ts",
   ]),
 ]);

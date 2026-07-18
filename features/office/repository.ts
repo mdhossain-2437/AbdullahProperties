@@ -57,6 +57,11 @@ const REQUIRED_OFFICE_TABLES = [
   "office_notification_attempts",
   "office_contact_preferences",
   "office_audit_events",
+  "office_employees",
+  "office_compensation_profiles",
+  "office_compensation_components",
+  "office_payroll_runs",
+  "office_payroll_entries",
 ] as const;
 
 export type OfficePriority = "low" | "normal" | "high" | "urgent";

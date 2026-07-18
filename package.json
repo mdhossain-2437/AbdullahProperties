@@ -11,7 +11,7 @@
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run build && npm run test:artifacts",
-    "test:artifacts": "node --test tests/bengali-public-locale.test.mjs tests/bengali-rendered.test.mjs tests/cms-workflow.test.mjs tests/office-domain.test.mjs tests/office-documents-v2.test.mjs tests/office-offline.test.mjs tests/office-performance.test.mjs tests/office-presentation.test.mjs tests/office-reporting.test.mjs tests/office-storage.test.mjs tests/public-experience-planner.test.mjs tests/rendered-html.test.mjs tests/performance-budget.test.mjs",
+    "test:artifacts": "node --test tests/bengali-public-locale.test.mjs tests/bengali-rendered.test.mjs tests/cms-workflow.test.mjs tests/office-desktop-sync-api.test.mjs tests/office-domain.test.mjs tests/office-documents-v2.test.mjs tests/office-offline.test.mjs tests/office-payroll.test.mjs tests/office-performance.test.mjs tests/office-presentation.test.mjs tests/office-reporting.test.mjs tests/office-storage.test.mjs tests/public-experience-planner.test.mjs tests/rendered-html.test.mjs tests/performance-budget.test.mjs",
     "test:e2e": "playwright test",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern apps/office-desktop/dist",
     "typecheck": "tsc --noEmit",

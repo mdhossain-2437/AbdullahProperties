@@ -1,0 +1,89 @@
+{
+  "generatedBy": "scripts/generate-installer-branding.mjs",
+  "sourceAssets": {
+    "logo-primary.png": "d4e47a3c3b02f5312965291123a1e9c8683ed3dfd1208eb4569e5f370b3f4c3e",
+    "logo-inverse.png": "26e027ea13857aa805deaf6e1fce83294410ef0ef807d4f8559b09c42fe1aee0",
+    "logo-mark.png": "f992b8dad5b54c10a8776b469503240f2c5ea8c2c338fce4a638785016ba4934",
+    "icon.ico": "41d1c29b08561beaea31a56dd9f7fb024cd66bbf451c816309515d2620099887"
+  },
+  "files": {
+    "nsis-sidebar.bmp": {
+      "width": 164,
+      "height": 314,
+      "bitsPerPixel": 24,
+      "compression": 0,
+      "sha256": "dfca50e26a463313834674641518971f3a5816d20bbbca0f78a3d08c78d36490"
+    },
+    "nsis-header.bmp": {
+      "width": 150,
+      "height": 57,
+      "bitsPerPixel": 24,
+      "compression": 0,
+      "sha256": "7f720cd5e08f0cd67c3065370c01a3247dcce46af1f1b22ba38b0009059d3a28"
+    },
+    "nsis-uninstaller-sidebar.bmp": {
+      "width": 164,
+      "height": 314,
+      "bitsPerPixel": 24,
+      "compression": 0,
+      "sha256": "18a6a08f5827d1cfcc8a01e5be9bacef95c25208a2a32d3e05faecb6c05bd820"
+    },
+    "nsis-uninstaller-header.bmp": {
+      "width": 150,
+      "height": 57,
+      "bitsPerPixel": 24,
+      "compression": 0,
+      "sha256": "6668c2db6db719056caa75618157eb4e24b53879905c3919046533c862f7e705"
+    },
+    "wix-dialog.bmp": {
+      "width": 493,
+      "height": 312,
+      "bitsPerPixel": 24,
+      "compression": 0,
+      "sha256": "f949123e21ec756ff9eab7b444840a0efd2011333f4cc2c92cf8c4ba85dd6b36"
+    },
+    "wix-banner.bmp": {
+      "width": 493,
+      "height": 58,
+      "bitsPerPixel": 24,
+      "compression": 0,
+      "sha256": "e7e4de4c36587633d6e20a30017aae6117ea40afb3be20043b87e2588a1bbebd"
+    },
+    "installer-icon.ico": {
+      "imageCount": 6,
+      "sizes": [
+        {
+          "width": 32,
+          "height": 32,
+          "bitsPerPixel": 32
+        },
+        {
+          "width": 16,
+          "height": 16,
+          "bitsPerPixel": 32
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "bitsPerPixel": 32
+        },
+        {
+          "width": 48,
+          "height": 48,
+          "bitsPerPixel": 32
+        },
+        {
+          "width": 64,
+          "height": 64,
+          "bitsPerPixel": 32
+        },
+        {
+          "width": 256,
+          "height": 256,
+          "bitsPerPixel": 32
+        }
+      ],
+      "sha256": "41d1c29b08561beaea31a56dd9f7fb024cd66bbf451c816309515d2620099887"
+    }
+  }
+}

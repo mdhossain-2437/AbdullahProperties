@@ -5,7 +5,7 @@ export type OfficeNavigationItem = {
   label: string;
   description: string;
   permission: OfficePermission;
-  icon: "overview" | "people" | "land" | "projects" | "tasks" | "invoices" | "payments" | "expenses" | "approvals" | "documents" | "notices" | "notifications" | "reports" | "team" | "audit" | "settings";
+  icon: "overview" | "people" | "land" | "projects" | "tasks" | "invoices" | "payments" | "expenses" | "payroll" | "approvals" | "documents" | "notices" | "notifications" | "reports" | "team" | "audit" | "desktop" | "settings";
 };
 
 export type OfficeNavigationGroup = {
@@ -44,6 +44,7 @@ export const officeNavigation: readonly OfficeNavigationGroup[] = [
       { href: "/office/invoices", label: "Invoices", description: "Commercial documents and aging", permission: "finance.read", icon: "invoices" },
       { href: "/office/payments", label: "Payments", description: "Collections and allocations", permission: "finance.read", icon: "payments" },
       { href: "/office/expenses", label: "Expenses", description: "Submission and approval", permission: "expenses.read", icon: "expenses" },
+      { href: "/office/payroll", label: "Payroll", description: "Employees, calculations, and runs", permission: "payroll.read", icon: "payroll" },
     ],
   },
   {
@@ -53,6 +54,7 @@ export const officeNavigation: readonly OfficeNavigationGroup[] = [
       { href: "/office/team", label: "Team", description: "Membership and roles", permission: "team.read", icon: "team" },
       { href: "/office/audit", label: "Audit", description: "Immutable activity history", permission: "audit.read", icon: "audit" },
       { href: "/office/notifications", label: "Notifications", description: "Email and SMS delivery queue", permission: "notifications.read", icon: "notifications" },
+      { href: "/office/desktop-inbox", label: "Desktop inbox", description: "Review native drafts received by the server", permission: "settings.manage", icon: "desktop" },
       { href: "/office/settings", label: "Settings", description: "Controlled workspace utilities", permission: "settings.manage", icon: "settings" },
     ],
   },

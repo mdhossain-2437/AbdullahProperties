@@ -205,7 +205,10 @@ export async function issueOfficeInvoiceAction(_previous: OfficeActionState, for
 }
 
 export async function recordOfficePaymentAction(_previous: OfficeActionState, formData: FormData): Promise<OfficeActionState> {
-  const actor = await authorize("payments.record");
+  // This action creates an immediately posted receipt, allocates the invoice balance, and
+  // queues transactional notification intents. It is therefore a posting boundary rather
+  // than a provisional payment-entry boundary.
+  const actor = await authorize("payments.post");
   if (!actor) return authorizationFailure();
   const parsed = parseOfficePaymentForm(formData);
   if (!parsed.success) return validationFailure(parsed);

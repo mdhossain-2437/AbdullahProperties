@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="LaunchApp">Launch Abdullah Properties Office</String>
+  <String Id="DowngradeErrorMessage">A newer Abdullah Properties Office version is installed. Downgrades are blocked to protect compatibility and local data.</String>
+  <String Id="PathEnvVarFeature">Add Abdullah Properties Office to the Windows PATH for approved administrative workflows.</String>
+  <String Id="InstallAppFeature">Install the Abdullah Properties Office application and managed shortcuts.</String>
+</WixLocalization>

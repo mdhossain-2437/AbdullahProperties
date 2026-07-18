@@ -95,6 +95,8 @@ const worker = {
       url.pathname.startsWith("/studio/") ||
       url.pathname === "/office" ||
       url.pathname.startsWith("/office/") ||
+      url.pathname === "/api/office" ||
+      url.pathname.startsWith("/api/office/") ||
       url.pathname === "/track" ||
       url.pathname.startsWith("/track/")
     ) {
