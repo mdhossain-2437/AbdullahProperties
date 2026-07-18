@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const siteUrl = "https://abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site";
+const siteUrl = "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("bengali-test", `${process.pid}-${Date.now()}`);
 const workerPromise = import(workerUrl.href).then(({ default: worker }) => worker);

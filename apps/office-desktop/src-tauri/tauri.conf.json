@@ -37,7 +37,7 @@
     "active": true,
     "targets": ["nsis", "msi"],
     "publisher": "Abdullah Properties",
-    "homepage": "https://abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site",
+    "homepage": "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site",
     "copyright": "Copyright 2026 Abdullah Properties. All rights reserved.",
     "licenseFile": "windows/EULA.rtf",
     "category": "Business",

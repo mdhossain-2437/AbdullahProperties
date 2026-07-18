@@ -3,7 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const templateRoot = new URL("../", import.meta.url);
-const siteUrl = "https://abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site";
+const siteUrl = "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
 const brandKitPublicPath = "/brand/abdullah-properties-brand-kit.zip";
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);

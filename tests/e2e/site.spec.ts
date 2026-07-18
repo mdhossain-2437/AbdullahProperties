@@ -40,7 +40,7 @@ function collectRuntimeErrors(page: Page) {
     const text = message.text();
     const isLocalMetadataCspNoise =
       page.url().startsWith("http://localhost:") &&
-      text.includes("abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site") &&
+      text.includes("abdullah-properties-joypurhat.zedamorello0079.chatgpt.site") &&
       text.includes("violates the following Content Security Policy directive");
 
     if (message.type() === "error" && !isLocalMetadataCspNoise) errors.push(`console: ${text}`);

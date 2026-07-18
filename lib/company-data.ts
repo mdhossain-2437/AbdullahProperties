@@ -1,4 +1,4 @@
-export const SITE_URL = "https://abdullah-properties-joypurhat.delowarhossain-dev.chatgpt.site";
+export const SITE_URL = "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
 
 export const company = {
   name: "Abdullah Properties",
