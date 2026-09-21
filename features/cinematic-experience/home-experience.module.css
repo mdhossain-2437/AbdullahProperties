@@ -53,10 +53,10 @@
 .evidenceIntro h2,
 .officeHeader h2 {
   margin: 1.35rem 0 0;
-  font-size: clamp(2.8rem, 6.2vw, 6.8rem);
+  font-size: clamp(1.85rem, 3.6vw, 3.25rem);
   font-weight: 650;
-  letter-spacing: -0.064em;
-  line-height: 0.92;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
 }
 
 .decisionHeader h2 {
@@ -142,10 +142,10 @@
 
 .route summary strong {
   max-width: 23ch;
-  font-size: clamp(1.6rem, 3vw, 3.1rem);
+  font-size: clamp(1.3rem, 2.2vw, 2.1rem);
   font-weight: 620;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 
 .routeToggle,
@@ -282,8 +282,8 @@
 }
 
 .evidenceIntro h2 {
-  max-width: 10ch;
-  font-size: clamp(2.7rem, 4.8vw, 5.2rem);
+  max-width: 12ch;
+  font-size: clamp(1.85rem, 3.4vw, 3rem);
 }
 
 .evidenceIntro > p {
@@ -458,11 +458,11 @@
 }
 
 .officeAddress address {
-  font-size: clamp(1.75rem, 3vw, 3.25rem);
+  font-size: clamp(1.4rem, 2.2vw, 2.25rem);
   font-style: normal;
   font-weight: 620;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .officeHours {
@@ -555,10 +555,10 @@
 
 .officeProcess h3 {
   margin: 0;
-  font-size: clamp(1.5rem, 2.4vw, 2.35rem);
+  font-size: clamp(1.2rem, 1.8vw, 1.75rem);
   font-weight: 620;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
 .officeProcess li p {
@@ -725,7 +725,9 @@
 
   .decisionHeader h2,
   .officeHeader h2 {
-    font-size: clamp(2.6rem, 12vw, 4.2rem);
+    font-size: clamp(1.65rem, 6.2vw, 2.25rem);
+    line-height: 1.12;
+    letter-spacing: -0.03em;
   }
 
   .route summary {
@@ -743,7 +745,8 @@
   .route summary strong {
     grid-column: 2;
     grid-row: 2;
-    font-size: 1.55rem;
+    font-size: 1.25rem;
+    line-height: 1.2;
   }
 
   .routeIndex {
@@ -777,7 +780,9 @@
   }
 
   .evidenceIntro h2 {
-    font-size: clamp(2.55rem, 11.4vw, 4.1rem);
+    font-size: clamp(1.65rem, 6vw, 2.2rem);
+    line-height: 1.12;
+    letter-spacing: -0.03em;
   }
 
   .evidenceMedia {
@@ -813,7 +818,8 @@
   }
 
   .officeAddress address {
-    font-size: clamp(1.65rem, 7.6vw, 2.5rem);
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+    line-height: 1.2;
   }
 
   .officeProcess li {

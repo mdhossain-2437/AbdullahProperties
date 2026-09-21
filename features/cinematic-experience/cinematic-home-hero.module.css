@@ -70,10 +70,10 @@
   margin: 0;
   color: var(--ink);
   font-family: var(--font-anybody), "Anybody", sans-serif;
-  font-size: clamp(4.25rem, 9.1vw, 9.6rem);
+  font-size: clamp(2.85rem, 5.8vw, 5.5rem);
   font-weight: 760;
-  letter-spacing: -0.075em;
-  line-height: 0.77;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
   text-transform: uppercase;
 }
 
@@ -175,10 +175,10 @@
   max-width: 13ch;
   margin: 1.65rem 0 1.55rem;
   font-family: var(--font-anybody), "Anybody", sans-serif;
-  font-size: clamp(2rem, 3.6vw, 3.65rem);
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
   font-weight: 620;
-  letter-spacing: -0.052em;
-  line-height: 0.94;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .searchForm {
@@ -327,7 +327,7 @@
   }
 
   .title {
-    font-size: clamp(4rem, 12.4vw, 8.3rem);
+    font-size: clamp(2.6rem, 6.8vw, 4.5rem);
   }
 
   .lineTwo {
@@ -358,9 +358,9 @@
   }
 
   .title {
-    font-size: clamp(3.05rem, 14.2vw, 5.25rem);
-    letter-spacing: -0.068em;
-    line-height: 0.8;
+    font-size: clamp(2.15rem, 8.5vw, 3.25rem);
+    letter-spacing: -0.035em;
+    line-height: 0.95;
   }
 
   .lineThree {
@@ -401,9 +401,11 @@
   }
 
   .searchPanel h2 {
-    max-width: 14ch;
+    max-width: 16ch;
     margin: 1.25rem 0 1.2rem;
-    font-size: clamp(2rem, 9.5vw, 2.8rem);
+    font-size: clamp(1.35rem, 5.5vw, 1.85rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
   }
 
   .stageIndex {
@@ -416,7 +418,8 @@
 
 @media (max-width: 390px) {
   .title {
-    font-size: clamp(2.75rem, 14vw, 3.4rem);
+    font-size: clamp(1.85rem, 8.2vw, 2.35rem);
+    line-height: 1;
   }
 
   .titleSignal {

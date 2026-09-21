@@ -66,9 +66,9 @@
   max-width: 760px;
   margin-top: 18px;
   font-family: var(--font-anybody);
-  font-size: clamp(2.3rem, 8vw, 6rem);
-  line-height: 0.92;
-  letter-spacing: -0.06em;
+  font-size: clamp(1.85rem, 4.5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
   overflow-wrap: anywhere;
 }
 .tracking-card__title p {

@@ -277,13 +277,13 @@
   margin: 0;
   font-family: var(--font-anybody), "Anybody", sans-serif;
   font-weight: 620;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.035em;
 }
 
 .dialogTitle {
   max-width: 990px;
-  font-size: clamp(2.8rem, 5.8vw, 7.1rem);
-  line-height: 0.9;
+  font-size: clamp(2rem, 4.2vw, 3.85rem);
+  line-height: 1.05;
   text-wrap: balance;
 }
 
@@ -555,8 +555,8 @@
 .mobileTitle {
   margin-top: 7px;
   color: #fffaf5 !important;
-  font-size: clamp(2.25rem, 11vw, 4rem) !important;
-  line-height: 0.92;
+  font-size: clamp(1.75rem, 6.5vw, 2.45rem) !important;
+  line-height: 1.08;
 }
 
 .mobileDescription {

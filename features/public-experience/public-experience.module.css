@@ -64,10 +64,10 @@
   max-width: 17ch;
   margin: 0;
   font-family: var(--font-anybody, "Anybody"), sans-serif;
-  font-size: clamp(2.45rem, 5.8vw, 6.6rem);
+  font-size: clamp(1.85rem, 3.6vw, 3.25rem);
   font-weight: 650;
-  letter-spacing: -0.065em;
-  line-height: 0.96;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
 }
 
 .sectionDescription {
@@ -112,13 +112,13 @@
 .railWord {
   display: inline-flex;
   align-items: center;
-  gap: clamp(1.2rem, 3vw, 3rem);
-  padding-inline: clamp(1.2rem, 3vw, 3rem);
+  gap: clamp(1.2rem, 2.2vw, 2.5rem);
+  padding-inline: clamp(1.2rem, 2.2vw, 2.5rem);
   font-family: var(--font-anybody, "Anybody"), sans-serif;
-  font-size: clamp(1.65rem, 4.8vw, 5.3rem);
+  font-size: clamp(1.4rem, 2.8vw, 2.75rem);
   font-weight: 620;
-  letter-spacing: -0.055em;
-  line-height: 1;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
   white-space: nowrap;
 }
 
@@ -221,10 +221,10 @@
 .solutionCard h3 {
   max-width: 13ch;
   margin: 0;
-  font-size: clamp(2rem, 3.5vw, 3.75rem);
+  font-size: clamp(1.4rem, 2.2vw, 2.1rem);
   font-weight: 620;
-  letter-spacing: -0.055em;
-  line-height: 1;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .solutionCard p {
@@ -356,10 +356,10 @@
 .processCard h3 {
   max-width: 15ch;
   margin: 2.5rem 0 0;
-  font-size: clamp(2rem, 4vw, 4.5rem);
+  font-size: clamp(1.5rem, 2.5vw, 2.4rem);
   font-weight: 630;
-  letter-spacing: -0.06em;
-  line-height: 0.98;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
 }
 
 .processCardSummary {
@@ -525,10 +525,10 @@
 .resourceSummary h3 {
   max-width: 16ch;
   margin: 0;
-  font-size: clamp(1.65rem, 3vw, 3rem);
+  font-size: clamp(1.3rem, 2vw, 1.95rem);
   font-weight: 620;
-  letter-spacing: -0.05em;
-  line-height: 1;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 
 .resourceSummary p {
@@ -947,10 +947,10 @@
 .closingGrid h2 {
   max-width: 16ch;
   margin: 0;
-  font-size: clamp(2.4rem, 6vw, 6.4rem);
+  font-size: clamp(1.85rem, 3.6vw, 3.25rem);
   font-weight: 640;
-  letter-spacing: -0.065em;
-  line-height: 0.95;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
 }
 
 .closingGrid p {

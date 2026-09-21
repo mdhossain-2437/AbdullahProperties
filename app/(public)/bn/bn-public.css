@@ -84,9 +84,9 @@
 .hero h1 {
   max-width: 12ch;
   margin: 1.45rem 0 0;
-  font-size: clamp(3.1rem, 7.5vw, 7.2rem);
+  font-size: clamp(2.25rem, 4.6vw, 4.25rem);
   font-weight: 760;
-  line-height: 1.04;
+  line-height: 1.06;
 }
 
 .heroDescription {
@@ -207,9 +207,9 @@
 .storyIndex h2,
 .nextRoutesHeading h2 {
   margin: 1rem 0 0;
-  font-size: clamp(2rem, 3.6vw, 3.7rem);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
   font-weight: 700;
-  line-height: 1.14;
+  line-height: 1.12;
 }
 
 .storyIndex ol {
@@ -273,7 +273,7 @@
 
 .section h2 {
   margin: 0;
-  font-size: clamp(1.7rem, 3vw, 3.25rem);
+  font-size: clamp(1.4rem, 2.2vw, 2.1rem);
   font-weight: 720;
   line-height: 1.15;
 }
@@ -349,9 +349,9 @@
 .routeCard h3 {
   max-width: 14ch;
   margin: auto 0 0;
-  font-size: clamp(1.5rem, 2.5vw, 2.45rem);
+  font-size: clamp(1.25rem, 1.8vw, 1.65rem);
   font-weight: 720;
-  line-height: 1.16;
+  line-height: 1.18;
 }
 
 .routeCard p {
@@ -433,7 +433,7 @@
 .cta h2 {
   max-width: 13ch;
   margin: 1rem 0 0;
-  font-size: clamp(2.8rem, 6vw, 6.5rem);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 760;
   line-height: 1.08;
 }
@@ -504,8 +504,8 @@
   }
 
   .hero h1 {
-    font-size: clamp(2.75rem, 13.4vw, 4.45rem);
-    line-height: 1.08;
+    font-size: clamp(1.85rem, 7vw, 2.65rem);
+    line-height: 1.1;
   }
 
   .heroActions,
