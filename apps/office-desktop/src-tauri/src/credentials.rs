@@ -20,8 +20,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
 const CREDENTIAL_FILE_NAME: &str = "office-device-session-v1.bin";
 const DPAPI_ENTROPY: &[u8] = b"Abdullah Properties Office device credential v1";
-const PRODUCTION_API_ORIGIN: &str =
-    "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
+const PRODUCTION_API_ORIGIN: &str = "https://abdullah-properties.com";
 const MAX_ACTIVATION_RESPONSE_BYTES: u64 = 64 * 1024;
 
 #[derive(Deserialize)]

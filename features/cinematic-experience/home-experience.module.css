@@ -27,13 +27,11 @@
   display: none;
 }
 
+.hero,
 .decisionRoom,
 .evidenceLedger,
 .officeSection,
-:global(#story-start),
-:global(#operating-system),
-:global(#decision-process),
-:global(#selected-work) {
+.decisionStory {
   scroll-margin-top: 6rem;
 }
 

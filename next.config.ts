@@ -43,6 +43,7 @@ function externalOfficeRedirects(origin: string) {
 }
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   poweredByHeader: false,
   images: {
     // Sites serves versioned public assets through Cloudflare. Keep image delivery

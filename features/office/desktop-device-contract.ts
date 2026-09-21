@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const OFFICE_DESKTOP_PROTOCOL_VERSION = 1 as const;
 export const OFFICE_DESKTOP_PRODUCTION_ORIGIN =
-  "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site" as const;
+  "https://abdullah-properties.com" as const;
 
 const uuidSchema = z.string().uuid();
 const isoTimestampSchema = z.string().datetime({ offset: true });

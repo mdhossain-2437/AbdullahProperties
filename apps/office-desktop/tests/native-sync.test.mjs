@@ -22,8 +22,8 @@ test("normalizes the short one-time pairing code without exposing a bearer", () 
 
 test("requires a clean HTTPS API origin", () => {
   assert.equal(
-    normalizeApiOrigin("https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site/"),
-    "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site",
+    normalizeApiOrigin("https://abdullah-properties.com/"),
+    "https://abdullah-properties.com",
   );
   assert.throws(() => normalizeApiOrigin("http://office.example.com"), /requires HTTPS/);
   assert.throws(() => normalizeApiOrigin("https://office.example.com"), /verified Abdullah Properties/);
