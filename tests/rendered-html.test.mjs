@@ -3,7 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const templateRoot = new URL("../", import.meta.url);
-const siteUrl = "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
+const siteUrl = "https://abdullah-properties.com";
 const brandKitPublicPath = "/brand/abdullah-properties-brand-kit.zip";
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
@@ -325,7 +325,7 @@ test("publishes crawl controls, sitemap, manifest, and branded discovery assets"
 test("keeps the CMS authenticated, allowlisted, durable, noindexed, and fail-closed", async () => {
   const anonymous = await render("/studio");
   assert.equal(anonymous.status, 307);
-  assert.match(anonymous.headers.get("location") ?? "", /\/signin-with-chatgpt\?return_to=/);
+  assert.match(anonymous.headers.get("location") ?? "", /\/login\?return_to=/);
   assert.equal(anonymous.headers.get("cache-control"), "private, no-store");
   assert.equal(anonymous.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
 
@@ -376,7 +376,7 @@ test("keeps the CMS authenticated, allowlisted, durable, noindexed, and fail-clo
 test("keeps Office OS authenticated, private, noindexed, and separate from the public shell", async () => {
   const anonymous = await render("/office");
   assert.equal(anonymous.status, 307);
-  assert.match(anonymous.headers.get("location") ?? "", /\/signin-with-chatgpt\?return_to=/);
+  assert.match(anonymous.headers.get("location") ?? "", /\/login\?return_to=/);
   assert.equal(anonymous.headers.get("cache-control"), "private, no-store");
   assert.equal(anonymous.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
 

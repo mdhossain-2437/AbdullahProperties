@@ -25,7 +25,7 @@ export function OfficeShell({ children, groups, user, roleLabel }: OfficeShellPr
         <div className="office-account">
           <CircleUserRound aria-hidden="true" />
           <div><strong>{user.displayName}</strong><span>{roleLabel}</span><small>{user.email}</small></div>
-          <Link href="/signout-with-chatgpt?return_to=/" aria-label="Sign out of the office workspace"><LogOut aria-hidden="true" /></Link>
+          <Link href="/api/auth/logout?return_to=/" aria-label="Sign out of the office workspace"><LogOut aria-hidden="true" /></Link>
         </div>
       </aside>
       <div className="office-workspace">

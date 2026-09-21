@@ -60,8 +60,31 @@ const nextConfig: NextConfig = {
       { source: "/cookie-policy", destination: "/cookies", permanent: true },
       { source: "/disclaimer", destination: "/property-disclaimer", permanent: true },
       { source: "/brand", destination: "/brand-kit", permanent: true },
+      { source: "/signin-with-chatgpt", destination: "/login", permanent: false },
+      { source: "/signout-with-chatgpt", destination: "/api/auth/logout", permanent: false },
+      { source: "/signin", destination: "/login", permanent: true },
+      { source: "/logout", destination: "/api/auth/logout", permanent: false },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.abdullah-properties.com" }],
+        destination: "https://abdullah-properties.com/:path*",
+        permanent: true,
+      },
       ...(officeAppOrigin ? externalOfficeRedirects(officeAppOrigin) : []),
     ];
+  },
+  webpack(config, { isServer }) {
+    config.module.rules.push({
+      resourceQuery: /raw/,
+      type: "asset/source",
+    });
+    if (isServer) {
+      config.externals = [
+        ...(Array.isArray(config.externals) ? config.externals : [config.externals].filter(Boolean)),
+        "cloudflare:workers",
+      ];
+    }
+    return config;
   },
   async rewrites() {
     return {

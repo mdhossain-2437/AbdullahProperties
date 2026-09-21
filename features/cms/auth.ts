@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { getChatGPTUser, requireChatGPTUser, type ChatGPTUser } from "@/app/chatgpt-auth";
+import { getAuthUser, requireAuthUser, type AuthUser } from "@/app/auth";
 
 type RuntimeEnv = {
   CMS_ALLOWED_EMAILS?: string;
@@ -57,7 +57,7 @@ export async function isCmsAdministrator(email: string) {
 }
 
 export async function getCmsPageSession(returnTo: string) {
-  const user = await requireChatGPTUser(returnTo);
+  const user = await requireAuthUser(returnTo);
   const authorization = await cmsAuthorization();
   const role = roleForEmail(user.email, authorization);
 
@@ -69,10 +69,10 @@ export async function getCmsPageSession(returnTo: string) {
   };
 }
 
-export type AuthorizedCmsActor = ChatGPTUser & { role: CmsRole };
+export type AuthorizedCmsActor = AuthUser & { role: CmsRole };
 
 export async function getAuthorizedCmsActor(): Promise<AuthorizedCmsActor | null> {
-  const user = await getChatGPTUser();
+  const user = await getAuthUser();
   if (!user) return null;
   const role = await getCmsRole(user.email);
   return role ? { ...user, role } : null;

@@ -26,7 +26,7 @@ export function OfficeAccessState(props: OfficeAccessStateProps) {
         <span className="office-eyebrow">Protected operations</span>
         <h1>{title}</h1>
         <p>{description}</p>
-        <div><Link className="office-button" href="/">Return to the public website</Link><Link className="office-button office-button--ghost" href="/signout-with-chatgpt?return_to=/">Sign out</Link></div>
+        <div><Link className="office-button" href="/">Return to the public website</Link><Link className="office-button office-button--ghost" href="/api/auth/logout?return_to=/">Sign out</Link></div>
       </section>
     </main>
   );

@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { getChatGPTUser, requireChatGPTUser, type ChatGPTUser } from "@/app/chatgpt-auth";
+import { getAuthUser, requireAuthUser, type AuthUser } from "@/app/auth";
 import { getD1 } from "@/db";
 import { getCmsRole } from "@/features/cms/auth";
 import {
@@ -26,7 +26,7 @@ type OfficeMembershipRow = {
   updated_at: string;
 };
 
-export type AuthorizedOfficeActor = ChatGPTUser & {
+export type AuthorizedOfficeActor = AuthUser & {
   memberId: string | null;
   role: OfficeRole;
   source: "membership" | "cms_owner_bootstrap";
@@ -96,7 +96,7 @@ export async function getOfficeMembershipByEmail(email: string): Promise<OfficeM
   return getOfficeMembershipByNormalizedEmail(normalizedEmailSchema.parse(email));
 }
 
-const resolveOfficeActor = cache(async (user: ChatGPTUser): Promise<AuthorizedOfficeActor | null> => {
+const resolveOfficeActor = cache(async (user: AuthUser): Promise<AuthorizedOfficeActor | null> => {
   const membership = await getOfficeMembershipByEmail(user.email);
   if (membership) {
     if (membership.status !== "active") return null;
@@ -118,12 +118,12 @@ const resolveOfficeActor = cache(async (user: ChatGPTUser): Promise<AuthorizedOf
 });
 
 export async function getAuthorizedOfficeActor(): Promise<AuthorizedOfficeActor | null> {
-  const user = await getChatGPTUser();
+  const user = await getAuthUser();
   return user ? resolveOfficeActor(user) : null;
 }
 
 export async function getOfficePageSession(returnTo: string) {
-  const user = await requireChatGPTUser(returnTo);
+  const user = await requireAuthUser(returnTo);
   const actor = await resolveOfficeActor(user);
   return {
     user,
@@ -133,7 +133,7 @@ export async function getOfficePageSession(returnTo: string) {
 }
 
 export async function requireOfficeActor(returnTo = "/office"): Promise<AuthorizedOfficeActor> {
-  const user = await requireChatGPTUser(returnTo);
+  const user = await requireAuthUser(returnTo);
   const actor = await resolveOfficeActor(user);
   if (!actor) {
     throw new OfficeAccessError(

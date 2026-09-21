@@ -1,0 +1,28 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "npm run build:vercel",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.abdullah-properties.com"
+        }
+      ],
+      "destination": "https://abdullah-properties.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/signin-with-chatgpt",
+      "destination": "/login",
+      "permanent": false
+    },
+    {
+      "source": "/signout-with-chatgpt",
+      "destination": "/api/auth/logout",
+      "permanent": false
+    }
+  ]
+}

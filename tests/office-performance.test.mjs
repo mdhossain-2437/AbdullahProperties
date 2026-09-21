@@ -115,13 +115,13 @@ test("high-cost Office composers use reference queries for option data", async (
 });
 
 test("authentication and authorization lookups are request-memoized", async () => {
-  const [chatAuth, cmsAuth, officeAuth] = await Promise.all([
-    readProjectFile("app/chatgpt-auth.ts"),
+  const [authSource, cmsAuth, officeAuth] = await Promise.all([
+    readProjectFile("app/auth.ts"),
     readProjectFile("features/cms/auth.ts"),
     readProjectFile("features/office/auth.ts"),
   ]);
 
-  assert.match(chatAuth, /export const getChatGPTUser = cache\(readChatGPTUser\)/);
+  assert.match(authSource, /export const getAuthUser = cache\(readAuthUser\)/);
   assert.match(cmsAuth, /const cmsAuthorization = cache\(async/);
   assert.match(cmsAuth, /const getCmsRoleForNormalizedEmail = cache\(async/);
   assert.match(officeAuth, /const getOfficeMembershipByNormalizedEmail = cache\(async/);

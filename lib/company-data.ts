@@ -1,4 +1,4 @@
-const FALLBACK_SITE_URL = "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
+const FALLBACK_SITE_URL = "https://abdullah-properties.com";
 
 function toHttpsOrigin(value: string | undefined): string | null {
   if (!value?.trim()) return null;
