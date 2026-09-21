@@ -2,7 +2,7 @@
 .studio-page { min-height:75vh; padding:80px 0 120px; }
 .studio-shell { width:min(1320px,calc(100% - 40px)); margin-inline:auto; }
 .studio-header { display:grid; grid-template-columns:1.35fr .45fr; gap:8vw; align-items:end; padding:36px 0 58px; border-bottom:1px solid #141414; }
-.studio-header h1,.studio-editor > header h1,.studio-state h1 { margin-top:18px; font-size:clamp(2.25rem,4.5vw,3.75rem); font-weight:650; line-height:1.05; letter-spacing:-.035em; }
+.studio-header h1,.studio-editor > header h1,.studio-state h1 { margin-top:18px; font-size:clamp(2rem,4vw,3.25rem); font-weight:650; line-height:1.08; letter-spacing:-.035em; }
 .studio-header > div:first-child > p,.studio-editor > header > p { max-width:62ch; margin-top:24px; color:#5c5754; line-height:1.65; }
 .studio-header__account { min-height:190px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; padding:22px; border:1px solid; border-radius:22px; }
 .studio-header__account svg { width:28px; color:var(--orange-deep); }
@@ -81,7 +81,7 @@
 .studio-preview__bar svg { width:16px; }
 .studio-preview article { width:min(1080px,calc(100% - 40px)); margin:0 auto; }
 .studio-preview article > header { padding:110px 0 70px; border-bottom:1px solid; }
-.studio-preview h1 { margin-top:28px; font-size:clamp(2.5rem,5vw,4.5rem); font-weight:650; line-height:1.02; letter-spacing:-.035em; }
+.studio-preview h1 { margin-top:28px; font-size:clamp(2.15rem,4.2vw,3.5rem); font-weight:650; line-height:1.08; letter-spacing:-.035em; }
 .studio-preview article > header > p { max-width:62ch; margin-top:28px; color:var(--slate); font-size:1.1rem; line-height:1.7; }
 .studio-preview__body section { min-height:260px; display:grid; grid-template-columns:70px 1fr; gap:38px; align-content:center; border-bottom:1px solid; }
 .studio-preview__body section > span { font-size:.7rem; font-weight:700; }
@@ -119,4 +119,14 @@
   .studio-preview__bar { align-items:flex-start; flex-direction:column; }
   .studio-preview article > header { padding:76px 0 52px; }
   .studio-preview__body section { grid-template-columns:40px 1fr; gap:14px; }
+  .studio-header h1,
+  .studio-editor > header h1,
+  .studio-state h1 {
+    font-size: clamp(1.65rem, 6vw, 2.25rem);
+    line-height: 1.1;
+  }
+  .studio-preview h1 {
+    font-size: clamp(1.85rem, 6.5vw, 2.45rem);
+    line-height: 1.1;
+  }
 }

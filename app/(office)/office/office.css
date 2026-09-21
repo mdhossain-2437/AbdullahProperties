@@ -207,7 +207,7 @@
 .office-gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--office-paper); }
 .office-gate > section { width: min(760px,100%); min-height: 520px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 19px; padding: clamp(28px,6vw,70px); border: 1px solid var(--office-ink); border-radius: 28px; background: var(--office-card); }
 .office-gate > section > svg { width: 52px; height: 52px; color: var(--office-orange); }
-.office-gate h1 { font-size: clamp(2.25rem, 4.5vw, 3.75rem); font-weight: 650; letter-spacing: -0.035em; line-height: 1.05; }
+.office-gate h1 { font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 650; letter-spacing: -0.035em; line-height: 1.08; }
 .office-gate p { max-width: 62ch; color: var(--office-muted); line-height: 1.65; overflow-wrap: anywhere; }
 .office-gate > section > div { display: flex; flex-wrap: wrap; gap: 10px; }
 .office-eyebrow {
@@ -234,10 +234,10 @@
 .office-page-header h1 {
   max-width: 950px;
   margin-top: 16px;
-  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 650;
   letter-spacing: -0.035em;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 .office-page-header > div:first-child > p { max-width: 68ch; margin-top: 24px; color: var(--office-muted); line-height: 1.65; }
 .office-page-header__aside { display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column; gap: 14px; }
@@ -441,7 +441,7 @@
 .office-form { display: grid; gap: 22px; }
 .office-create-panel { display: grid; gap: 28px; margin-top: clamp(48px, 8vw, 110px); padding-top: clamp(36px, 6vw, 72px); border-top: 1px solid var(--office-ink); scroll-margin-top: 90px; }
 .office-form-intro { display: grid; gap: 13px; }
-.office-form-intro h2 { max-width: 920px; font-size: clamp(1.85rem, 3.5vw, 3rem); font-weight: 640; letter-spacing: -0.035em; line-height: 1.08; }
+.office-form-intro h2 { max-width: 920px; font-size: clamp(1.65rem, 3vw, 2.6rem); font-weight: 640; letter-spacing: -0.03em; line-height: 1.12; }
 .office-form-intro p { max-width: 68ch; color: var(--office-muted); line-height: 1.65; }
 .office-form-section { min-width: 0; padding: clamp(22px, 4vw, 36px); border: 1px solid var(--office-line); border-radius: 22px; background: var(--office-card); }
 .office-form-section legend { padding: 0 8px; font-family: var(--font-anybody); font-size: 1.3rem; font-weight: 650; }
@@ -503,7 +503,7 @@
 .invoice-sheet { max-width: 1040px; margin-inline: auto; border: 1px solid var(--office-ink); background: white; }
 .invoice-sheet__brand,.invoice-sheet__parties,.invoice-sheet__totals,.invoice-sheet__footer { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 40px; padding: 34px; }
 .invoice-sheet__brand { background: var(--office-ink); color: white; }
-.invoice-sheet__brand h1 { margin-top: 28px; font-size: clamp(2.25rem, 4.5vw, 3.75rem); line-height: 1.05; letter-spacing: -0.035em; }
+.invoice-sheet__brand h1 { margin-top: 28px; font-size: clamp(1.85rem, 3.8vw, 3rem); line-height: 1.08; letter-spacing: -0.035em; }
 .invoice-sheet__brand > div:last-child { text-align: right; }
 .invoice-sheet__parties { border-bottom: 1px solid var(--office-line); }
 .invoice-sheet__parties h2,.invoice-sheet__footer h2 { margin-bottom: 10px; font-size: .67rem; letter-spacing: .12em; text-transform: uppercase; }
@@ -571,6 +571,16 @@
   .invoice-sheet__totals > div { grid-column: 1 / -1; }
   .office-device-row { grid-template-columns: 34px minmax(0, 1fr); }
   .office-device-row > .office-status,.office-device-row > .office-button { grid-column: 2; justify-self: start; }
+  .office-gate h1,
+  .office-page-header h1,
+  .invoice-sheet__brand h1 {
+    font-size: clamp(1.65rem, 6vw, 2.25rem);
+    line-height: 1.1;
+  }
+  .office-form-intro h2 {
+    font-size: clamp(1.45rem, 5vw, 1.95rem);
+    line-height: 1.15;
+  }
 }
 
 @media print {

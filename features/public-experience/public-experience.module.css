@@ -427,13 +427,13 @@
 
 .trustIndex {
   display: block;
-  margin-bottom: clamp(3rem, 7vw, 7rem);
+  margin-bottom: clamp(2.5rem, 5vw, 5rem);
   color: var(--orange, #ff6b2c);
   font-family: var(--font-anybody, "Anybody"), sans-serif;
-  font-size: 3rem;
+  font-size: clamp(2.25rem, 3.5vw, 2.85rem);
   font-weight: 620;
-  letter-spacing: -0.06em;
-  line-height: 1;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
 }
 
 .trustItem h3 {
@@ -862,10 +862,10 @@
 
 .resultHeader h3 {
   margin: 0;
-  font-size: clamp(2rem, 4vw, 4rem);
+  font-size: clamp(1.45rem, 2.4vw, 2.25rem);
   font-weight: 630;
-  letter-spacing: -0.055em;
-  line-height: 1;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 
 .resultHeader p {
@@ -1039,6 +1039,18 @@
   .trustNote .textLink,
   .resourceToggle {
     grid-column: 2;
+  }
+
+  .sectionTitle,
+  .closingGrid h2 {
+    font-size: clamp(1.65rem, 6.2vw, 2.25rem);
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+  }
+
+  .resultHeader h3 {
+    font-size: clamp(1.35rem, 5vw, 1.85rem);
+    line-height: 1.18;
   }
 
   .formFooter {

@@ -84,9 +84,9 @@
 .hero h1 {
   max-width: 12ch;
   margin: 1.45rem 0 0;
-  font-size: clamp(2.25rem, 4.6vw, 4.25rem);
+  font-size: clamp(2.15rem, 4.4vw, 3.85rem);
   font-weight: 760;
-  line-height: 1.06;
+  line-height: 1.15;
 }
 
 .heroDescription {
@@ -207,9 +207,9 @@
 .storyIndex h2,
 .nextRoutesHeading h2 {
   margin: 1rem 0 0;
-  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  font-size: clamp(1.55rem, 2.5vw, 2.25rem);
   font-weight: 700;
-  line-height: 1.12;
+  line-height: 1.18;
 }
 
 .storyIndex ol {
@@ -433,9 +433,9 @@
 .cta h2 {
   max-width: 13ch;
   margin: 1rem 0 0;
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(1.85rem, 3.5vw, 3rem);
   font-weight: 760;
-  line-height: 1.08;
+  line-height: 1.15;
 }
 
 .cta h2 + p {
@@ -504,8 +504,13 @@
   }
 
   .hero h1 {
-    font-size: clamp(1.85rem, 7vw, 2.65rem);
-    line-height: 1.1;
+    font-size: clamp(1.75rem, 6.5vw, 2.5rem);
+    line-height: 1.15;
+  }
+
+  .cta h2 {
+    font-size: clamp(1.65rem, 6vw, 2.25rem);
+    line-height: 1.18;
   }
 
   .heroActions,

@@ -70,10 +70,10 @@
   margin: 0;
   color: var(--ink);
   font-family: var(--font-anybody), "Anybody", sans-serif;
-  font-size: clamp(2.85rem, 5.8vw, 5.5rem);
+  font-size: clamp(2.5rem, 5.2vw, 4.75rem);
   font-weight: 760;
-  letter-spacing: -0.04em;
-  line-height: 0.92;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
   text-transform: uppercase;
 }
 
@@ -327,7 +327,8 @@
   }
 
   .title {
-    font-size: clamp(2.6rem, 6.8vw, 4.5rem);
+    font-size: clamp(2.35rem, 6vw, 3.85rem);
+    line-height: 0.98;
   }
 
   .lineTwo {
@@ -358,9 +359,9 @@
   }
 
   .title {
-    font-size: clamp(2.15rem, 8.5vw, 3.25rem);
-    letter-spacing: -0.035em;
-    line-height: 0.95;
+    font-size: clamp(1.85rem, 7.5vw, 2.85rem);
+    letter-spacing: -0.03em;
+    line-height: 1.02;
   }
 
   .lineThree {
@@ -418,8 +419,8 @@
 
 @media (max-width: 390px) {
   .title {
-    font-size: clamp(1.85rem, 8.2vw, 2.35rem);
-    line-height: 1;
+    font-size: clamp(1.65rem, 7.8vw, 2.25rem);
+    line-height: 1.05;
   }
 
   .titleSignal {
