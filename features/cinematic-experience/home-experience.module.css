@@ -157,6 +157,7 @@
   height: 2.75rem;
   border: 1px solid currentColor;
   border-radius: 999px;
+  transition: transform 220ms ease-out, border-color 220ms ease-out;
 }
 
 .routeToggle::before,
@@ -651,7 +652,12 @@
 
 @media (hover: hover) and (pointer: fine) {
   .route:not([open]) summary:hover {
-    background: rgba(255, 107, 44, 0.12);
+    background: rgba(255, 107, 44, 0.08);
+  }
+
+  .route summary:hover .routeToggle {
+    transform: scale(1.08);
+    border-color: #ff6b2c;
   }
 
   .evidenceMedia:hover img {
@@ -824,6 +830,7 @@
 @media (prefers-reduced-motion: reduce) {
   .chapterTrack > span,
   .route,
+  .routeToggle,
   .routeToggle::before,
   .routeToggle::after,
   .ledgerToggle::before,
@@ -833,5 +840,6 @@
   .officeAction svg,
   .evidenceMedia img {
     transition-duration: 0.01ms !important;
+    transform: none !important;
   }
 }

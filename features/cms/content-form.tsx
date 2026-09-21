@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { AlertCircle, CheckCircle2, ExternalLink, Save, ShieldCheck } from "lucide-react";
-import { initialCmsActionState, saveContentAction } from "@/features/cms/actions";
+import { saveContentAction } from "@/features/cms/actions";
+import { initialCmsActionState } from "@/features/cms/action-state";
 import type { CmsRole } from "@/features/cms/auth";
 import type { CmsContentEntry } from "@/features/cms/types";
 

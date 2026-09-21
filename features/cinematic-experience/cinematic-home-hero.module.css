@@ -250,13 +250,19 @@
 }
 
 .chips a {
-  padding: 0.48rem 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 999px;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.88);
   font-family: var(--font-work-sans), "Work Sans", sans-serif;
-  font-size: 1rem;
-  transition: border-color 180ms ease-out, background-color 180ms ease-out, color 180ms ease-out;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1;
+  transition: border-color 200ms ease-out, background-color 200ms ease-out, color 200ms ease-out, transform 200ms ease-out;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -266,9 +272,10 @@
   }
 
   .chips a:hover {
-    border-color: white;
-    background: white;
+    border-color: #ffffff;
+    background: #ffffff;
     color: var(--ink);
+    transform: translateY(-1px);
   }
 }
 
@@ -437,5 +444,6 @@
   .searchForm button,
   .chips a {
     transition-duration: 0.01ms !important;
+    transform: none !important;
   }
 }

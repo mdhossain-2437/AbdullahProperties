@@ -1,4 +1,37 @@
-export const SITE_URL = "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
+const FALLBACK_SITE_URL = "https://abdullah-properties-joypurhat.zedamorello0079.chatgpt.site";
+
+function toHttpsOrigin(value: string | undefined): string | null {
+  if (!value?.trim()) return null;
+
+  try {
+    const candidate = value.trim();
+    const url = new URL(candidate.includes("://") ? candidate : `https://${candidate}`);
+    if (url.protocol !== "https:" || url.username || url.password) return null;
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A canonical origin is deliberately an environment concern rather than a
+ * source edit. `VERCEL_PROJECT_PRODUCTION_URL` keeps preview and production
+ * metadata pointed at one Vercel production host when Vercel system variables
+ * are enabled; an explicit public URL always wins for a business custom domain.
+ */
+function resolveSiteUrl(): string {
+  const environment: Record<string, string | undefined> =
+    typeof process === "undefined" ? {} : process.env;
+  return (
+    toHttpsOrigin(environment.NEXT_PUBLIC_SITE_URL) ??
+    toHttpsOrigin(environment.SITE_URL) ??
+    toHttpsOrigin(environment.VERCEL_PROJECT_PRODUCTION_URL) ??
+    toHttpsOrigin(environment.VERCEL_URL) ??
+    FALLBACK_SITE_URL
+  );
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 export const company = {
   name: "Abdullah Properties",

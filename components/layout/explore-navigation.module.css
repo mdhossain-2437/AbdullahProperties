@@ -243,10 +243,10 @@
 }
 
 .dialogClose {
-  min-height: 42px !important;
+  min-height: 44px !important;
   gap: 9px !important;
   border-radius: 999px !important;
-  padding-inline: 17px !important;
+  padding-inline: 18px !important;
 }
 
 .dialogClose:hover,
@@ -497,6 +497,21 @@
   gap: 8px;
 }
 
+.mobileOnly .languageToggle {
+  min-height: 44px;
+  padding: 2px;
+}
+
+.mobileOnly .languageOption {
+  min-width: 44px;
+  min-height: 44px;
+  padding-inline: 10px;
+}
+
+.mobileOnly .languageOption[lang="bn"] {
+  min-width: 54px;
+}
+
 .mobileTrigger {
   width: 44px !important;
   height: 44px !important;
@@ -529,8 +544,10 @@
 }
 
 .mobileClose {
-  width: 40px !important;
-  height: 40px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
   flex: 0 0 auto;
   border-radius: 999px !important;
 }
@@ -678,20 +695,6 @@
   .headerInner :global(.brand-logo) {
     width: 128px;
     height: 40px;
-  }
-
-  .mobileOnly .languageToggle {
-    min-height: 42px;
-  }
-
-  .mobileOnly .languageOption {
-    min-width: 36px;
-    min-height: 34px;
-    padding-inline: 8px;
-  }
-
-  .mobileOnly .languageOption[lang="bn"] {
-    min-width: 52px;
   }
 
   .mobilePanel {

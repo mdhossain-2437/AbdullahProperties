@@ -3,21 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAuthorizedCmsActor } from "@/features/cms/auth";
+import type { CmsActionState, CmsFormField } from "@/features/cms/action-state";
 import { createContentEntry, getContentEntry, seedCuratedContent, updateContentEntry } from "@/features/cms/repository";
 import { parseCmsContentForm, type CmsContentType } from "@/features/cms/types";
 import { validateCmsSubmission, validateCmsTransition } from "@/features/cms/workflow";
-
-export type CmsActionState = {
-  status: "idle" | "error" | "success";
-  message: string;
-  entryId?: string;
-  version?: number;
-  fieldErrors?: Partial<Record<CmsFormField, string>>;
-};
-
-export const initialCmsActionState: CmsActionState = { status: "idle", message: "" };
-
-type CmsFormField = "type" | "slug" | "title" | "excerpt" | "sections" | "status" | "verification" | "seoTitle" | "seoDescription";
 
 function revalidateContentPaths(type: CmsContentType, slug: string) {
   revalidatePath("/");
