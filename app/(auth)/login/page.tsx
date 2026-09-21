@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { BrandLogo } from "@/components/brand/brand-logo";
-import { createSessionToken, getAuthUser, SESSION_COOKIE_NAME } from "@/app/auth";
+import {
+  createSessionToken,
+  getAuthUser,
+  safeRelativeReturnPath,
+  timingSafeEqualStrings,
+  SESSION_COOKIE_NAME,
+} from "@/app/auth";
 import { LockKeyhole, ShieldCheck, ArrowRight, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -10,6 +16,58 @@ export const metadata: Metadata = {
   description: "Secure access to Abdullah Properties Office OS and Content Studio.",
   robots: { index: false, follow: false, noarchive: true, nocache: true },
 };
+
+type RateLimitRecord = { count: number; resetAt: number; lockedUntil?: number };
+const loginAttempts = new Map<string, RateLimitRecord>();
+const MAX_ATTEMPTS = 5;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+function checkRateLimit(key: string): { allowed: boolean; waitSeconds?: number } {
+  const now = Date.now();
+  const record = loginAttempts.get(key);
+  if (!record) return { allowed: true };
+
+  if (record.lockedUntil && record.lockedUntil > now) {
+    return {
+      allowed: false,
+      waitSeconds: Math.ceil((record.lockedUntil - now) / 1000),
+    };
+  }
+
+  if (now > record.resetAt) {
+    loginAttempts.delete(key);
+    return { allowed: true };
+  }
+
+  if (record.count >= MAX_ATTEMPTS) {
+    record.lockedUntil = now + LOCKOUT_MS;
+    return {
+      allowed: false,
+      waitSeconds: Math.ceil(LOCKOUT_MS / 1000),
+    };
+  }
+
+  return { allowed: true };
+}
+
+function recordFailedAttempt(key: string): void {
+  const now = Date.now();
+  const record = loginAttempts.get(key);
+  if (!record || now > record.resetAt) {
+    loginAttempts.set(key, { count: 1, resetAt: now + WINDOW_MS });
+  } else {
+    record.count += 1;
+    if (record.count >= MAX_ATTEMPTS) {
+      record.lockedUntil = now + LOCKOUT_MS;
+    }
+  }
+}
+
+function clearRateLimit(key: string): void {
+  loginAttempts.delete(key);
+}
+
 
 const loginStyles = `
   .login-page {
@@ -153,18 +211,36 @@ async function authenticateAction(formData: FormData) {
 
   const email = (formData.get("email") as string)?.trim().toLowerCase();
   const password = (formData.get("password") as string)?.trim();
-  const returnTo = (formData.get("return_to") as string)?.trim() || "/office";
+  const rawReturnTo = (formData.get("return_to") as string)?.trim() || "/office";
+  const returnTo = safeRelativeReturnPath(rawReturnTo);
+
+  const headersList = await headers();
+  const ip =
+    headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    headersList.get("x-real-ip") ||
+    "client";
+  const rateLimitKey = `${ip}:${email || "anonymous"}`;
+
+  const rateCheck = checkRateLimit(rateLimitKey);
+  if (!rateCheck.allowed) {
+    redirect(`/login?error=rate_limited&return_to=${encodeURIComponent(returnTo)}`);
+  }
 
   if (!email || !email.includes("@")) {
+    recordFailedAttempt(rateLimitKey);
     redirect(`/login?error=invalid_email&return_to=${encodeURIComponent(returnTo)}`);
   }
 
   if (!password) {
+    recordFailedAttempt(rateLimitKey);
     redirect(`/login?error=missing_password&return_to=${encodeURIComponent(returnTo)}`);
   }
 
   // Authorize against configured admin/owner/editor emails and credentials
-  const envPassword = process.env.AUTH_PASSWORD ?? process.env.ADMIN_KEY ?? "abdullah2026";
+  const envPassword = process.env.AUTH_PASSWORD ?? process.env.ADMIN_KEY;
+  const effectivePassword =
+    envPassword || (process.env.NODE_ENV !== "production" ? "abdullah2026" : undefined);
+
   const allowedEmails = (process.env.CMS_ALLOWED_EMAILS ?? "")
     .split(",")
     .map((e) => e.trim().toLowerCase())
@@ -179,9 +255,15 @@ async function authenticateAction(formData: FormData) {
     ownerEmails.includes(email) ||
     allowedEmails.includes(email);
 
-  if (!isOwnerOrEditor || password !== envPassword) {
+  if (!effectivePassword || !isOwnerOrEditor || !timingSafeEqualStrings(password, effectivePassword)) {
+    recordFailedAttempt(rateLimitKey);
+    // Artificial delay to mitigate brute force timing attacks
+    await new Promise((resolve) => setTimeout(resolve, 300));
     redirect(`/login?error=invalid_credentials&return_to=${encodeURIComponent(returnTo)}`);
   }
+
+  // Clear failed attempts upon successful authentication
+  clearRateLimit(rateLimitKey);
 
   const displayName = email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const token = await createSessionToken({
@@ -190,37 +272,43 @@ async function authenticateAction(formData: FormData) {
     fullName: displayName,
   });
 
+  const proto = headersList.get("x-forwarded-proto");
+  const host = headersList.get("host") || "";
+  const isLocalhost = host.startsWith("localhost") || host.startsWith("127.0.0.1") || host.includes(".local");
+  const isHttps = proto === "https" || (!isLocalhost && process.env.NODE_ENV === "production");
+
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isHttps,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
 
-  const safeReturnTo = returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/office";
-  redirect(safeReturnTo);
+  redirect(returnTo);
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const user = await getAuthUser();
   const query = await searchParams;
-  const returnTo = query.return_to || "/office";
+  const returnTo = safeRelativeReturnPath(query.return_to || "/office");
 
   if (user) {
-    const safeReturnTo = returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/office";
-    redirect(safeReturnTo);
+    redirect(returnTo);
   }
 
   const errorMessage =
-    query.error === "invalid_credentials"
-      ? "Invalid email or access key. Please check your credentials."
-      : query.error === "invalid_email"
-        ? "Please enter a valid email address."
-        : query.error === "missing_password"
-          ? "Please enter your access key or password."
-          : null;
+    query.error === "rate_limited"
+      ? "Too many failed sign-in attempts. Please wait 15 minutes before trying again."
+      : query.error === "invalid_credentials"
+        ? "Invalid email or access key. Please check your credentials."
+        : query.error === "invalid_email"
+          ? "Please enter a valid email address."
+          : query.error === "missing_password"
+            ? "Please enter your access key or password."
+            : null;
+
 
   return (
     <div className="login-page">

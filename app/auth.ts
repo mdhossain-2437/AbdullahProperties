@@ -203,8 +203,23 @@ export function signOutPath(returnTo = "/"): string {
 }
 export const chatGPTSignOutPath = signOutPath;
 
-function safeRelativeReturnPath(value: string): string {
-  if (!value.startsWith("/") || value.startsWith("//")) return "/";
+export function timingSafeEqualStrings(a: string, b: string): boolean {
+  const encoder = new TextEncoder();
+  const aBytes = encoder.encode(a);
+  const bBytes = encoder.encode(b);
+  if (aBytes.byteLength !== bBytes.byteLength) {
+    return false;
+  }
+  let diff = 0;
+  for (let i = 0; i < aBytes.byteLength; i++) {
+    diff |= aBytes[i] ^ bBytes[i];
+  }
+  return diff === 0;
+}
+
+export function safeRelativeReturnPath(value: string): string {
+  if (!value || typeof value !== "string") return "/";
+  if (!value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) return "/";
 
   let url: URL;
   try {
@@ -227,3 +242,4 @@ function isReservedAuthPath(pathname: string): boolean {
     pathname === "/callback"
   );
 }
+

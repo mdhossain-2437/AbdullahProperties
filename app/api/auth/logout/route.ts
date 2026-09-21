@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE_NAME } from "@/app/auth";
+import { safeRelativeReturnPath, SESSION_COOKIE_NAME } from "@/app/auth";
 
 export async function GET(request: NextRequest) {
   return handleLogout(request);
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 function handleLogout(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const returnTo = searchParams.get("return_to") ?? "/";
-  const safeReturnTo = returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/";
+  const safeReturnTo = safeRelativeReturnPath(returnTo);
 
   const response = NextResponse.redirect(new URL(safeReturnTo, request.url));
 
