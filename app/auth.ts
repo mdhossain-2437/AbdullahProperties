@@ -32,6 +32,9 @@ async function getHmacKey(secret: string): Promise<CryptoKey> {
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(bytes).toString("base64url");
+  }
   let binary = "";
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
@@ -40,6 +43,9 @@ function base64UrlEncode(bytes: Uint8Array): string {
 }
 
 function base64UrlDecode(str: string): Uint8Array {
+  if (typeof Buffer !== "undefined") {
+    return new Uint8Array(Buffer.from(str, "base64url"));
+  }
   let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
   while (base64.length % 4) {
     base64 += "=";
@@ -94,7 +100,9 @@ export async function verifySessionToken(token: string): Promise<AuthUser | null
 
     if (!isValid) return null;
 
-    const payloadJson = new TextDecoder().decode(base64UrlDecode(encodedPayload));
+    const payloadJson = typeof Buffer !== "undefined"
+      ? Buffer.from(encodedPayload, "base64url").toString("utf8")
+      : new TextDecoder().decode(base64UrlDecode(encodedPayload));
     const payload = JSON.parse(payloadJson);
 
     if (typeof payload.exp === "number" && payload.exp < Math.floor(Date.now() / 1000)) {
@@ -116,7 +124,7 @@ export async function verifySessionToken(token: string): Promise<AuthUser | null
 }
 
 async function readAuthUser(): Promise<AuthUser | null> {
-  // 1. Check HTTP-only session cookie
+  // 1. Check HTTP-only session cookie via cookies() API
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME)?.value;
@@ -127,6 +135,22 @@ async function readAuthUser(): Promise<AuthUser | null> {
   } catch {
     // cookies() may throw in unsupported contexts; proceed to headers
   }
+
+  // 2. Check raw Cookie header from request headers (critical for RSC client-side transitions)
+  try {
+    const requestHeaders = await headers();
+    const rawCookieHeader = requestHeaders.get("cookie");
+    if (rawCookieHeader) {
+      const match = rawCookieHeader.match(new RegExp(`(?:^|;\\s*)${SESSION_COOKIE_NAME}=([^;]+)`));
+      if (match && match[1]) {
+        const user = await verifySessionToken(decodeURIComponent(match[1]));
+        if (user) return user;
+      }
+    }
+  } catch {
+    // headers() may throw in unsupported contexts
+  }
+
 
   // 2. Check Authorization header (Bearer token)
   try {

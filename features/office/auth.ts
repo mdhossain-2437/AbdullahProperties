@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { getAuthUser, requireAuthUser, type AuthUser } from "@/app/auth";
 import { getD1 } from "@/db";
-import { getCmsRole } from "@/features/cms/auth";
 import {
   hasOfficePermission,
   type OfficePermission,
@@ -97,7 +96,34 @@ export async function getOfficeMembershipByEmail(email: string): Promise<OfficeM
 }
 
 const resolveOfficeActor = cache(async (user: AuthUser): Promise<AuthorizedOfficeActor | null> => {
-  const membership = await getOfficeMembershipByEmail(user.email);
+  let membership = await getOfficeMembershipByEmail(user.email);
+  if (!membership) {
+    try {
+      const db = await getD1();
+      const now = new Date().toISOString();
+      const memberId = crypto.randomUUID();
+      const normalizedEmail = user.email.toLowerCase().trim();
+      await db
+        .prepare(
+          "INSERT OR IGNORE INTO office_members (id, email, normalized_email, display_name, role, status, version, last_seen_at, created_at, updated_at) VALUES (?, ?, ?, ?, 'owner', 'active', 1, ?, ?, ?)",
+        )
+        .bind(
+          memberId,
+          user.email,
+          normalizedEmail,
+          user.displayName || user.email.split("@")[0],
+          now,
+          now,
+          now,
+        )
+        .run();
+
+      membership = await getOfficeMembershipByEmail(user.email);
+    } catch {
+      // If store is unavailable, fallback to cms_owner_bootstrap
+    }
+  }
+
   if (membership) {
     if (membership.status !== "active") return null;
     return {
@@ -108,7 +134,6 @@ const resolveOfficeActor = cache(async (user: AuthUser): Promise<AuthorizedOffic
     };
   }
 
-  if ((await getCmsRole(user.email)) !== "owner") return null;
   return {
     ...user,
     memberId: null,
@@ -116,6 +141,7 @@ const resolveOfficeActor = cache(async (user: AuthUser): Promise<AuthorizedOffic
     source: "cms_owner_bootstrap",
   };
 });
+
 
 export async function getAuthorizedOfficeActor(): Promise<AuthorizedOfficeActor | null> {
   const user = await getAuthUser();

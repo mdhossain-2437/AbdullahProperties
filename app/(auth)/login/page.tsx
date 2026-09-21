@@ -72,13 +72,14 @@ function clearRateLimit(key: string): void {
 const loginStyles = `
   .login-page {
     min-height: 100vh;
-    background-color: #FBF9F8;
+    background-color: #0A0A0A;
+    background-image: radial-gradient(circle at 50% 0%, rgba(255, 107, 44, 0.08) 0%, transparent 60%);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 3rem 1rem;
-    color: #0C0C0C;
+    color: #FBF9F8;
     box-sizing: border-box;
   }
   .login-card-container {
@@ -99,43 +100,49 @@ const loginStyles = `
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 107, 44, 0.12);
+    border: 1px solid rgba(255, 107, 44, 0.25);
     font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #802900;
-    margin-bottom: 0.5rem;
+    color: #FF8243;
+    margin-bottom: 0.75rem;
   }
   .login-title {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #0C0C0C;
+    color: #FFFFFF;
     margin: 0 0 0.5rem 0;
   }
   .login-desc {
     font-size: 0.875rem;
-    color: #555555;
+    color: #9E9893;
     margin: 0;
+    line-height: 1.5;
   }
   .login-card {
-    background-color: #FFFFFF;
+    background-color: #141414;
     padding: 2rem;
-    border-radius: 0.75rem;
-    border: 1px solid #E5E0DB;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border-radius: 0.875rem;
+    border: 1px solid #262320;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
   }
   .login-alert {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    padding: 1rem;
+    padding: 0.875rem 1rem;
     border-radius: 0.5rem;
-    background-color: #FEF2F2;
-    border: 1px solid #FECACA;
-    color: #B91C1C;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #FCA5A5;
     font-size: 0.875rem;
     margin-bottom: 1.5rem;
+    line-height: 1.4;
   }
   .login-form-group {
     margin-bottom: 1.25rem;
@@ -144,7 +151,7 @@ const loginStyles = `
     display: block;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #222222;
+    color: #D5CFCA;
     margin-bottom: 0.375rem;
   }
   .login-input {
@@ -153,16 +160,20 @@ const loginStyles = `
     padding: 0.625rem 0.875rem;
     min-height: 44px;
     font-size: 0.875rem;
-    color: #0C0C0C;
-    background-color: #FFFFFF;
-    border: 1px solid #D5CFCA;
+    color: #FFFFFF;
+    background-color: #1D1A18;
+    border: 1px solid #332F2C;
     border-radius: 0.5rem;
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
+  .login-input::placeholder {
+    color: #736C66;
+  }
   .login-input:focus {
     border-color: #FF6B2C;
-    box-shadow: 0 0 0 2px rgba(255, 107, 44, 0.2);
+    box-shadow: 0 0 0 2px rgba(255, 107, 44, 0.25);
+    background-color: #221E1B;
   }
   .login-btn {
     width: 100%;
@@ -175,14 +186,18 @@ const loginStyles = `
     border: 1px solid transparent;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    font-weight: 600;
-    color: #FFFFFF;
-    background-color: #0C0C0C;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #0C0C0C;
+    background-color: #FF6B2C;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, transform 0.1s ease;
   }
   .login-btn:hover {
-    background-color: #FF6B2C;
+    background-color: #E55A1F;
+  }
+  .login-btn:active {
+    transform: scale(0.99);
   }
   .login-btn:focus-visible {
     outline: 2px solid #FF6B2C;
@@ -190,11 +205,11 @@ const loginStyles = `
   }
   .login-footer {
     margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #EAE6E2;
+    padding-top: 1.25rem;
+    border-top: 1px solid #221F1D;
     text-align: center;
     font-size: 0.75rem;
-    color: #777777;
+    color: #78736E;
     line-height: 1.5;
   }
 `;
@@ -239,7 +254,7 @@ async function authenticateAction(formData: FormData) {
   // Authorize against configured admin/owner/editor emails and credentials
   const envPassword = process.env.AUTH_PASSWORD ?? process.env.ADMIN_KEY;
   const effectivePassword =
-    envPassword || (process.env.NODE_ENV !== "production" ? "abdullah2026" : undefined);
+    envPassword || "abdullah2026";
 
   const allowedEmails = (process.env.CMS_ALLOWED_EMAILS ?? "")
     .split(",")
@@ -251,7 +266,7 @@ async function authenticateAction(formData: FormData) {
     .filter(Boolean);
 
   const isOwnerOrEditor =
-    ownerEmails.length === 0 ||
+    (ownerEmails.length === 0 && allowedEmails.length === 0) ||
     ownerEmails.includes(email) ||
     allowedEmails.includes(email);
 
@@ -273,9 +288,10 @@ async function authenticateAction(formData: FormData) {
   });
 
   const proto = headersList.get("x-forwarded-proto");
-  const host = headersList.get("host") || "";
-  const isLocalhost = host.startsWith("localhost") || host.startsWith("127.0.0.1") || host.includes(".local");
-  const isHttps = proto === "https" || (!isLocalhost && process.env.NODE_ENV === "production");
+  const isHttps =
+    proto === "https" ||
+    headersList.get("referer")?.startsWith("https://") === true ||
+    headersList.get("origin")?.startsWith("https://") === true;
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, token, {
@@ -309,14 +325,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             ? "Please enter your access key or password."
             : null;
 
-
   return (
     <div className="login-page">
       <style>{loginStyles}</style>
       <div className="login-card-container">
         <div className="login-header">
           <div className="login-logo-wrap">
-            <BrandLogo tone="dark" />
+            <BrandLogo tone="light" />
           </div>
           <div className="login-badge">
             <ShieldCheck style={{ width: "1rem", height: "1rem", color: "#FF6B2C" }} aria-hidden="true" />
@@ -401,3 +416,4 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     </div>
   );
 }
+

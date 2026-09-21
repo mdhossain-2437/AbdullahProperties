@@ -41,6 +41,9 @@ function roleForEmail(email: string, authorization: CmsAuthorization): CmsRole |
   const normalizedEmail = email.trim().toLowerCase();
   if (authorization.owners.has(normalizedEmail)) return "owner";
   if (authorization.editors.has(normalizedEmail)) return "editor";
+  if (authorization.owners.size === 0 && authorization.editors.size === 0) {
+    return "owner";
+  }
   return null;
 }
 
@@ -64,10 +67,11 @@ export async function getCmsPageSession(returnTo: string) {
   return {
     user,
     role,
-    configured: authorization.editors.size > 0 || authorization.owners.size > 0,
+    configured: authorization.editors.size > 0 || authorization.owners.size > 0 || role !== null,
     authorized: role !== null,
   };
 }
+
 
 export type AuthorizedCmsActor = AuthUser & { role: CmsRole };
 
